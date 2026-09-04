@@ -12,8 +12,8 @@ export default function NewDogScreen() {
 
   function handleSubmit(payload: DogPayload) {
     createDog.mutate(payload, {
-      onSuccess: (dog) => {
-        router.replace(`/dog/${dog.id}`);
+      onSuccess: () => {
+        router.dismissTo('/(tabs)/dogs');
       },
     });
   }

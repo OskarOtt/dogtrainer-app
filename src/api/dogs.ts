@@ -29,4 +29,10 @@ export const dogsApi = {
   async remove(id: string): Promise<void> {
     await apiClient.delete(`/dogs/${id}`);
   },
+
+  /** Persists the new display order (index 0 = top of Dogs tab = first everywhere else). */
+  async reorder(dogIds: string[]): Promise<Dog[]> {
+    const { data } = await apiClient.put<Dog[]>('/dogs/order', { dogIds });
+    return data;
+  },
 };

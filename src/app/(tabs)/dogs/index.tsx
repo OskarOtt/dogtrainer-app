@@ -1,19 +1,20 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { ActivityIndicator, FlatList, Pressable, StyleSheet } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { DogCard } from '@/components/dog-card';
+import { DraggableDogList } from '@/components/draggable-dog-list';
 import { EmptyState } from '@/components/empty-state';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
-import { useDogs } from '@/hooks/use-dogs';
+import { useDogs, useReorderDogs } from '@/hooks/use-dogs';
 import { useTheme } from '@/hooks/use-theme';
 import { getApiErrorMessage } from '@/utils/apiError';
 
 export default function DogsScreen() {
   const { data: dogs, isLoading, isError, error } = useDogs();
+  const reorderDogs = useReorderDogs();
   const router = useRouter();
   const colors = useTheme();
 
@@ -39,12 +40,13 @@ export default function DogsScreen() {
         ) : !dogs || dogs.length === 0 ? (
           <EmptyState icon="paw-outline" title="No dogs yet" message="Add your first dog to get started." />
         ) : (
-          <FlatList
-            data={dogs}
-            keyExtractor={(dog) => dog.id}
-            contentContainerStyle={styles.list}
-            renderItem={({ item }) => <DogCard dog={item} onPress={() => router.push(`/dog/${item.id}`)} />}
-          />
+          <ScrollView contentContainerStyle={styles.list}>
+            <DraggableDogList
+              dogs={dogs}
+              onPressDog={(dog) => router.push(`/dog/${dog.id}`)}
+              onReorder={(reordered) => reorderDogs.mutate(reordered.map((dog) => dog.id))}
+            />
+          </ScrollView>
         )}
       </SafeAreaView>
     </ThemedView>
