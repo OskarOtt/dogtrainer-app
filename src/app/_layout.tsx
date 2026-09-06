@@ -35,18 +35,16 @@ function RootNavigator() {
         <Stack.Screen name="dog/[id]/goals/[goalId]/edit" options={{ headerShown: true }} />
         <Stack.Screen name="train/pick-dog" options={{ headerShown: true }} />
         <Stack.Screen name="train/[dogId]/index" options={{ headerShown: true }} />
-        <Stack.Screen name="train/[dogId]/[categoryId]/index" options={{ headerShown: true }} />
-        <Stack.Screen name="train/[dogId]/[categoryId]/[activityId]/index" options={{ headerShown: true }} />
         <Stack.Screen name="train/start/index" options={{ headerShown: true }} />
         <Stack.Screen name="train/plan/index" options={{ headerShown: true }} />
         <Stack.Screen name="train/plan/[dogId]/new" options={{ headerShown: true }} />
         <Stack.Screen name="train/plan/[dogId]/[planId]/edit" options={{ headerShown: true }} />
         <Stack.Screen name="train/plan-picker/index" options={{ headerShown: true }} />
-        <Stack.Screen name="train/plan-picker/[categoryId]/index" options={{ headerShown: true }} />
-        <Stack.Screen name="train/plan-picker/[categoryId]/[activityId]/index" options={{ headerShown: true }} />
         <Stack.Screen name="session/new" options={{ headerShown: true }} />
-        <Stack.Screen name="session/[id]" options={{ headerShown: true }} />
+        <Stack.Screen name="session/[id]" options={{ headerShown: false }} />
         <Stack.Screen name="progress/[dogId]" options={{ headerShown: true }} />
+        <Stack.Screen name="calendar/[date]/index" options={{ headerShown: true }} />
+        <Stack.Screen name="calendar/[date]/new-plan" options={{ headerShown: true }} />
       </Stack.Protected>
       <Stack.Protected guard={!isAuthenticated}>
         <Stack.Screen name="(auth)" />

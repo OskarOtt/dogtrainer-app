@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { DatePicker } from '@/components/date-picker';
+import { FormTextInput } from '@/components/form-text-input';
 import { PrimaryButton } from '@/components/primary-button';
 import { ThemedText } from '@/components/themed-text';
-import { Radii, Spacing } from '@/constants/theme';
-import { useTheme } from '@/hooks/use-theme';
+import { Spacing } from '@/constants/theme';
 import type { Goal, GoalPayload, GoalStatus } from '@/types/goal';
 
 export interface GoalFormProps {
@@ -25,17 +25,10 @@ const STATUS_OPTIONS: { label: string; value: GoalStatus }[] = [
 
 /** Shared add/edit form used by both the "new goal" and "edit goal" screens. */
 export function GoalForm({ initialValue, submitLabel, isSubmitting, errorMessage, onSubmit }: GoalFormProps) {
-  const colors = useTheme();
-
   const [title, setTitle] = useState(initialValue?.title ?? '');
   const [description, setDescription] = useState(initialValue?.description ?? '');
   const [targetDate, setTargetDate] = useState(initialValue?.targetDate ?? '');
   const [status, setStatus] = useState<GoalStatus>(initialValue?.status ?? 'NOT_STARTED');
-
-  const inputStyle = [
-    styles.input,
-    { color: colors.text, borderColor: colors.border, backgroundColor: colors.backgroundElement },
-  ];
 
   function handleSubmit() {
     onSubmit({
@@ -49,22 +42,16 @@ export function GoalForm({ initialValue, submitLabel, isSubmitting, errorMessage
   return (
     <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
       <ThemedText type="smallBold">Title</ThemedText>
-      <TextInput
-        value={title}
-        onChangeText={setTitle}
-        placeholder="e.g. Master recall"
-        placeholderTextColor={colors.textSecondary}
-        style={inputStyle}
-      />
+      <FormTextInput defaultValue={title} onChangeText={setTitle} placeholder="e.g. Master recall" />
 
       <ThemedText type="smallBold">Description</ThemedText>
-      <TextInput
-        value={description}
+      <FormTextInput
+        defaultValue={description}
         onChangeText={setDescription}
         placeholder="What does success look like?"
-        placeholderTextColor={colors.textSecondary}
         multiline
-        style={[inputStyle, styles.multiline]}
+        numberOfLines={4}
+        style={styles.multilineHost}
       />
 
       <ThemedText type="smallBold">Target date</ThemedText>
@@ -109,15 +96,7 @@ const styles = StyleSheet.create({
     padding: Spacing.four,
     gap: Spacing.two,
   },
-  input: {
-    minHeight: 48,
-    borderWidth: 1,
-    borderRadius: Radii.medium,
-    paddingHorizontal: Spacing.three,
-    fontSize: 16,
-    marginBottom: Spacing.two,
-  },
-  multiline: { minHeight: 88, textAlignVertical: 'top', paddingVertical: Spacing.two },
+  multilineHost: { height: 88, marginBottom: Spacing.two },
   statusGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',

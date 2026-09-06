@@ -21,3 +21,14 @@ export interface Exercise {
   difficulty: Difficulty;
   instructions: string | null;
 }
+
+/**
+ * An `Exercise` flattened together with its parent activity/category names,
+ * used to power the single searchable exercise list that replaced the old
+ * category → activity → exercise drill-down (see `useTrainingCatalogFlat`).
+ */
+export interface CatalogExercise extends Exercise {
+  activityName: string;
+  categoryId: string;
+  categoryName: string;
+}

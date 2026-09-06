@@ -1,7 +1,6 @@
-import { ActivityIndicator, Pressable, StyleSheet, useColorScheme, type ViewStyle } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, Text, useColorScheme, type ViewStyle } from 'react-native';
 
-import { ThemedText } from '@/components/themed-text';
-import { Colors, Radii, Spacing } from '@/constants/theme';
+import { Colors, Radii } from '@/constants/theme';
 
 export interface PrimaryButtonProps {
   title: string;
@@ -14,8 +13,10 @@ export interface PrimaryButtonProps {
 
 /**
  * Large, high-contrast touch target used for the app's primary actions
- * (Start Training, Save, Finish Session, etc.) — kept big and simple for
- * quick, low-friction use while actively training a dog.
+ * (Start Training, Save, Finish Session, etc.). Styled to match the iOS
+ * system button look (filled/tinted rounded-rect, system font weight, subtle
+ * press-state dimming) using plain `Pressable`/`Text` so its appearance is
+ * consistent and reliable across iOS, Android and web.
  */
 export function PrimaryButton({
   title,
@@ -29,38 +30,56 @@ export function PrimaryButton({
   const colors = Colors[scheme === 'dark' ? 'dark' : 'light'];
   const isDisabled = disabled || loading;
 
+  const isFilled = variant !== 'secondary';
   const backgroundColor =
     variant === 'danger' ? colors.danger : variant === 'secondary' ? colors.backgroundElement : colors.primary;
-  const textColor = variant === 'secondary' ? colors.text : colors.onPrimary;
+  const textColor = variant === 'secondary' ? colors.primary : colors.onPrimary;
 
   return (
     <Pressable
       onPress={onPress}
       disabled={isDisabled}
       style={({ pressed }) => [
-        styles.button,
-        { backgroundColor, opacity: isDisabled ? 0.6 : pressed ? 0.85 : 1 },
-        variant === 'secondary' && { borderWidth: 1, borderColor: colors.border },
+        styles.base,
+        {
+          backgroundColor,
+          borderColor: variant === 'secondary' ? colors.border : 'transparent',
+          borderWidth: variant === 'secondary' ? StyleSheet.hairlineWidth : 0,
+          opacity: isDisabled ? 0.5 : pressed ? 0.7 : 1,
+        },
+        isFilled ? styles.shadow : null,
         style,
-      ]}>
+      ]}
+    >
       {loading ? (
         <ActivityIndicator color={textColor} />
       ) : (
-        <ThemedText type="smallBold" themeColor={undefined} style={{ color: textColor, fontSize: 16 }}>
+        <Text style={[styles.label, { color: textColor }]} numberOfLines={1}>
           {title}
-        </ThemedText>
+        </Text>
       )}
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  button: {
-    minHeight: 56,
+  base: {
+    height: 50,
     borderRadius: Radii.medium,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: Spacing.four,
-    paddingVertical: Spacing.three,
+    paddingHorizontal: 16,
+  },
+  shadow: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  label: {
+    fontSize: 17,
+    fontWeight: '600',
+    letterSpacing: -0.2,
   },
 });

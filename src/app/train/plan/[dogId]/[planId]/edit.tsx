@@ -1,9 +1,9 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { ActivityIndicator, Alert } from 'react-native';
+import { ActivityIndicator } from 'react-native';
 
+import { ConfirmDialog } from '@/components/confirm-dialog';
 import { EmptyState } from '@/components/empty-state';
 import { PlanForm } from '@/components/plan-form';
-import { PrimaryButton } from '@/components/primary-button';
 import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
 import { useDeletePlan, usePlan, useUpdatePlan } from '@/hooks/use-plans';
@@ -30,16 +30,7 @@ export default function EditPlanScreen() {
   }
 
   function handleDelete() {
-    Alert.alert('Delete plan', 'Remove this training plan?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Delete',
-        style: 'destructive',
-        onPress: () => {
-          deletePlan.mutate(planId, { onSuccess: () => router.back() });
-        },
-      },
-    ]);
+    deletePlan.mutate(planId, { onSuccess: () => router.back() });
   }
 
   if (isLoading) {
@@ -69,12 +60,16 @@ export default function EditPlanScreen() {
         onSubmit={handleSubmit}
         pickerHref={`/train/plan-picker?returnTo=${encodeURIComponent(`/train/plan/${dogId}/${planId}/edit`)}`}
       />
-      <PrimaryButton
+      <ConfirmDialog
         title="Delete Plan"
         variant="danger"
-        onPress={handleDelete}
         loading={deletePlan.isPending}
         style={{ marginHorizontal: Spacing.four, marginBottom: Spacing.four }}
+        dialogTitle="Delete plan"
+        dialogMessage="Remove this training plan?"
+        confirmLabel="Delete"
+        destructive
+        onConfirm={handleDelete}
       />
     </ThemedView>
   );

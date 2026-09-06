@@ -14,8 +14,8 @@ import { getApiErrorMessage } from '@/utils/apiError';
 /**
  * Creates a training session, then adds pre-selected exercises before handing off to
  * the active session screen. Supports two entry points:
- *  - dogId + exerciseIds: the regular "Start Empty Training" flow (dog → category →
- *    activity → exercises).
+ *  - dogId + exerciseIds: the regular "Start Empty Training" flow (dog → pick
+ *    exercises from the searchable catalog).
  *  - planId: "Start Training" picked an existing training plan; the session is
  *    created for that plan's dog and pre-filled with all of the plan's exercises.
  * This screen shows a brief loading state and never stays on the navigation stack

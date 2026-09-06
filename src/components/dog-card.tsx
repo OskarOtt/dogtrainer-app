@@ -11,16 +11,22 @@ import { formatAge } from '@/utils/date';
 export interface DogCardProps {
   dog: Dog;
   onPress?: () => void;
+  /** Optional long-press handler, used by DraggableDogList to trigger drag-to-reorder. */
+  onLongPress?: () => void;
+  /** Disables press handling, e.g. while this card is the one actively being dragged. */
+  disabled?: boolean;
 }
 
 /** Card summarizing a dog for use in lists (Dogs tab, dog selection in Train flow). */
-export function DogCard({ dog, onPress }: DogCardProps) {
+export function DogCard({ dog, onPress, onLongPress, disabled }: DogCardProps) {
   const colors = useTheme();
   const age = formatAge(dog.birthDate);
 
   return (
     <Pressable
       onPress={onPress}
+      onLongPress={onLongPress}
+      disabled={disabled}
       style={({ pressed }) => [
         styles.card,
         { backgroundColor: colors.backgroundElement, borderColor: colors.border, opacity: pressed ? 0.85 : 1 },

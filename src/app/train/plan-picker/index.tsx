@@ -1,75 +1,37 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { ActivityIndicator, FlatList, StyleSheet, View } from 'react-native';
 
-import { EmptyState } from '@/components/empty-state';
+import { ExerciseCatalogPicker } from '@/components/exercise-catalog-picker';
 import { PrimaryButton } from '@/components/primary-button';
 import { ThemedView } from '@/components/themed-view';
-import { TrainingCategoryCard } from '@/components/training-category-card';
-import { Spacing } from '@/constants/theme';
-import { useTrainingCategories } from '@/hooks/use-training-catalog';
-import { usePlanPickerSelection } from '@/store/plan-exercise-picker';
-import { useTheme } from '@/hooks/use-theme';
-import { getApiErrorMessage } from '@/utils/apiError';
-import { ThemedText } from '@/components/themed-text';
+import { togglePlanPickerExercise, usePlanPickerSelection } from '@/store/plan-exercise-picker';
+import type { CatalogExercise } from '@/types/training';
 
 /**
- * Entry point for picking exercises to attach to a training plan. Mirrors the
- * regular /train category browse screen, but finishing here returns the picked
- * exercises to the Plan form instead of starting a session (see
- * src/store/plan-exercise-picker.ts).
+ * Entry point for picking exercises to attach to a training plan. A single
+ * searchable list of every exercise in the catalog (tagged with its
+ * category/activity) lets the user mix exercises from any activities; the
+ * picked exercises are written to the shared plan-exercise-picker store and
+ * read back by the Plan form (see src/store/plan-exercise-picker.ts).
  */
-export default function PlanPickerCategoriesScreen() {
+export default function PlanPickerScreen() {
   const { returnTo } = useLocalSearchParams<{ returnTo: string }>();
   const router = useRouter();
-  const colors = useTheme();
-  const { data: categories, isLoading, isError, error } = useTrainingCategories();
   const selection = usePlanPickerSelection();
+  const selectedIds = selection.map((exercise) => exercise.id);
+
+  function toggle(exercise: CatalogExercise) {
+    togglePlanPickerExercise({ id: exercise.id, activityId: exercise.activityId, name: exercise.name });
+  }
 
   return (
     <ThemedView style={{ flex: 1 }}>
-      <Stack.Screen options={{ title: 'Select Category' }} />
-      {isLoading ? (
-        <ActivityIndicator style={styles.loading} color={colors.primary} />
-      ) : isError ? (
-        <EmptyState icon="alert-circle-outline" title="Couldn't load categories" message={getApiErrorMessage(error)} />
-      ) : !categories || categories.length === 0 ? (
-        <EmptyState icon="layers-outline" title="No categories available" />
-      ) : (
-        <FlatList
-          data={categories}
-          keyExtractor={(category) => category.id}
-          contentContainerStyle={styles.list}
-          ListHeaderComponent={
-            <ThemedText themeColor="textSecondary" style={styles.header}>
-              Pick the exercises this plan should include.
-            </ThemedText>
-          }
-          renderItem={({ item }) => (
-            <TrainingCategoryCard
-              category={item}
-              onPress={() =>
-                router.push(`/train/plan-picker/${item.id}?returnTo=${encodeURIComponent(returnTo)}`)
-              }
-            />
-          )}
-        />
-      )}
-      <View style={[styles.footer, { backgroundColor: colors.background, borderTopColor: colors.border }]}>
-        <PrimaryButton
-          title={selection.length > 0 ? `Done (${selection.length})` : 'Done'}
-          onPress={() => router.dismissTo(returnTo as never)}
-        />
-      </View>
+      <Stack.Screen options={{ title: 'Select Exercises' }} />
+      <ExerciseCatalogPicker
+        headerMessage="Tap exercises to add or remove them from this plan."
+        selectedIds={selectedIds}
+        onToggle={toggle}
+        actionButton={<PrimaryButton title="Done" onPress={() => router.dismissTo(returnTo as never)} />}
+      />
     </ThemedView>
   );
 }
-
-const styles = StyleSheet.create({
-  loading: { marginTop: Spacing.six },
-  list: { padding: Spacing.four, gap: Spacing.three, paddingBottom: Spacing.six * 2 },
-  header: { marginBottom: Spacing.one },
-  footer: {
-    padding: Spacing.four,
-    borderTopWidth: 1,
-  },
-});

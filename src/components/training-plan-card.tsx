@@ -5,6 +5,7 @@ import { Radii, Spacing, StatusColors } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import type { TrainingPlan } from '@/types/plan';
 import { formatIsoDateDMY } from '@/utils/date';
+import { stripRichTextMarkup } from '@/utils/richText';
 
 export interface TrainingPlanCardProps {
   plan: TrainingPlan;
@@ -49,7 +50,7 @@ export function TrainingPlanCard({ plan, onPress, showDogName }: TrainingPlanCar
       ) : null}
       {plan.description ? (
         <ThemedText themeColor="textSecondary" numberOfLines={2}>
-          {plan.description}
+          {stripRichTextMarkup(plan.description)}
         </ThemedText>
       ) : null}
       <ThemedText themeColor="textSecondary" type="small">

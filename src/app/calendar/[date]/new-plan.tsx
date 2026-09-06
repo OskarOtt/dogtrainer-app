@@ -1,4 +1,4 @@
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -14,11 +14,12 @@ import { useTheme } from '@/hooks/use-theme';
 import { getApiErrorMessage } from '@/utils/apiError';
 
 /**
- * Dog picker for the "Start Empty Training" flow. Auto-selects (and skips itself)
- * when the user has only one dog, otherwise lets them choose which dog to train.
+ * Dog picker for "New Plan" from the Calendar Day View. Auto-selects (and skips itself)
+ * when the user has only one dog, otherwise lets them choose which dog the new plan is
+ * for, then continues to the plan form pre-filled with this day's date.
  */
-
-export default function PickDogScreen() {
+export default function CalendarNewPlanPickDogScreen() {
+  const { date } = useLocalSearchParams<{ date: string }>();
   const { data: dogs, isLoading, isError, error } = useDogs();
   const router = useRouter();
   const colors = useTheme();
@@ -27,9 +28,9 @@ export default function PickDogScreen() {
   useEffect(() => {
     if (!redirected.current && dogs && dogs.length === 1) {
       redirected.current = true;
-      router.replace(`/train/${dogs[0].id}`);
+      router.replace(`/train/plan/${dogs[0].id}/new?date=${date}`);
     }
-  }, [dogs, router]);
+  }, [dogs, date, router]);
 
   if (isLoading || (dogs && dogs.length === 1)) {
     return (
@@ -55,7 +56,7 @@ export default function PickDogScreen() {
     return (
       <ThemedView style={styles.container}>
         <SafeAreaView style={styles.safeArea} edges={['top']}>
-          <EmptyState icon="paw-outline" title="No dogs yet" message="Add a dog before starting a training session.">
+          <EmptyState icon="paw-outline" title="No dogs yet" message="Add a dog before creating a training plan.">
             <PrimaryButton title="Add a Dog" onPress={() => router.push('/dog/new')} style={styles.emptyButton} />
           </EmptyState>
         </SafeAreaView>
@@ -70,13 +71,15 @@ export default function PickDogScreen() {
           Choose a Dog
         </ThemedText>
         <ThemedText themeColor="textSecondary" style={styles.subtitle}>
-          Who are you training today?
+          Who is this training plan for?
         </ThemedText>
         <FlatList
           data={dogs}
           keyExtractor={(dog) => dog.id}
           contentContainerStyle={styles.list}
-          renderItem={({ item }) => <DogCard dog={item} onPress={() => router.push(`/train/${item.id}`)} />}
+          renderItem={({ item }) => (
+            <DogCard dog={item} onPress={() => router.push(`/train/plan/${item.id}/new?date=${date}`)} />
+          )}
         />
       </SafeAreaView>
     </ThemedView>

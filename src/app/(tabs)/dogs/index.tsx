@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { DraggableDogList } from '@/components/draggable-dog-list';
@@ -40,13 +40,11 @@ export default function DogsScreen() {
         ) : !dogs || dogs.length === 0 ? (
           <EmptyState icon="paw-outline" title="No dogs yet" message="Add your first dog to get started." />
         ) : (
-          <ScrollView contentContainerStyle={styles.list}>
-            <DraggableDogList
-              dogs={dogs}
-              onPressDog={(dog) => router.push(`/dog/${dog.id}`)}
-              onReorder={(reordered) => reorderDogs.mutate(reordered.map((dog) => dog.id))}
-            />
-          </ScrollView>
+          <DraggableDogList
+            dogs={dogs}
+            onPressDog={(dog) => router.push(`/dog/${dog.id}`)}
+            onReorder={(reordered) => reorderDogs.mutate(reordered.map((dog) => dog.id))}
+          />
         )}
       </SafeAreaView>
     </ThemedView>
@@ -73,9 +71,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   loading: { marginTop: Spacing.six },
-  list: {
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.three,
-    paddingBottom: Spacing.six,
-  },
 });

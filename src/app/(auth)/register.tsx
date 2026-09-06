@@ -1,6 +1,7 @@
+import { Host, TextInput } from '@expo/ui';
 import { Link, useRouter } from 'expo-router';
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TextInput } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { PrimaryButton } from '@/components/primary-button';
@@ -49,33 +50,54 @@ export default function RegisterScreen() {
               Track training progress for every dog you love.
             </ThemedText>
 
-            <TextInput
-              value={name}
-              onChangeText={setName}
-              placeholder="Name"
-              placeholderTextColor={colors.textSecondary}
-              autoComplete="name"
-              style={[styles.input, { color: colors.text, borderColor: colors.border, backgroundColor: colors.backgroundElement }]}
-            />
-            <TextInput
-              value={email}
-              onChangeText={setEmail}
-              placeholder="Email"
-              placeholderTextColor={colors.textSecondary}
-              autoCapitalize="none"
-              keyboardType="email-address"
-              autoComplete="email"
-              style={[styles.input, { color: colors.text, borderColor: colors.border, backgroundColor: colors.backgroundElement }]}
-            />
-            <TextInput
-              value={password}
-              onChangeText={setPassword}
-              placeholder="Password (min. 8 characters)"
-              placeholderTextColor={colors.textSecondary}
-              secureTextEntry
-              autoComplete="new-password"
-              style={[styles.input, { color: colors.text, borderColor: colors.border, backgroundColor: colors.backgroundElement }]}
-            />
+            <Host style={[styles.inputHost, { borderColor: colors.border, backgroundColor: colors.backgroundElement }]}>
+              <TextInput
+                defaultValue={name}
+                onChangeText={setName}
+                placeholder="Name"
+                placeholderTextColor={colors.textSecondary}
+                autoComplete="name"
+                textStyle={{ color: colors.text, fontSize: 17 }}
+                style={{
+                  paddingHorizontal: Spacing.three,
+                  paddingVertical: Spacing.two,
+                  height: 56,
+                }}
+              />
+            </Host>
+            <Host style={[styles.inputHost, { borderColor: colors.border, backgroundColor: colors.backgroundElement }]}>
+              <TextInput
+                defaultValue={email}
+                onChangeText={setEmail}
+                placeholder="Email"
+                placeholderTextColor={colors.textSecondary}
+                autoCapitalize="none"
+                keyboardType="email-address"
+                autoComplete="email"
+                textStyle={{ color: colors.text, fontSize: 17 }}
+                style={{
+                  paddingHorizontal: Spacing.three,
+                  paddingVertical: Spacing.two,
+                  height: 56,
+                }}
+              />
+            </Host>
+            <Host style={[styles.inputHost, { borderColor: colors.border, backgroundColor: colors.backgroundElement }]}>
+              <TextInput
+                defaultValue={password}
+                onChangeText={setPassword}
+                placeholder="Password (min. 8 characters)"
+                placeholderTextColor={colors.textSecondary}
+                secureTextEntry
+                autoComplete="new-password"
+                textStyle={{ color: colors.text, fontSize: 17 }}
+                style={{
+                  paddingHorizontal: Spacing.three,
+                  paddingVertical: Spacing.two,
+                  height: 56,
+                }}
+              />
+            </Host>
 
             {error ? (
               <ThemedText themeColor="danger" style={styles.error}>
@@ -112,12 +134,11 @@ const styles = StyleSheet.create({
   },
   title: { fontSize: 32 },
   subtitle: { marginBottom: Spacing.three },
-  input: {
-    minHeight: 52,
+  inputHost: {
+    height: 56,
     borderWidth: 1,
     borderRadius: Radii.medium,
-    paddingHorizontal: Spacing.three,
-    fontSize: 16,
+    overflow: 'hidden',
   },
   error: { textAlign: 'center' },
   button: { marginTop: Spacing.two },

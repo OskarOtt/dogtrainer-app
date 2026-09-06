@@ -1,8 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { ActivityIndicator, Alert, ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 
+import { ConfirmDialog } from '@/components/confirm-dialog';
 import { EmptyState } from '@/components/empty-state';
 import { PrimaryButton } from '@/components/primary-button';
 import { ThemedText } from '@/components/themed-text';
@@ -29,18 +30,9 @@ export default function DogDetailsScreen() {
     if (!dog) {
       return;
     }
-    Alert.alert('Delete dog', `Remove ${dog.name} and all of their training data?`, [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Delete',
-        style: 'destructive',
-        onPress: () => {
-          deleteDog.mutate(dog.id, {
-            onSuccess: () => router.replace('/(tabs)/dogs'),
-          });
-        },
-      },
-    ]);
+    deleteDog.mutate(dog.id, {
+      onSuccess: () => router.replace('/(tabs)/dogs'),
+    });
   }
 
   if (isLoading) {
@@ -87,7 +79,7 @@ export default function DogDetailsScreen() {
             </ThemedText>
             <ThemedText themeColor="textSecondary">
               {statistics.completedSessions} sessions completed · {formatDuration(statistics.totalTrainingMinutes)}{' '}
-              total · {statistics.currentStreakDays} day streak ·{' '}
+              total · {statistics.currentStreakWeeks} {statistics.currentStreakWeeks === 1 ? 'week' : 'weeks'} streak ·{' '}
               {Math.round(statistics.averageSuccessRate * 100)}% avg success
             </ThemedText>
           </View>
@@ -139,7 +131,17 @@ export default function DogDetailsScreen() {
           onPress={() => router.push(`/dog/${dog.id}/edit`)}
           style={styles.button}
         />
-        <PrimaryButton title="Delete Dog" variant="danger" onPress={handleDelete} style={styles.button} />
+        <ConfirmDialog
+          title="Delete Dog"
+          variant="danger"
+          loading={deleteDog.isPending}
+          style={styles.button}
+          dialogTitle="Delete dog"
+          dialogMessage={`Remove ${dog.name} and all of their training data?`}
+          confirmLabel="Delete"
+          destructive
+          onConfirm={handleDelete}
+        />
       </ScrollView>
     </ThemedView>
   );

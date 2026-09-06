@@ -5,7 +5,7 @@ export interface DogStatistics {
   completedSessions: number;
   totalTrainingMinutes: number;
   sessionsThisWeek: number;
-  currentStreakDays: number;
+  currentStreakWeeks: number;
   averageSuccessRate: number;
 }
 
@@ -26,7 +26,7 @@ export interface DogProgress {
   history: TrainingSession[];
   totalTrainingMinutes: number;
   sessionsPerWeek: number;
-  currentStreakDays: number;
+  currentStreakWeeks: number;
   averageSuccessRate: number;
   exerciseProgress: ExerciseProgressEntry[];
 }

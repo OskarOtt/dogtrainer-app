@@ -1,14 +1,18 @@
 import { Ionicons } from '@expo/vector-icons';
+import { SegmentedControl } from '@expo/ui/community/segmented-control';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, FlatList, StyleSheet, TextInput, View } from 'react-native';
+import { ActivityIndicator, BackHandler, FlatList, Platform, Pressable, StyleSheet, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { ConfirmDialog } from '@/components/confirm-dialog';
 import { EmptyState } from '@/components/empty-state';
 import { PrimaryButton } from '@/components/primary-button';
+import { TenTapNotesEditor } from '@/components/rich-text/tentap-notes-editor';
 import { SessionExerciseCard } from '@/components/session-exercise-card';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Radii, Spacing } from '@/constants/theme';
+import { Spacing } from '@/constants/theme';
 import { useExercise } from '@/hooks/use-training-catalog';
 import {
   useCancelSession,
@@ -28,14 +32,20 @@ function SessionExerciseRow({
   sessionExercise,
   disabled,
   onRemove,
-  onIncrementRepetitions,
-  onIncrementSuccessful,
+  onIncrementSuccess,
+  onDecrementSuccess,
+  onIncrementFail,
+  onDecrementFail,
+  onNotesBlur,
 }: {
   sessionExercise: SessionExercise;
   disabled: boolean;
   onRemove: () => void;
-  onIncrementRepetitions: () => void;
-  onIncrementSuccessful: () => void;
+  onIncrementSuccess: () => void;
+  onDecrementSuccess: () => void;
+  onIncrementFail: () => void;
+  onDecrementFail: () => void;
+  onNotesBlur?: (notes: string | null) => void;
 }) {
   const { data: exercise } = useExercise(sessionExercise.exerciseId);
   return (
@@ -44,8 +54,11 @@ function SessionExerciseRow({
       exerciseName={exercise?.name ?? 'Exercise'}
       disabled={disabled}
       onRemove={onRemove}
-      onIncrementRepetitions={onIncrementRepetitions}
-      onIncrementSuccessful={onIncrementSuccessful}
+      onIncrementSuccess={onIncrementSuccess}
+      onDecrementSuccess={onDecrementSuccess}
+      onIncrementFail={onIncrementFail}
+      onDecrementFail={onDecrementFail}
+      onNotesBlur={onNotesBlur}
     />
   );
 }
@@ -62,14 +75,8 @@ export default function ActiveSessionScreen() {
   const updateSessionExercise = useUpdateSessionExercise(id ?? '');
   const removeSessionExercise = useRemoveSessionExercise(id ?? '');
 
-  const [notes, setNotes] = useState('');
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
-
-  useEffect(() => {
-    if (session) {
-      setNotes(session.notes ?? '');
-    }
-  }, [session?.id, session?.notes]);
+  const [activeTab, setActiveTab] = useState<'exercises' | 'notes'>('exercises');
 
   useEffect(() => {
     if (!session || session.status !== 'IN_PROGRESS') {
@@ -81,6 +88,16 @@ export default function ActiveSessionScreen() {
     const interval = setInterval(tick, 1000);
     return () => clearInterval(interval);
   }, [session?.startedAt, session?.status]);
+
+  // Prevent leaving an in-progress session via the Android hardware back button —
+  // Finish/Cancel are the only supported exits while training is active.
+  useEffect(() => {
+    if (Platform.OS !== 'android' || !session || session.status !== 'IN_PROGRESS') {
+      return;
+    }
+    const subscription = BackHandler.addEventListener('hardwareBackPress', () => true);
+    return () => subscription.remove();
+  }, [session?.status]);
 
   if (isLoading) {
     return (
@@ -99,50 +116,25 @@ export default function ActiveSessionScreen() {
   }
 
   const isActive = session.status === 'IN_PROGRESS';
-  const dogId = session.dogId;
   const sessionNotes = session.notes;
 
   function handleFinish() {
-    Alert.alert('Finish session', 'Mark this training session as complete?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Finish',
-        onPress: () => {
-          completeSession.mutate(undefined, {
-            onSuccess: () => router.replace(`/train/${dogId}`),
-          });
-        },
-      },
-    ]);
+    completeSession.mutate(undefined, {
+      onSuccess: () => router.replace('/(tabs)'),
+    });
   }
 
   function handleCancel() {
-    Alert.alert('Cancel session', 'Discard this training session? This cannot be undone.', [
-      { text: 'Keep Training', style: 'cancel' },
-      {
-        text: 'Discard',
-        style: 'destructive',
-        onPress: () => {
-          cancelSession.mutate(undefined, {
-            onSuccess: () => router.replace(`/train/${dogId}`),
-          });
-        },
-      },
-    ]);
+    cancelSession.mutate(undefined, {
+      onSuccess: () => router.replace('/(tabs)'),
+    });
   }
 
   function handleRemoveExercise(sessionExerciseId: string) {
     removeSessionExercise.mutate(sessionExerciseId);
   }
 
-  function handleIncrementRepetitions(sessionExercise: SessionExercise) {
-    updateSessionExercise.mutate({
-      exerciseId: sessionExercise.id,
-      payload: { repetitions: sessionExercise.repetitions + 1 },
-    });
-  }
-
-  function handleIncrementSuccessful(sessionExercise: SessionExercise) {
+  function handleIncrementSuccess(sessionExercise: SessionExercise) {
     updateSessionExercise.mutate({
       exerciseId: sessionExercise.id,
       payload: {
@@ -152,15 +144,74 @@ export default function ActiveSessionScreen() {
     });
   }
 
-  function handleNotesBlur() {
-    if (notes !== (sessionNotes ?? '')) {
-      updateSession.mutate({ notes: notes.trim() || null });
+  function handleDecrementSuccess(sessionExercise: SessionExercise) {
+    if (sessionExercise.successfulRepetitions <= 0) {
+      return;
+    }
+    updateSessionExercise.mutate({
+      exerciseId: sessionExercise.id,
+      payload: {
+        repetitions: sessionExercise.repetitions - 1,
+        successfulRepetitions: sessionExercise.successfulRepetitions - 1,
+      },
+    });
+  }
+
+  function handleIncrementFail(sessionExercise: SessionExercise) {
+    updateSessionExercise.mutate({
+      exerciseId: sessionExercise.id,
+      payload: { repetitions: sessionExercise.repetitions + 1 },
+    });
+  }
+
+  function handleDecrementFail(sessionExercise: SessionExercise) {
+    const fail = sessionExercise.repetitions - sessionExercise.successfulRepetitions;
+    if (fail <= 0) {
+      return;
+    }
+    updateSessionExercise.mutate({
+      exerciseId: sessionExercise.id,
+      payload: { repetitions: sessionExercise.repetitions - 1 },
+    });
+  }
+
+  function handleUpdateExerciseNotes(sessionExercise: SessionExercise, notes: string | null) {
+    if (notes === (sessionExercise.notes ?? null)) {
+      return;
+    }
+    updateSessionExercise.mutate({ exerciseId: sessionExercise.id, payload: { notes } });
+  }
+
+  function handleNotesBlur(html: string) {
+    if (html !== (sessionNotes ?? '')) {
+      updateSession.mutate({ notes: html.trim() || null });
     }
   }
 
   return (
     <ThemedView style={{ flex: 1 }}>
-      <Stack.Screen options={{ title: isActive ? 'Training Session' : 'Session Summary' }} />
+      <Stack.Screen
+        options={{
+          headerShown: false,
+          gestureEnabled: !isActive,
+          fullScreenGestureEnabled: !isActive,
+        }}
+      />
+
+      <SafeAreaView style={styles.topSafeArea} edges={['top']}>
+        <View style={styles.headerRow}>
+          {!isActive ? (
+            <Pressable onPress={() => router.back()} hitSlop={8} style={styles.backButton}>
+              <Ionicons name="chevron-back" size={26} color={colors.primary} />
+            </Pressable>
+          ) : (
+            <View style={styles.backButtonPlaceholder} />
+          )}
+          <ThemedText type="title" style={styles.pageTitle}>
+            {isActive ? 'Training Session' : 'Session Summary'}
+          </ThemedText>
+        </View>
+      </SafeAreaView>
 
       <View style={[styles.timerBar, { backgroundColor: colors.backgroundElement, borderColor: colors.border }]}>
         <Ionicons name="time-outline" size={22} color={colors.primary} />
@@ -170,67 +221,87 @@ export default function ActiveSessionScreen() {
         <ThemedText themeColor="textSecondary">{isActive ? 'Elapsed' : 'Duration'}</ThemedText>
       </View>
 
-      <FlatList
-        data={session.exercises}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.list}
-        ListHeaderComponent={
-          isActive ? (
-            <PrimaryButton
-              title="Add Exercise"
-              variant="secondary"
-              onPress={() => router.push(`/train/${session.dogId}?sessionId=${session.id}`)}
-              style={styles.addButton}
+      <View style={styles.tabsHost}>
+        <SegmentedControl
+          values={['Exercises', 'Notes']}
+          selectedIndex={activeTab === 'exercises' ? 0 : 1}
+          onValueChange={(value) => setActiveTab(value === 'Notes' ? 'notes' : 'exercises')}
+          style={styles.tabs}
+        />
+      </View>
+
+      <View style={activeTab === 'exercises' ? styles.tabPane : styles.tabPaneHidden}>
+        <FlatList
+          data={session.exercises}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.list}
+          ListHeaderComponent={
+            isActive ? (
+              <PrimaryButton
+                title="Add Exercise"
+                variant="secondary"
+                onPress={() => router.push(`/train/${session.dogId}?sessionId=${session.id}`)}
+                style={styles.addButton}
+              />
+            ) : undefined
+          }
+          renderItem={({ item }) => (
+            <SessionExerciseRow
+              sessionExercise={item}
+              disabled={!isActive}
+              onRemove={() => handleRemoveExercise(item.id)}
+              onIncrementSuccess={() => handleIncrementSuccess(item)}
+              onDecrementSuccess={() => handleDecrementSuccess(item)}
+              onIncrementFail={() => handleIncrementFail(item)}
+              onDecrementFail={() => handleDecrementFail(item)}
+              onNotesBlur={isActive ? (notes) => handleUpdateExerciseNotes(item, notes) : undefined}
             />
-          ) : undefined
-        }
-        renderItem={({ item }) => (
-          <SessionExerciseRow
-            sessionExercise={item}
-            disabled={!isActive}
-            onRemove={() => handleRemoveExercise(item.id)}
-            onIncrementRepetitions={() => handleIncrementRepetitions(item)}
-            onIncrementSuccessful={() => handleIncrementSuccessful(item)}
-          />
-        )}
-        ListEmptyComponent={
-          <EmptyState
-            icon="barbell-outline"
-            title="No exercises yet"
-            message={isActive ? 'Add an exercise to start recording reps.' : 'No exercises were recorded.'}
-          />
-        }
-        ListFooterComponent={
-          <View style={styles.notesSection}>
-            <ThemedText type="smallBold">Notes</ThemedText>
-            <TextInput
-              value={notes}
-              onChangeText={setNotes}
-              onBlur={handleNotesBlur}
-              editable={isActive}
-              placeholder="How did it go?"
-              placeholderTextColor={colors.textSecondary}
-              multiline
-              style={[
-                styles.notesInput,
-                { color: colors.text, borderColor: colors.border, backgroundColor: colors.backgroundElement },
-              ]}
+          )}
+          ListEmptyComponent={
+            <EmptyState
+              icon="barbell-outline"
+              title="No exercises yet"
+              message={isActive ? 'Add an exercise to start recording reps.' : 'No exercises were recorded.'}
             />
-          </View>
-        }
-      />
+          }
+        />
+      </View>
+
+      <View style={[activeTab === 'notes' ? styles.tabPane : styles.tabPaneHidden, styles.list, styles.notesTab]}>
+        <TenTapNotesEditor
+          key={session.id}
+          initialContent={session.notes}
+          editable={isActive}
+          onChangeHtml={isActive ? handleNotesBlur : undefined}
+          onBlurHtml={isActive ? handleNotesBlur : undefined}
+          style={styles.notesEditor}
+        />
+      </View>
 
       {isActive ? (
-        <View style={[styles.footer, { backgroundColor: colors.background, borderTopColor: colors.border }]}>
-          <PrimaryButton title="Finish Session" onPress={handleFinish} loading={completeSession.isPending} />
-          <PrimaryButton
-            title="Cancel Session"
-            variant="danger"
-            onPress={handleCancel}
-            loading={cancelSession.isPending}
-            style={styles.cancelButton}
+        <SafeAreaView edges={['bottom']} style={[styles.footer, { backgroundColor: colors.background, borderTopColor: colors.border }]}>
+          <ConfirmDialog
+            title="Finish"
+            loading={completeSession.isPending}
+            style={styles.footerButton}
+            dialogTitle="Finish session"
+            dialogMessage="Mark this training session as complete?"
+            confirmLabel="Finish"
+            onConfirm={handleFinish}
           />
-        </View>
+          <ConfirmDialog
+            title="Cancel"
+            variant="danger"
+            loading={cancelSession.isPending}
+            style={styles.footerButton}
+            dialogTitle="Cancel session"
+            dialogMessage="Discard this training session? This cannot be undone."
+            confirmLabel="Discard"
+            cancelLabel="Keep Training"
+            destructive
+            onConfirm={handleCancel}
+          />
+        </SafeAreaView>
       ) : null}
     </ThemedView>
   );
@@ -238,6 +309,11 @@ export default function ActiveSessionScreen() {
 
 const styles = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  topSafeArea: { paddingHorizontal: Spacing.four },
+  headerRow: { flexDirection: 'row', alignItems: 'center', paddingTop: Spacing.two, gap: Spacing.two },
+  backButton: { padding: Spacing.one, marginLeft: -Spacing.one },
+  backButtonPlaceholder: { width: 26 + Spacing.one * 2, marginLeft: -Spacing.one },
+  pageTitle: { fontSize: 22 },
   timerBar: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -247,21 +323,20 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   timerText: { fontSize: 32, lineHeight: 36 },
+  tabsHost: { paddingHorizontal: Spacing.four, paddingTop: Spacing.three },
+  tabs: { height: 36 },
+  tabPane: { flex: 1 },
+  tabPaneHidden: { display: 'none' },
   list: { padding: Spacing.four, gap: Spacing.three, flexGrow: 1 },
+  notesTab: { flex: 1 },
+  notesEditor: { flex: 1 },
   addButton: { marginBottom: Spacing.one },
-  notesSection: { gap: Spacing.two, marginTop: Spacing.two },
-  notesInput: {
-    minHeight: 88,
-    borderWidth: 1,
-    borderRadius: Radii.medium,
-    padding: Spacing.three,
-    fontSize: 16,
-    textAlignVertical: 'top',
-  },
   footer: {
-    padding: Spacing.four,
+    flexDirection: 'row',
+    paddingHorizontal: 5,
+    paddingVertical: 20,
     borderTopWidth: 1,
-    gap: Spacing.two,
+    height: 80,
   },
-  cancelButton: { marginTop: 0 },
+  footerButton: { flex: 1, width: 100, marginHorizontal: 5 },
 });

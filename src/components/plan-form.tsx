@@ -1,9 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
 import { DatePicker } from '@/components/date-picker';
+import { FormTextInput } from '@/components/form-text-input';
 import { PrimaryButton } from '@/components/primary-button';
 import { ThemedText } from '@/components/themed-text';
 import { Radii, Spacing } from '@/constants/theme';
@@ -19,6 +20,8 @@ export interface PlanFormProps {
   onSubmit: (payload: TrainingPlanPayload) => void;
   /** Route to push to when the user taps "Add Exercises", to browse the training catalog. */
   pickerHref: string;
+  /** Pre-fills the start date field for a brand-new plan (e.g. from the Calendar Day View). Ignored when initialValue is set. */
+  initialStartDate?: string;
 }
 
 const STATUS_OPTIONS: { label: string; value: PlanStatus }[] = [
@@ -36,13 +39,14 @@ export function PlanForm({
   errorMessage,
   onSubmit,
   pickerHref,
+  initialStartDate,
 }: PlanFormProps) {
   const colors = useTheme();
   const router = useRouter();
 
   const [name, setName] = useState(initialValue?.name ?? '');
   const [description, setDescription] = useState(initialValue?.description ?? '');
-  const [startDate, setStartDate] = useState(initialValue?.startDate ?? '');
+  const [startDate, setStartDate] = useState(initialValue?.startDate ?? initialStartDate ?? '');
   const [endDate, setEndDate] = useState(initialValue?.endDate ?? '');
   const [status, setStatus] = useState<PlanStatus>(initialValue?.status ?? 'NOT_STARTED');
   // The picker screens write directly into this shared store (see
@@ -57,11 +61,6 @@ export function PlanForm({
     resetPlanPickerSelection(initialValue?.exercises ?? []);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const inputStyle = [
-    styles.input,
-    { color: colors.text, borderColor: colors.border, backgroundColor: colors.backgroundElement },
-  ];
 
   function handleAddExercises() {
     router.push(pickerHref as never);
@@ -85,22 +84,16 @@ export function PlanForm({
   return (
     <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
       <ThemedText type="smallBold">Name</ThemedText>
-      <TextInput
-        value={name}
-        onChangeText={setName}
-        placeholder="e.g. 8-week obedience plan"
-        placeholderTextColor={colors.textSecondary}
-        style={inputStyle}
-      />
+      <FormTextInput defaultValue={name} onChangeText={setName} placeholder="e.g. 8-week obedience plan" />
 
       <ThemedText type="smallBold">Description</ThemedText>
-      <TextInput
-        value={description}
+      <FormTextInput
+        defaultValue={description}
         onChangeText={setDescription}
         placeholder="What does this plan cover?"
-        placeholderTextColor={colors.textSecondary}
         multiline
-        style={[inputStyle, styles.multiline]}
+        numberOfLines={9}
+        style={styles.descriptionHost}
       />
 
       <ThemedText type="smallBold">Start date</ThemedText>
@@ -176,15 +169,7 @@ const styles = StyleSheet.create({
     padding: Spacing.four,
     gap: Spacing.two,
   },
-  input: {
-    minHeight: 48,
-    borderWidth: 1,
-    borderRadius: Radii.medium,
-    paddingHorizontal: Spacing.three,
-    fontSize: 16,
-    marginBottom: Spacing.two,
-  },
-  multiline: { minHeight: 88, textAlignVertical: 'top', paddingVertical: Spacing.two },
+  descriptionHost: { height: 187, marginBottom: Spacing.two },
   noExercises: { marginBottom: Spacing.two },
   exerciseList: { gap: Spacing.two, marginBottom: Spacing.two },
   exerciseRow: {

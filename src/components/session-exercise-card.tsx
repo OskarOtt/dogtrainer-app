@@ -1,6 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
+import { RichTextEditor } from '@/components/rich-text/rich-text-editor';
+import { RichTextView } from '@/components/rich-text/rich-text-view';
 import { ThemedText } from '@/components/themed-text';
 import { Radii, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
@@ -9,27 +12,39 @@ import type { SessionExercise } from '@/types/session';
 export interface SessionExerciseCardProps {
   sessionExercise: SessionExercise;
   exerciseName: string;
-  onIncrementRepetitions: () => void;
-  onIncrementSuccessful: () => void;
+  onIncrementSuccess: () => void;
+  onDecrementSuccess: () => void;
+  onIncrementFail: () => void;
+  onDecrementFail: () => void;
   onRemove: () => void;
+  /** Commits an edited per-exercise note once the notes field loses focus. Omit while read-only. */
+  onNotesBlur?: (notes: string | null) => void;
   disabled?: boolean;
 }
 
 /**
  * Large-touch-target card used during an active training session to record
- * repetitions and successful repetitions with a single tap each — optimized
- * for quick use while actively training a dog (no typing required).
+ * successful and failed repetitions with dedicated +1/-1 controls (the -1
+ * controls let the trainer correct an accidental tap) — optimized for quick
+ * use while actively training a dog (no typing required). `repetitions` is
+ * always `successfulRepetitions + fail`, so fail is derived rather than
+ * stored separately.
  */
 export function SessionExerciseCard({
   sessionExercise,
   exerciseName,
-  onIncrementRepetitions,
-  onIncrementSuccessful,
+  onIncrementSuccess,
+  onDecrementSuccess,
+  onIncrementFail,
+  onDecrementFail,
   onRemove,
+  onNotesBlur,
   disabled,
 }: SessionExerciseCardProps) {
   const colors = useTheme();
   const successRatePercent = Math.round(sessionExercise.successRate * 100);
+  const fail = sessionExercise.repetitions - sessionExercise.successfulRepetitions;
+  const [notes, setNotes] = useState(sessionExercise.notes ?? '');
 
   return (
     <View style={[styles.card, { backgroundColor: colors.backgroundElement, borderColor: colors.border }]}>
@@ -43,40 +58,89 @@ export function SessionExerciseCard({
       </View>
 
       <View style={styles.countersRow}>
-        <Pressable
-          onPress={onIncrementRepetitions}
-          disabled={disabled}
-          style={({ pressed }) => [
-            styles.counterButton,
-            { backgroundColor: colors.backgroundSelected, opacity: disabled ? 0.5 : pressed ? 0.8 : 1 },
-          ]}>
-          <ThemedText type="title" style={styles.counterValue}>
-            {sessionExercise.repetitions}
+        <View style={[styles.counterGroup, { backgroundColor: colors.danger + '22' }]}>
+          <ThemedText type="title" style={[styles.counterValue, { color: colors.danger }]}>
+            {fail}
           </ThemedText>
           <ThemedText themeColor="textSecondary" type="smallBold">
-            Reps (+1)
+            Fail
           </ThemedText>
-        </Pressable>
+          <View style={styles.counterButtonsRow}>
+            <Pressable
+                onPress={onDecrementFail}
+                disabled={disabled || fail <= 0}
+                style={({ pressed }) => [
+                  styles.counterButton,
+                  { backgroundColor: colors.background, opacity: disabled || fail <= 0 ? 0.4 : pressed ? 0.7 : 1 },
+                ]}>
+              <ThemedText type="subtitle">-1</ThemedText>
+            </Pressable>
+            <Pressable
+                onPress={onIncrementFail}
+                disabled={disabled}
+                style={({ pressed }) => [
+                  styles.counterButton,
+                  { backgroundColor: colors.background, opacity: disabled ? 0.4 : pressed ? 0.7 : 1 },
+                ]}>
+              <ThemedText type="subtitle">+1</ThemedText>
+            </Pressable>
+          </View>
+        </View>
 
-        <Pressable
-          onPress={onIncrementSuccessful}
-          disabled={disabled}
-          style={({ pressed }) => [
-            styles.counterButton,
-            { backgroundColor: colors.success + '22', opacity: disabled ? 0.5 : pressed ? 0.8 : 1 },
-          ]}>
+        <View style={[styles.counterGroup, { backgroundColor: colors.success + '22' }]}>
           <ThemedText type="title" style={[styles.counterValue, { color: colors.success }]}>
             {sessionExercise.successfulRepetitions}
           </ThemedText>
           <ThemedText themeColor="textSecondary" type="smallBold">
-            Success (+1)
+            Success
           </ThemedText>
-        </Pressable>
+          <View style={styles.counterButtonsRow}>
+            <Pressable
+              onPress={onDecrementSuccess}
+              disabled={disabled || sessionExercise.successfulRepetitions <= 0}
+              style={({ pressed }) => [
+                styles.counterButton,
+                {
+                  backgroundColor: colors.background,
+                  opacity: disabled || sessionExercise.successfulRepetitions <= 0 ? 0.4 : pressed ? 0.7 : 1,
+                },
+              ]}>
+              <ThemedText type="subtitle">-1</ThemedText>
+            </Pressable>
+            <Pressable
+              onPress={onIncrementSuccess}
+              disabled={disabled}
+              style={({ pressed }) => [
+                styles.counterButton,
+                { backgroundColor: colors.background, opacity: disabled ? 0.4 : pressed ? 0.7 : 1 },
+              ]}>
+              <ThemedText type="subtitle">+1</ThemedText>
+            </Pressable>
+          </View>
+        </View>
       </View>
 
-      <ThemedText themeColor="textSecondary" type="small">
-        Success rate: {successRatePercent}%
-      </ThemedText>
+      <View style={[styles.summaryRow, { borderTopColor: colors.border }]}>
+        <ThemedText themeColor="textSecondary" type="small">
+          Success rate: {successRatePercent}%
+        </ThemedText>
+        <ThemedText themeColor="textSecondary" type="small">
+          Total reps: {sessionExercise.repetitions}
+        </ThemedText>
+      </View>
+
+      {onNotesBlur && !disabled ? (
+        <RichTextEditor
+          key={sessionExercise.id}
+          defaultValue={notes}
+          onChangeText={setNotes}
+          onBlur={() => onNotesBlur(notes.trim() || null)}
+          placeholder="Notes for this exercise…"
+          style={styles.notesHost}
+        />
+      ) : sessionExercise.notes ? (
+        <RichTextView value={sessionExercise.notes} />
+      ) : null}
     </View>
   );
 }
@@ -99,14 +163,34 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: Spacing.two,
   },
+  counterGroup: {
+    flex: 1,
+    borderRadius: Radii.medium,
+    paddingVertical: Spacing.two,
+    paddingHorizontal: Spacing.two,
+    alignItems: 'center',
+    gap: Spacing.one,
+  },
+  counterValue: { fontSize: 32, lineHeight: 36 },
+  counterButtonsRow: {
+    flexDirection: 'row',
+    gap: Spacing.one,
+    marginTop: Spacing.one,
+    width: '100%',
+  },
   counterButton: {
     flex: 1,
     borderRadius: Radii.medium,
-    paddingVertical: Spacing.three,
+    paddingVertical: Spacing.two,
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 88,
-    gap: Spacing.one,
+    minHeight: 48,
   },
-  counterValue: { fontSize: 36, lineHeight: 40 },
+  summaryRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingTop: Spacing.two,
+    borderTopWidth: 1,
+  },
+  notesHost: { minHeight: 100 },
 });

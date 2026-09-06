@@ -10,7 +10,7 @@ import { StatCard } from '@/components/stat-card';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { TrainingSessionCard } from '@/components/training-session-card';
-import { Radii, Spacing } from '@/constants/theme';
+import { BottomTabInset, Radii, Spacing } from '@/constants/theme';
 import { useDogs } from '@/hooks/use-dogs';
 import { useDogGoals } from '@/hooks/use-goals';
 import { useDogSessions } from '@/hooks/use-sessions';
@@ -107,7 +107,7 @@ export default function HomeScreen() {
                 <StatCard
                   icon="flame-outline"
                   label="Training streak"
-                  value={`${statistics?.currentStreakDays ?? 0} days`}
+                  value={`${statistics?.currentStreakWeeks ?? 0} ${(statistics?.currentStreakWeeks ?? 0) === 1 ? 'week' : 'weeks'}`}
                 />
                 <StatCard
                   icon="time-outline"
@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   safeArea: { flex: 1 },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  scroll: { padding: Spacing.four, gap: Spacing.three },
+  scroll: { padding: Spacing.four, paddingBottom: Spacing.four + BottomTabInset, gap: Spacing.three },
   title: { fontSize: 28 },
   emptyButton: { marginTop: Spacing.three, minWidth: 200 },
   dogPicker: { flexGrow: 0, marginBottom: Spacing.one },

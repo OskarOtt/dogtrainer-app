@@ -10,6 +10,8 @@ import { formatDateTime, formatDuration } from '@/utils/date';
 export interface TrainingSessionCardProps {
   session: TrainingSession;
   onPress?: () => void;
+  /** Optional owning dog's name, shown under the date row (e.g. in cross-dog calendar lists). */
+  dogName?: string | null;
 }
 
 const STATUS_LABELS: Record<TrainingSession['status'], string> = {
@@ -19,7 +21,7 @@ const STATUS_LABELS: Record<TrainingSession['status'], string> = {
 };
 
 /** Card summarizing a training session for use in history/progress lists. */
-export function TrainingSessionCard({ session, onPress }: TrainingSessionCardProps) {
+export function TrainingSessionCard({ session, onPress, dogName }: TrainingSessionCardProps) {
   const colors = useTheme();
   const statusColor = StatusColors[session.status];
 
@@ -47,6 +49,11 @@ export function TrainingSessionCard({ session, onPress }: TrainingSessionCardPro
             </ThemedText>
           </View>
         </View>
+        {dogName ? (
+          <ThemedText themeColor="textSecondary" type="small" numberOfLines={1}>
+            {dogName}
+          </ThemedText>
+        ) : null}
         <ThemedText themeColor="textSecondary" numberOfLines={1}>
           {[
             session.location,

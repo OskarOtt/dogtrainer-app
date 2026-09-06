@@ -44,7 +44,7 @@ export default function DogProgressScreen() {
         <View style={styles.statsGrid}>
           <StatCard icon="time-outline" label="Total training time" value={formatDuration(progress.totalTrainingMinutes)} />
           <StatCard icon="calendar-outline" label="Sessions / week" value={progress.sessionsPerWeek.toFixed(1)} />
-          <StatCard icon="flame-outline" label="Current streak" value={`${progress.currentStreakDays} days`} />
+          <StatCard icon="flame-outline" label="Current streak" value={`${progress.currentStreakWeeks} ${progress.currentStreakWeeks === 1 ? 'week' : 'weeks'}`} />
           <StatCard
             icon="checkmark-circle-outline"
             label="Avg. success rate"

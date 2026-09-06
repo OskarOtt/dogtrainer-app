@@ -3,10 +3,10 @@ import { useSyncExternalStore } from 'react';
 import type { PlanExercise } from '@/types/plan';
 
 /**
- * Tiny pub/sub store used only to carry the exercises a user picks while browsing
- * the category → activity → exercise screens (in "plan picker" mode) back to the
- * Plan Training form, since expo-router has no built-in way to return a value from
- * a pushed screen. The Plan form subscribes to this while it's focused and copies
+ * Tiny pub/sub store used only to carry the exercises a user picks from the flat,
+ * searchable exercise catalog screen (`/train/plan-picker`) back to the Plan
+ * Training form, since expo-router has no built-in way to return a value from a
+ * pushed screen. The Plan form subscribes to this while it's focused and copies
  * the selection into its own local state; the store itself holds no long-term state.
  */
 let selection: PlanExercise[] = [];

@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { PrimaryButton } from '@/components/primary-button';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Radii, Spacing } from '@/constants/theme';
+import { BottomTabInset, Radii, Spacing } from '@/constants/theme';
 import { useAuth } from '@/hooks/use-auth';
 import { useTheme } from '@/hooks/use-theme';
 
@@ -32,7 +32,7 @@ export default function ProfileScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  safeArea: { flex: 1, padding: Spacing.four, gap: Spacing.four },
+  safeArea: { flex: 1, padding: Spacing.four, paddingBottom: Spacing.six + BottomTabInset, gap: Spacing.four },
   title: { fontSize: 28 },
   card: {
     borderWidth: 1,

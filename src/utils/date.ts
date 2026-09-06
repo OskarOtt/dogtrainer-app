@@ -1,3 +1,24 @@
+/** Formats a Date as a local (no timezone shift) ISO date string, YYYY-MM-DD. */
+export function toIsoDateLocal(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+/** Parses an ISO date (YYYY-MM-DD) into a local Date at midnight. Returns null when invalid/missing. */
+export function parseIsoDateLocal(iso: string | null | undefined): Date | null {
+  if (!iso) {
+    return null;
+  }
+  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso);
+  if (!match) {
+    return null;
+  }
+  const [, year, month, day] = match;
+  return new Date(Number(year), Number(month) - 1, Number(day));
+}
+
 /** Formats an ISO date (YYYY-MM-DD) as dd-mm-yyyy for display. Returns '' when invalid/missing. */
 export function formatIsoDateDMY(iso: string | null | undefined): string {
   if (!iso) {

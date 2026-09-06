@@ -8,7 +8,7 @@ import type { TrainingPlanPayload } from '@/types/plan';
 import { getApiErrorMessage } from '@/utils/apiError';
 
 export default function NewPlanScreen() {
-  const { dogId } = useLocalSearchParams<{ dogId: string }>();
+  const { dogId, date } = useLocalSearchParams<{ dogId: string; date?: string }>();
   const router = useRouter();
   const createPlan = useCreatePlan(dogId);
 
@@ -30,6 +30,7 @@ export default function NewPlanScreen() {
         errorMessage={createPlan.isError ? getApiErrorMessage(createPlan.error) : null}
         onSubmit={handleSubmit}
         pickerHref={`/train/plan-picker?returnTo=${encodeURIComponent(`/train/plan/${dogId}/new`)}`}
+        initialStartDate={date}
       />
     </ThemedView>
   );

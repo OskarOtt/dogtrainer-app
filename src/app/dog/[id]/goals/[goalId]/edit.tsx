@@ -1,9 +1,9 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { ActivityIndicator, Alert } from 'react-native';
+import { ActivityIndicator } from 'react-native';
 
+import { ConfirmDialog } from '@/components/confirm-dialog';
 import { EmptyState } from '@/components/empty-state';
 import { GoalForm } from '@/components/goal-form';
-import { PrimaryButton } from '@/components/primary-button';
 import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
 import { useDeleteGoal, useGoal, useUpdateGoal } from '@/hooks/use-goals';
@@ -26,16 +26,7 @@ export default function EditGoalScreen() {
   }
 
   function handleDelete() {
-    Alert.alert('Delete goal', 'Remove this goal?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Delete',
-        style: 'destructive',
-        onPress: () => {
-          deleteGoal.mutate(goalId, { onSuccess: () => router.back() });
-        },
-      },
-    ]);
+    deleteGoal.mutate(goalId, { onSuccess: () => router.back() });
   }
 
   if (isLoading) {
@@ -64,12 +55,16 @@ export default function EditGoalScreen() {
         errorMessage={updateGoal.isError ? getApiErrorMessage(updateGoal.error) : null}
         onSubmit={handleSubmit}
       />
-      <PrimaryButton
+      <ConfirmDialog
         title="Delete Goal"
         variant="danger"
-        onPress={handleDelete}
         loading={deleteGoal.isPending}
         style={{ marginHorizontal: Spacing.four, marginBottom: Spacing.four }}
+        dialogTitle="Delete goal"
+        dialogMessage="Remove this goal?"
+        confirmLabel="Delete"
+        destructive
+        onConfirm={handleDelete}
       />
     </ThemedView>
   );
