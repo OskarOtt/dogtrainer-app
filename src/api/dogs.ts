@@ -1,5 +1,6 @@
 import { apiClient } from '@/api/client';
 import type { Dog, DogPayload } from '@/types/dog';
+import type { UploadUrlRequest, UploadUrlResponse } from '@/types/media';
 
 /**
  * Thin wrapper around the /dogs endpoints. UI code and hooks should only ever
@@ -34,5 +35,19 @@ export const dogsApi = {
   async reorder(dogIds: string[]): Promise<Dog[]> {
     const { data } = await apiClient.put<Dog[]>('/dogs/order', { dogIds });
     return data;
+  },
+
+  async getMediaUploadUrl(id: string, payload: UploadUrlRequest): Promise<UploadUrlResponse> {
+    const { data } = await apiClient.post<UploadUrlResponse>(`/dogs/${id}/media/upload-url`, payload);
+    return data;
+  },
+
+  async confirmMedia(id: string, objectKey: string): Promise<Dog> {
+    const { data } = await apiClient.put<Dog>(`/dogs/${id}/media`, { objectKey });
+    return data;
+  },
+
+  async removeMedia(id: string): Promise<void> {
+    await apiClient.delete(`/dogs/${id}/media`);
   },
 };

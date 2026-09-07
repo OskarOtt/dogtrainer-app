@@ -1,16 +1,15 @@
-import { Ionicons } from '@expo/vector-icons';
-import { Image } from 'expo-image';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { EmptyState } from '@/components/empty-state';
+import { MediaAvatarPicker } from '@/components/media-avatar-picker';
 import { PrimaryButton } from '@/components/primary-button';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { TrainingSessionCard } from '@/components/training-session-card';
 import { Radii, Spacing } from '@/constants/theme';
-import { useDeleteDog, useDog } from '@/hooks/use-dogs';
+import { useDeleteDog, useDog, useRemoveDogMedia, useUploadDogMedia } from '@/hooks/use-dogs';
 import { useDogSessions } from '@/hooks/use-sessions';
 import { useDogStatistics } from '@/hooks/use-stats';
 import { useTheme } from '@/hooks/use-theme';
@@ -25,6 +24,14 @@ export default function DogDetailsScreen() {
   const { data: sessions } = useDogSessions(id);
   const { data: statistics } = useDogStatistics(id);
   const deleteDog = useDeleteDog();
+  const uploadMedia = useUploadDogMedia(id as string);
+  const removeMedia = useRemoveDogMedia(id as string);
+  const isMediaBusy = uploadMedia.isPending || removeMedia.isPending;
+  const mediaErrorMessage = uploadMedia.isError
+    ? getApiErrorMessage(uploadMedia.error)
+    : removeMedia.isError
+      ? getApiErrorMessage(removeMedia.error)
+      : null;
 
   function handleDelete() {
     if (!dog) {
@@ -57,13 +64,29 @@ export default function DogDetailsScreen() {
     <ThemedView style={{ flex: 1 }}>
       <Stack.Screen options={{ title: dog.name }} />
       <ScrollView contentContainerStyle={styles.container}>
-        <View style={[styles.avatar, { backgroundColor: colors.backgroundSelected }]}>
-          {dog.imageUrl ? (
-            <Image source={{ uri: dog.imageUrl }} style={styles.avatarImage} contentFit="cover" />
-          ) : (
-            <Ionicons name="paw" size={40} color={colors.primary} />
-          )}
-        </View>
+        <MediaAvatarPicker
+          uri={dog.mediaUrl}
+          mediaType={dog.mediaType}
+          size={96}
+          placeholderIcon="paw"
+          allowVideo
+          isBusy={isMediaBusy}
+          onSelect={(asset) => uploadMedia.mutate(asset)}
+        />
+        {mediaErrorMessage ? (
+          <ThemedText themeColor="danger" style={styles.error}>
+            {mediaErrorMessage}
+          </ThemedText>
+        ) : null}
+        {dog.mediaUrl ? (
+          <PrimaryButton
+            title="Remove Photo"
+            variant="secondary"
+            disabled={isMediaBusy}
+            onPress={() => removeMedia.mutate()}
+            style={styles.removeButton}
+          />
+        ) : null}
 
         <ThemedText type="title" style={styles.name}>
           {dog.name}
@@ -113,12 +136,6 @@ export default function DogDetailsScreen() {
         />
 
         <PrimaryButton
-          title="Goals"
-          variant="secondary"
-          onPress={() => router.push(`/dog/${dog.id}/goals`)}
-          style={styles.button}
-        />
-        <PrimaryButton
           title="View Progress"
           variant="secondary"
           onPress={() => router.push(`/progress/${dog.id}`)}
@@ -154,17 +171,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: Spacing.two,
   },
-  avatar: {
-    width: 96,
-    height: 96,
-    borderRadius: Radii.pill,
-    alignItems: 'center',
-    justifyContent: 'center',
-    overflow: 'hidden',
-    marginBottom: Spacing.two,
-  },
-  avatarImage: { width: '100%', height: '100%' },
-  name: { fontSize: 28 },
+  removeButton: { paddingHorizontal: Spacing.four },
+  error: { textAlign: 'center', paddingHorizontal: Spacing.four },
+  name: { fontSize: 28, marginTop: Spacing.two },
   subtitle: { marginBottom: Spacing.three },
   card: {
     alignSelf: 'stretch',

@@ -32,8 +32,10 @@ export function DogCard({ dog, onPress, onLongPress, disabled }: DogCardProps) {
         { backgroundColor: colors.backgroundElement, borderColor: colors.border, opacity: pressed ? 0.85 : 1 },
       ]}>
       <View style={[styles.avatar, { backgroundColor: colors.backgroundSelected }]}>
-        {dog.imageUrl ? (
-          <Image source={{ uri: dog.imageUrl }} style={styles.avatarImage} contentFit="cover" />
+        {dog.mediaUrl && dog.mediaType !== 'VIDEO' ? (
+          <Image source={{ uri: dog.mediaUrl }} style={styles.avatarImage} contentFit="cover" />
+        ) : dog.mediaType === 'VIDEO' ? (
+          <Ionicons name="videocam" size={28} color={colors.primary} />
         ) : (
           <Ionicons name="paw" size={28} color={colors.primary} />
         )}

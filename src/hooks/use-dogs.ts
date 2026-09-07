@@ -1,7 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import type { ImagePickerAsset } from 'expo-image-picker';
 
 import { dogsApi } from '@/api/dogs';
 import type { Dog, DogPayload } from '@/types/dog';
+import { getAssetFileSize, resolveContentType, uploadAssetToPresignedUrl } from '@/utils/upload';
 
 const dogsKey = ['dogs'] as const;
 const dogKey = (id: string) => ['dogs', id] as const;
@@ -48,6 +50,35 @@ export function useDeleteDog() {
     mutationFn: (id: string) => dogsApi.remove(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: dogsKey });
+    },
+  });
+}
+
+/** Full presign → upload → confirm flow for a dog's photo/video. */
+export function useUploadDogMedia(dogId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (asset: ImagePickerAsset) => {
+      const contentType = resolveContentType(asset);
+      const fileSizeBytes = getAssetFileSize(asset);
+      const { uploadUrl, objectKey } = await dogsApi.getMediaUploadUrl(dogId, { contentType, fileSizeBytes });
+      await uploadAssetToPresignedUrl(asset, uploadUrl, contentType);
+      return dogsApi.confirmMedia(dogId, objectKey);
+    },
+    onSuccess: (dog) => {
+      queryClient.setQueryData(dogKey(dogId), dog);
+      queryClient.invalidateQueries({ queryKey: dogsKey });
+    },
+  });
+}
+
+export function useRemoveDogMedia(dogId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => dogsApi.removeMedia(dogId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: dogsKey });
+      queryClient.invalidateQueries({ queryKey: dogKey(dogId) });
     },
   });
 }

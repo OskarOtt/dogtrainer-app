@@ -62,6 +62,7 @@ export default function TrainScreen() {
         <View style={styles.buttons}>
           <PrimaryButton title="Start Training" onPress={() => router.push('/train/start')} />
           <PrimaryButton title="Plan Training" variant="secondary" onPress={() => router.push('/train/plan')} />
+          <PrimaryButton title="Add Goal" variant="secondary" onPress={() => router.push('/dog/goals/pick-dog')} />
         </View>
       </SafeAreaView>
     </ThemedView>

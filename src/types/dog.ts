@@ -1,5 +1,7 @@
 export type DogSex = 'MALE' | 'FEMALE';
 
+export type DogMediaType = 'IMAGE' | 'VIDEO';
+
 export interface Dog {
   id: string;
   name: string;
@@ -7,7 +9,8 @@ export interface Dog {
   birthDate: string | null;
   sex: DogSex | null;
   weight: number | null;
-  imageUrl: string | null;
+  mediaUrl: string | null;
+  mediaType: DogMediaType | null;
   createdAt: string;
 }
 
@@ -17,5 +20,4 @@ export interface DogPayload {
   birthDate?: string | null;
   sex?: DogSex | null;
   weight?: number | null;
-  imageUrl?: string | null;
 }

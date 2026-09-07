@@ -28,7 +28,6 @@ export function DogForm({ initialValue, submitLabel, isSubmitting, errorMessage,
   const [birthDate, setBirthDate] = useState(initialValue?.birthDate ?? '');
   const [sex, setSex] = useState<DogSex | null>(initialValue?.sex ?? null);
   const [weight, setWeight] = useState(initialValue?.weight != null ? String(initialValue.weight) : '');
-  const [imageUrl, setImageUrl] = useState(initialValue?.imageUrl ?? '');
 
   function handleSubmit() {
     const parsedWeight = weight.trim() ? Number(weight.trim()) : null;
@@ -38,7 +37,6 @@ export function DogForm({ initialValue, submitLabel, isSubmitting, errorMessage,
       birthDate: birthDate.trim() || null,
       sex,
       weight: parsedWeight != null && !Number.isNaN(parsedWeight) ? parsedWeight : null,
-      imageUrl: imageUrl.trim() || null,
     });
   }
 
@@ -77,9 +75,6 @@ export function DogForm({ initialValue, submitLabel, isSubmitting, errorMessage,
 
       <ThemedText type="smallBold">Weight (kg)</ThemedText>
       <FormTextInput defaultValue={weight} onChangeText={setWeight} placeholder="e.g. 25.5" keyboardType="decimal-pad" />
-
-      <ThemedText type="smallBold">Photo URL</ThemedText>
-      <FormTextInput defaultValue={imageUrl} onChangeText={setImageUrl} placeholder="https://..." autoCapitalize="none" />
 
       {errorMessage ? (
         <ThemedText themeColor="danger" style={styles.error}>

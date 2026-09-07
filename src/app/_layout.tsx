@@ -32,6 +32,7 @@ function RootNavigator() {
         <Stack.Screen name="dog/[id]/edit" options={{ headerShown: true }} />
         <Stack.Screen name="dog/[id]/goals/index" options={{ headerShown: true }} />
         <Stack.Screen name="dog/[id]/goals/new" options={{ headerShown: true }} />
+        <Stack.Screen name="dog/goals/pick-dog" options={{ headerShown: true }} />
         <Stack.Screen name="dog/[id]/goals/[goalId]/edit" options={{ headerShown: true }} />
         <Stack.Screen name="train/pick-dog" options={{ headerShown: true }} />
         <Stack.Screen name="train/[dogId]/index" options={{ headerShown: true }} />
