@@ -120,7 +120,7 @@ export default function ActiveSessionScreen() {
 
   function handleFinish() {
     completeSession.mutate(undefined, {
-      onSuccess: () => router.replace('/(tabs)'),
+      onSuccess: () => router.replace(`/post/new?sessionId=${id}`),
     });
   }
 
@@ -300,6 +300,16 @@ export default function ActiveSessionScreen() {
             cancelLabel="Keep Training"
             destructive
             onConfirm={handleCancel}
+          />
+        </SafeAreaView>
+      ) : session.status === 'COMPLETED' ? (
+        <SafeAreaView
+          edges={['bottom']}
+          style={[styles.footer, { backgroundColor: colors.background, borderTopColor: colors.border }]}>
+          <PrimaryButton
+            title="Share to Feed"
+            onPress={() => router.push(`/post/new?sessionId=${session.id}`)}
+            style={styles.footerButton}
           />
         </SafeAreaView>
       ) : null}

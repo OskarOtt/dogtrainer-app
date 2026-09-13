@@ -46,6 +46,11 @@ function RootNavigator() {
         <Stack.Screen name="progress/[dogId]" options={{ headerShown: true }} />
         <Stack.Screen name="calendar/[date]/index" options={{ headerShown: true }} />
         <Stack.Screen name="calendar/[date]/new-plan" options={{ headerShown: true }} />
+        <Stack.Screen name="post/new" options={{ headerShown: true }} />
+        <Stack.Screen name="post/[id]" options={{ headerShown: true }} />
+        <Stack.Screen name="user/[id]/index" options={{ headerShown: true }} />
+        <Stack.Screen name="user/[id]/followers" options={{ headerShown: true }} />
+        <Stack.Screen name="user/[id]/following" options={{ headerShown: true }} />
       </Stack.Protected>
       <Stack.Protected guard={!isAuthenticated}>
         <Stack.Screen name="(auth)" />

@@ -103,6 +103,34 @@ export function formatDuration(minutes: number | null | undefined): string {
   return remaining === 0 ? `${hours}h` : `${hours}h ${remaining}m`;
 }
 
+/** Formats an ISO date-time as short relative time, e.g. "just now", "5m", "3h", "2d". */
+export function formatRelativeTime(iso: string | null | undefined): string {
+  if (!iso) {
+    return '';
+  }
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) {
+    return '';
+  }
+  const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+  if (seconds < 60) {
+    return 'just now';
+  }
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) {
+    return `${minutes}m`;
+  }
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) {
+    return `${hours}h`;
+  }
+  const days = Math.floor(hours / 24);
+  if (days < 7) {
+    return `${days}d`;
+  }
+  return formatDateTime(iso);
+}
+
 /** Formats elapsed seconds as a live session timer, e.g. "12:04". */
 export function formatTimer(totalSeconds: number): string {
   const clamped = Math.max(0, Math.floor(totalSeconds));

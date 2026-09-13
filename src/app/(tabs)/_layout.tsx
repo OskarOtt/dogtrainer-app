@@ -14,8 +14,11 @@ export default function TabLayout() {
       backgroundColor={colors.card}
       indicatorColor={colors.backgroundSelected}>
       <NativeTabs.Trigger name="index">
-        <NativeTabs.Trigger.Label>Home</NativeTabs.Trigger.Label>
-        <NativeTabs.Trigger.Icon sf={{ default: 'house', selected: 'house.fill' }} md="home" />
+        <NativeTabs.Trigger.Label>Feed</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon
+          sf={{ default: 'rectangle.stack', selected: 'rectangle.stack.fill' }}
+          md="dynamic_feed"
+        />
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="dogs">
         <NativeTabs.Trigger.Label>Dogs</NativeTabs.Trigger.Label>
