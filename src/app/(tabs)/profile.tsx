@@ -81,31 +81,31 @@ export default function ProfileScreen() {
         ) : null}
       </ThemedView>
 
-      <ThemedView style={[styles.card, { backgroundColor: colors.backgroundElement, borderColor: colors.border }]}>
-        <ThemedText type="subtitle" style={styles.cardTitle}>
-          {user?.name ?? 'Trainer'}
-        </ThemedText>
-        <ThemedText themeColor="textSecondary">{user?.email}</ThemedText>
-      </ThemedView>
-
       <View style={styles.followRow}>
         <Pressable
-          style={styles.followStat}
-          onPress={() => user && router.push(`/user/${user.id}/followers`)}>
+            style={styles.followStat}
+            onPress={() => user && router.push(`/user/${user.id}/followers`)}>
           <ThemedText type="subtitle" style={styles.followCount}>
             {followers?.length ?? 0}
           </ThemedText>
           <ThemedText themeColor="textSecondary">Followers</ThemedText>
         </Pressable>
         <Pressable
-          style={styles.followStat}
-          onPress={() => user && router.push(`/user/${user.id}/following`)}>
+            style={styles.followStat}
+            onPress={() => user && router.push(`/user/${user.id}/following`)}>
           <ThemedText type="subtitle" style={styles.followCount}>
             {following?.length ?? 0}
           </ThemedText>
           <ThemedText themeColor="textSecondary">Following</ThemedText>
         </Pressable>
       </View>
+
+      <ThemedView style={[styles.card, { backgroundColor: colors.backgroundElement, borderColor: colors.border }]}>
+        <ThemedText type="subtitle" style={styles.cardTitle}>
+          {user?.name ?? 'Trainer'}
+        </ThemedText>
+        <ThemedText themeColor="textSecondary">{user?.email}</ThemedText>
+      </ThemedView>
 
       {isLoadingDogs ? (
         <ActivityIndicator color={colors.primary} style={styles.dogsLoading} />

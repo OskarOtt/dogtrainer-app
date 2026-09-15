@@ -5,11 +5,11 @@ import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, BackHandler, FlatList, Platform, Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { ConfirmDialog } from '@/components/confirm-dialog';
 import { EmptyState } from '@/components/empty-state';
 import { PrimaryButton } from '@/components/primary-button';
 import LexicalNotesEditor from '@/components/rich-text/lexical-notes-editor.dom';
 import { SessionExerciseCard } from '@/components/session-exercise-card';
+import { SessionFooter } from '@/components/session-footer';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
@@ -346,36 +346,12 @@ export default function ActiveSessionScreen() {
       </View>
 
       {isActive ? (
-        <SafeAreaView edges={['bottom']} style={styles.footer}>
-          <View style={[styles.footerBox, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            <View style={styles.footerButtonCancel}>
-              <ConfirmDialog
-                title="Cancel"
-                variant="danger"
-                loading={cancelSession.isPending}
-                style={styles.footerButtonFill}
-                dialogTitle="Cancel session"
-                dialogMessage="Discard this training session? This cannot be undone."
-                confirmLabel="Discard"
-                cancelLabel="Keep Training"
-                destructive
-                onConfirm={handleCancel}
-              />
-            </View>
-            <View style={styles.footerButtonFinish}>
-              <ConfirmDialog
-                title="Finish"
-                variant="success"
-                loading={completeSession.isPending}
-                style={styles.footerButtonFill}
-                dialogTitle="Finish session"
-                dialogMessage="Mark this training session as complete?"
-                confirmLabel="Finish"
-                onConfirm={handleFinish}
-              />
-            </View>
-          </View>
-        </SafeAreaView>
+        <SessionFooter
+          onCancel={handleCancel}
+          onFinish={handleFinish}
+          cancelLoading={cancelSession.isPending}
+          finishLoading={completeSession.isPending}
+        />
       ) : session.status === 'COMPLETED' ? (
         <SafeAreaView
           edges={['bottom']}
@@ -415,7 +391,15 @@ const styles = StyleSheet.create({
   tabs: { height: 36 },
   tabPane: { flex: 1 },
   tabPaneHidden: { display: 'none' },
-  list: { padding: Spacing.four, gap: Spacing.three, flexGrow: 1 },
+  list: {
+    padding: Spacing.four,
+    // Extra clearance under the last item so it isn't hidden behind the
+    // hovering iOS footer (SessionFooter.ios), which floats over the content
+    // instead of taking up its own layout row.
+    paddingBottom: Platform.OS === 'ios' ? Spacing.six + Spacing.four : Spacing.four,
+    gap: Spacing.three,
+    flexGrow: 1,
+  },
   notesTab: { flex: 1 },
   notesEditor: { flex: 1 },
   addButton: { marginBottom: Spacing.one },
@@ -424,18 +408,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.six,
     paddingVertical: Spacing.one,
   },
-  footerBox: {
-    flexDirection: 'row',
-    alignItems: 'stretch',
-    borderRadius: 50,
-    borderWidth: StyleSheet.hairlineWidth,
-    padding: Spacing.one,
-    gap: Spacing.one,
-    overflow: 'hidden',
-  },
-  footerButtonCancel: { flex: 1 },
-  footerButtonFinish: { flex: 1 },
-  footerButtonFill: { width: '100%' },
   footerCentered: { justifyContent: 'center', alignItems: 'center' },
   shareButton: { width: '70%', height: 40 },
 });
