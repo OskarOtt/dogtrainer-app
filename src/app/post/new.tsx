@@ -88,9 +88,13 @@ export default function NewPostScreen() {
         options={{
           title: isFromSession ? 'Share Session' : 'New Post',
           presentation: 'modal',
-          headerRight: isFromSession ? () => <Pressable onPress={handleSkip} hitSlop={8}>
-            <ThemedText themeColor="primary">Skip</ThemedText>
-          </Pressable> : undefined,
+          headerRight: isFromSession
+            ? () => (
+                <Pressable onPress={handleSkip} hitSlop={8}>
+                  <Ionicons name="close" size={24} color={colors.text} />
+                </Pressable>
+              )
+            : undefined,
         }}
       />
       <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
@@ -177,6 +181,16 @@ export default function NewPostScreen() {
           disabled={!canSubmit || isSubmitting}
           style={styles.submitButton}
         />
+
+        {isFromSession ? (
+          <PrimaryButton
+            title="Don't Post"
+            variant="secondary"
+            onPress={handleSkip}
+            disabled={isSubmitting}
+            style={styles.dontPostButton}
+          />
+        ) : null}
       </ScrollView>
     </ThemedView>
   );
@@ -216,4 +230,5 @@ const styles = StyleSheet.create({
   },
   error: { textAlign: 'center' },
   submitButton: { marginTop: Spacing.three },
+  dontPostButton: { marginTop: Spacing.two },
 });

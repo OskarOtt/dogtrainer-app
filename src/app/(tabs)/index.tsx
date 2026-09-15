@@ -1,8 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { AddFriendModal } from '@/components/add-friend-modal';
 import { EmptyState } from '@/components/empty-state';
 import { PostList } from '@/components/post-list';
 import { ThemedText } from '@/components/themed-text';
@@ -15,6 +17,7 @@ import { getApiErrorMessage } from '@/utils/apiError';
 export default function FeedScreen() {
   const router = useRouter();
   const colors = useTheme();
+  const [isAddFriendVisible, setIsAddFriendVisible] = useState(false);
   const {
     data,
     isLoading,
@@ -36,13 +39,23 @@ export default function FeedScreen() {
           <ThemedText type="title" style={styles.title}>
             Feed
           </ThemedText>
-          <Pressable
-            onPress={() => router.push('/post/new')}
-            hitSlop={8}
-            style={[styles.composeButton, { backgroundColor: colors.primary }]}>
-            <Ionicons name="add" size={26} color={colors.onPrimary} />
-          </Pressable>
+          <View style={styles.headerActions}>
+            <Pressable
+              onPress={() => setIsAddFriendVisible(true)}
+              hitSlop={8}
+              style={[styles.composeButton, { backgroundColor: colors.backgroundElement, borderColor: colors.border, borderWidth: 1 }]}>
+              <Ionicons name="person-add-outline" size={22} color={colors.text} />
+            </Pressable>
+            <Pressable
+              onPress={() => router.push('/post/new')}
+              hitSlop={8}
+              style={[styles.composeButton, { backgroundColor: colors.primary }]}>
+              <Ionicons name="add" size={26} color={colors.onPrimary} />
+            </Pressable>
+          </View>
         </View>
+
+        <AddFriendModal visible={isAddFriendVisible} onClose={() => setIsAddFriendVisible(false)} />
 
         {isLoading ? (
           <View style={styles.center}>
@@ -82,6 +95,11 @@ const styles = StyleSheet.create({
     paddingTop: Spacing.two,
   },
   title: { fontSize: 28 },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.two,
+  },
   composeButton: {
     width: 40,
     height: 40,

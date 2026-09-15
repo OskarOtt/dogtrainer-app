@@ -13,6 +13,7 @@ import { SessionExerciseCard } from '@/components/session-exercise-card';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
+import { usePlan, useUpdatePlan } from '@/hooks/use-plans';
 import { useExercise } from '@/hooks/use-training-catalog';
 import {
   useCancelSession,
@@ -64,7 +65,7 @@ function SessionExerciseRow({
 }
 
 export default function ActiveSessionScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, planId } = useLocalSearchParams<{ id: string; planId?: string }>();
   const router = useRouter();
   const colors = useTheme();
   const { data: session, isLoading, isError, error } = useSession(id);
@@ -74,6 +75,11 @@ export default function ActiveSessionScreen() {
   const cancelSession = useCancelSession(id ?? '');
   const updateSessionExercise = useUpdateSessionExercise(id ?? '');
   const removeSessionExercise = useRemoveSessionExercise(id ?? '');
+
+  // If this session was started from a training plan, finishing it marks that
+  // plan COMPLETED. The plan's dogId is needed for the update hook's cache keys.
+  const { data: plan } = usePlan(planId);
+  const updatePlan = useUpdatePlan(planId ?? '', plan?.dogId ?? '');
 
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [activeTab, setActiveTab] = useState<'exercises' | 'notes'>('exercises');
@@ -120,7 +126,19 @@ export default function ActiveSessionScreen() {
 
   function handleFinish() {
     completeSession.mutate(undefined, {
-      onSuccess: () => router.replace(`/post/new?sessionId=${id}`),
+      onSuccess: () => {
+        if (planId && plan) {
+          updatePlan.mutate({
+            name: plan.name,
+            description: plan.description,
+            startDate: plan.startDate,
+            endDate: plan.endDate,
+            status: 'COMPLETED',
+            exerciseIds: plan.exercises.map((exercise) => exercise.id),
+          });
+        }
+        router.replace(`/post/new?sessionId=${id}`);
+      },
     });
   }
 
@@ -240,7 +258,13 @@ export default function ActiveSessionScreen() {
               <PrimaryButton
                 title="Add Exercise"
                 variant="secondary"
-                onPress={() => router.push(`/train/${session.dogId}?sessionId=${session.id}`)}
+                onPress={() =>
+                  router.push(
+                    planId
+                      ? `/train/${session.dogId}?sessionId=${session.id}&planId=${planId}`
+                      : `/train/${session.dogId}?sessionId=${session.id}`
+                  )
+                }
                 style={styles.addButton}
               />
             ) : undefined
@@ -305,11 +329,15 @@ export default function ActiveSessionScreen() {
       ) : session.status === 'COMPLETED' ? (
         <SafeAreaView
           edges={['bottom']}
-          style={[styles.footer, { backgroundColor: colors.background, borderTopColor: colors.border }]}>
+          style={[
+            styles.footer,
+            styles.footerCentered,
+            { backgroundColor: colors.background, borderTopColor: colors.border },
+          ]}>
           <PrimaryButton
             title="Share to Feed"
             onPress={() => router.push(`/post/new?sessionId=${session.id}`)}
-            style={styles.footerButton}
+            style={styles.shareButton}
           />
         </SafeAreaView>
       ) : null}
@@ -349,4 +377,6 @@ const styles = StyleSheet.create({
     height: 80,
   },
   footerButton: { flex: 1, width: 100, marginHorizontal: 5 },
+  footerCentered: { height: undefined, justifyContent: 'center', paddingTop: 16, paddingBottom: 0},
+  shareButton: { width: '70%', height: 40 },
 });

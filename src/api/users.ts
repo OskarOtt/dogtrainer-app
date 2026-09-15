@@ -13,6 +13,12 @@ export const usersApi = {
     return data;
   },
 
+  /** 404s (via ResourceNotFoundException) when no user has this email. */
+  async getByEmail(email: string): Promise<PublicUser> {
+    const { data } = await apiClient.get<PublicUser>('/users', { params: { email } });
+    return data;
+  },
+
   async getAvatarUploadUrl(payload: UploadUrlRequest): Promise<UploadUrlResponse> {
     const { data } = await apiClient.post<UploadUrlResponse>('/users/me/avatar/upload-url', payload);
     return data;

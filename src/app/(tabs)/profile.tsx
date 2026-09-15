@@ -1,23 +1,21 @@
 import { useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, FlatList, Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { EmptyState } from '@/components/empty-state';
 import { GoalCard } from '@/components/goal-card';
 import { MediaAvatarPicker } from '@/components/media-avatar-picker';
-import { PostList } from '@/components/post-list';
 import { PrimaryButton } from '@/components/primary-button';
 import { StatCard } from '@/components/stat-card';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { TrainingSessionCard } from '@/components/training-session-card';
-import { Radii, Spacing } from '@/constants/theme';
+import { BottomTabInset, Radii, Spacing } from '@/constants/theme';
 import { useAuth } from '@/hooks/use-auth';
 import { useDogs } from '@/hooks/use-dogs';
 import { useFollowers, useFollowing } from '@/hooks/use-follows';
 import { useDogGoals } from '@/hooks/use-goals';
-import { useUserPosts } from '@/hooks/use-posts';
 import { useDogSessions } from '@/hooks/use-sessions';
 import { useDogStatistics } from '@/hooks/use-stats';
 import { useTheme } from '@/hooks/use-theme';
@@ -52,16 +50,6 @@ export default function ProfileScreen() {
   const { data: sessions } = useDogSessions(activeDog?.id);
   const { data: goals } = useDogGoals(activeDog?.id);
   const activeGoals = goals?.filter((goal) => goal.status !== 'COMPLETED') ?? [];
-
-  const {
-    data: postsData,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    refetch,
-    isRefetching,
-  } = useUserPosts(user?.id);
-  const posts = postsData?.pages.flatMap((page) => page.items) ?? [];
 
   const header = (
     <View style={styles.headerContent}>
@@ -155,12 +143,6 @@ export default function ProfileScreen() {
 
           {activeDog ? (
             <>
-              <PrimaryButton
-                title={`Start Training with ${activeDog.name}`}
-                onPress={() => router.push(`/train/${activeDog.id}`)}
-                style={styles.startButton}
-              />
-
               <View style={styles.statsGrid}>
                 <StatCard
                   icon="calendar-outline"
@@ -222,29 +204,25 @@ export default function ProfileScreen() {
         </>
       )}
 
-      <ThemedText type="subtitle" style={styles.sectionTitle}>
-        My Posts
-      </ThemedText>
+      <Pressable style={styles.myPostsRow} onPress={() => user && router.push(`/user/${user.id}/posts`)}>
+        <ThemedText type="subtitle" style={styles.sectionTitle}>
+          My Posts
+        </ThemedText>
+        <ThemedText themeColor="textSecondary">View all</ThemedText>
+      </Pressable>
     </View>
   );
 
   return (
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea} edges={['top']}>
-        <PostList
-          posts={posts}
+        <FlatList
+          data={[]}
+          keyExtractor={() => 'header'}
+          renderItem={null}
+          contentContainerStyle={styles.scrollContent}
           ListHeaderComponent={header}
           ListFooterComponent={<PrimaryButton title="Log Out" onPress={logout} variant="danger" style={styles.logoutButton} />}
-          onEndReached={() => {
-            if (hasNextPage && !isFetchingNextPage) {
-              fetchNextPage();
-            }
-          }}
-          isFetchingNextPage={isFetchingNextPage}
-          refreshing={isRefetching}
-          onRefresh={refetch}
-          emptyTitle="No posts yet"
-          emptyMessage="Share a training session or a photo of your dog."
         />
       </SafeAreaView>
     </ThemedView>
@@ -254,7 +232,8 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   safeArea: { flex: 1 },
-  headerContent: { padding: Spacing.four, paddingBottom: 0, gap: Spacing.three },
+  scrollContent: { paddingHorizontal: Spacing.four, paddingBottom: Spacing.four + Spacing.three + BottomTabInset, flexGrow: 1 },
+  headerContent: { paddingTop: Spacing.four, gap: Spacing.three },
   title: { fontSize: 28 },
   avatarSection: { alignItems: 'center', gap: Spacing.two },
   removeButton: { alignSelf: 'center', paddingHorizontal: Spacing.four },
@@ -280,7 +259,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.three,
     paddingVertical: Spacing.two,
   },
-  startButton: { marginTop: Spacing.one },
+  myPostsRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   statsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
