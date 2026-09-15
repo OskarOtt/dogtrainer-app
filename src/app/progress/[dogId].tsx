@@ -2,6 +2,7 @@ import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 
 import { EmptyState } from '@/components/empty-state';
+import { PrimaryButton } from '@/components/primary-button';
 import { ProgressCard } from '@/components/progress-card';
 import { StatCard } from '@/components/stat-card';
 import { ThemedText } from '@/components/themed-text';
@@ -32,7 +33,9 @@ export default function DogProgressScreen() {
   if (isError || !progress) {
     return (
       <ThemedView style={{ flex: 1 }}>
-        <EmptyState icon="alert-circle-outline" title="Couldn't load progress" message={getApiErrorMessage(error)} />
+        <EmptyState icon="alert-circle-outline" title="Couldn't load progress" message={getApiErrorMessage(error)}>
+          <PrimaryButton title="Exit" variant="secondary" onPress={() => router.replace('/(tabs)')} />
+        </EmptyState>
       </ThemedView>
     );
   }

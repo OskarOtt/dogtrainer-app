@@ -1,4 +1,5 @@
 import { AlertDialog, Button, Host, OutlinedButton, Text, TextButton } from '@expo/ui/jetpack-compose';
+import { fillMaxWidth } from '@expo/ui/jetpack-compose/modifiers';
 import { useState } from 'react';
 import { StyleSheet, useColorScheme } from 'react-native';
 
@@ -33,13 +34,15 @@ export function ConfirmDialog({
   const triggerColors =
     variant === 'danger'
       ? { containerColor: colors.danger, contentColor: colors.onPrimary }
-      : variant === 'primary'
-        ? { containerColor: colors.primary, contentColor: colors.onPrimary }
-        : undefined;
+      : variant === 'success'
+        ? { containerColor: colors.success, contentColor: colors.onPrimary }
+        : variant === 'primary'
+          ? { containerColor: colors.primary, contentColor: colors.onPrimary }
+          : undefined;
 
   return (
     <Host style={[styles.host, { opacity: isDisabled ? 0.6 : 1 }, style]}>
-      <TriggerButton onClick={() => !isDisabled && setVisible(true)} colors={triggerColors}>
+      <TriggerButton onClick={() => !isDisabled && setVisible(true)} colors={triggerColors} modifiers={[fillMaxWidth()]}>
         <Text>{loading ? '…' : title}</Text>
       </TriggerButton>
       {visible ? (

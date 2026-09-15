@@ -55,7 +55,9 @@ export default function CalendarDayScreen() {
   if (isError) {
     return (
       <ThemedView style={{ flex: 1 }}>
-        <EmptyState icon="alert-circle-outline" title="Couldn't load this day" message={getApiErrorMessage(plansError)} />
+        <EmptyState icon="alert-circle-outline" title="Couldn't load this day" message={getApiErrorMessage(plansError)}>
+          <PrimaryButton title="Exit" variant="secondary" onPress={() => router.replace('/(tabs)')} />
+        </EmptyState>
       </ThemedView>
     );
   }

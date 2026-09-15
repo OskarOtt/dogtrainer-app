@@ -4,6 +4,7 @@ import { ActivityIndicator } from 'react-native';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { EmptyState } from '@/components/empty-state';
 import { PlanForm } from '@/components/plan-form';
+import { PrimaryButton } from '@/components/primary-button';
 import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
 import { useDeletePlan, usePlan, useUpdatePlan } from '@/hooks/use-plans';
@@ -44,7 +45,9 @@ export default function EditPlanScreen() {
   if (isError || !plan) {
     return (
       <ThemedView style={{ flex: 1 }}>
-        <EmptyState icon="alert-circle-outline" title="Couldn't load this plan" message={getApiErrorMessage(error)} />
+        <EmptyState icon="alert-circle-outline" title="Couldn't load this plan" message={getApiErrorMessage(error)}>
+          <PrimaryButton title="Exit" variant="secondary" onPress={() => router.replace('/(tabs)')} />
+        </EmptyState>
       </ThemedView>
     );
   }

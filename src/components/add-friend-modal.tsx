@@ -75,7 +75,10 @@ export function AddFriendModal({ visible, onClose }: AddFriendModalProps) {
           </View>
 
           <ThemedText style={[styles.wipNote, { color: colors.textSecondary }]}>
-            Work in progress — for now you can only add friends by email.
+            Work in progress — for now you can only follow people by email.
+          </ThemedText>
+          <ThemedText style={[styles.wipNote, { color: colors.textSecondary }]}>
+            Posts from people you follow will show up in your feed, manage followers and following in your profile.
           </ThemedText>
 
           <FormTextInput

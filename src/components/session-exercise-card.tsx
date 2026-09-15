@@ -1,9 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 
-import { RichTextEditor } from '@/components/rich-text/rich-text-editor';
-import { RichTextView } from '@/components/rich-text/rich-text-view';
 import { ThemedText } from '@/components/themed-text';
 import { Radii, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
@@ -130,16 +128,20 @@ export function SessionExerciseCard({
       </View>
 
       {onNotesBlur && !disabled ? (
-        <RichTextEditor
+        <TextInput
           key={sessionExercise.id}
-          defaultValue={notes}
+          value={notes}
           onChangeText={setNotes}
           onBlur={() => onNotesBlur(notes.trim() || null)}
           placeholder="Notes for this exercise…"
-          style={styles.notesHost}
+          placeholderTextColor={colors.textSecondary}
+          multiline
+          style={[styles.notesInput, { color: colors.text, borderColor: colors.border, backgroundColor: colors.backgroundElement }]}
         />
       ) : sessionExercise.notes ? (
-        <RichTextView value={sessionExercise.notes} />
+        <ThemedText themeColor="textSecondary" type="small">
+          {sessionExercise.notes}
+        </ThemedText>
       ) : null}
     </View>
   );
@@ -192,5 +194,12 @@ const styles = StyleSheet.create({
     paddingTop: Spacing.two,
     borderTopWidth: 1,
   },
-  notesHost: { minHeight: 100 },
+  notesInput: {
+    minHeight: 65,
+    borderWidth: 1,
+    borderRadius: Radii.medium,
+    padding: Spacing.two,
+    fontSize: 16,
+    textAlignVertical: 'top',
+  },
 });

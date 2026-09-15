@@ -3,6 +3,7 @@ import { ActivityIndicator, ScrollView, StyleSheet } from 'react-native';
 
 import { EmptyState } from '@/components/empty-state';
 import { PostCard } from '@/components/post-card';
+import { PrimaryButton } from '@/components/primary-button';
 import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
 import { usePost } from '@/hooks/use-posts';
@@ -26,7 +27,9 @@ export default function PostDetailScreen() {
   if (isError || !post) {
     return (
       <ThemedView style={{ flex: 1 }}>
-        <EmptyState icon="alert-circle-outline" title="Couldn't load this post" message={getApiErrorMessage(error)} />
+        <EmptyState icon="alert-circle-outline" title="Couldn't load this post" message={getApiErrorMessage(error)}>
+          <PrimaryButton title="Exit" variant="secondary" onPress={() => router.replace('/(tabs)')} />
+        </EmptyState>
       </ThemedView>
     );
   }

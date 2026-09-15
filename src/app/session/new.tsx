@@ -5,6 +5,7 @@ import { ActivityIndicator, StyleSheet } from 'react-native';
 import { sessionsApi } from '@/api/sessions';
 import { plansApi } from '@/api/plans';
 import { EmptyState } from '@/components/empty-state';
+import { PrimaryButton } from '@/components/primary-button';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
@@ -83,7 +84,9 @@ export default function NewSessionScreen() {
     <ThemedView style={{ flex: 1 }}>
       <Stack.Screen options={{ title: 'Starting Session' }} />
       {errorMessage ? (
-        <EmptyState icon="alert-circle-outline" title="Couldn't start session" message={errorMessage} />
+        <EmptyState icon="alert-circle-outline" title="Couldn't start session" message={errorMessage}>
+          <PrimaryButton title="Exit" variant="secondary" onPress={() => router.replace('/(tabs)')} />
+        </EmptyState>
       ) : (
         <ThemedView style={styles.center}>
           <ActivityIndicator color={colors.primary} />

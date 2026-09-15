@@ -1,7 +1,9 @@
 import { Button, ConfirmationDialog, Host, Text } from '@expo/ui/swift-ui';
-import { buttonStyle, disabled as disabledModifier } from '@expo/ui/swift-ui/modifiers';
+import { buttonStyle, disabled as disabledModifier, frame, tint } from '@expo/ui/swift-ui/modifiers';
 import { useState } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, useColorScheme } from 'react-native';
+
+import { Colors } from '@/constants/theme';
 
 import type { ConfirmDialogProps } from './confirm-dialog.types';
 
@@ -23,6 +25,8 @@ export function ConfirmDialog({
   destructive,
   onConfirm,
 }: ConfirmDialogProps) {
+  const scheme = useColorScheme();
+  const colors = Colors[scheme === 'dark' ? 'dark' : 'light'];
   const [isPresented, setIsPresented] = useState(false);
   const isDisabled = disabled || loading;
 
@@ -39,6 +43,11 @@ export function ConfirmDialog({
             role={variant === 'danger' ? 'destructive' : 'default'}
             modifiers={[
               buttonStyle(variant === 'secondary' ? 'bordered' : 'borderedProminent'),
+              // Large finite maxWidth mimics `.infinity` (unsupported by the JS bridge) so the
+              // native button fills its Host frame instead of shrinking to the label's size —
+              // needed so `style={{ flex }}` on the wrapping View actually changes visible width.
+              frame({ maxWidth: 10000 }),
+              ...(variant === 'success' ? [tint(colors.success)] : []),
               disabledModifier(!!isDisabled),
             ]}
             onPress={() => setIsPresented(true)}
