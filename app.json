@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Flink: Dog training app!",
+    "name": "Flink",
     "slug": "dogtrainer-app",
     "version": "1.0.0",
     "description": "Track training sessions, plans, and progress for your dog.",

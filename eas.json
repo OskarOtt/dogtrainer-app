@@ -5,6 +5,10 @@
   },
   "build": {
     "development": {
+      "developmentClient": false,
+      "distribution": "internal"
+    },
+    "developmentClient": {
       "developmentClient": true,
       "distribution": "internal"
     },
