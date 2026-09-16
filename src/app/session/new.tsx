@@ -5,6 +5,7 @@ import { ActivityIndicator, StyleSheet } from 'react-native';
 import { sessionsApi } from '@/api/sessions';
 import { plansApi } from '@/api/plans';
 import { EmptyState } from '@/components/empty-state';
+import { PrimaryButton } from '@/components/primary-button';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
@@ -18,6 +19,8 @@ import { getApiErrorMessage } from '@/utils/apiError';
  *    exercises from the searchable catalog).
  *  - planId: "Start Training" picked an existing training plan; the session is
  *    created for that plan's dog and pre-filled with all of the plan's exercises.
+ *    The plan is also moved to IN_PROGRESS, and its id is forwarded to the active
+ *    session screen so finishing the session can mark the plan COMPLETED.
  * This screen shows a brief loading state and never stays on the navigation stack
  * (it replaces itself with the active session once ready).
  */
@@ -50,6 +53,16 @@ export default function NewSessionScreen() {
           const plan = await plansApi.get(planId);
           sessionDogId = plan.dogId;
           ids = plan.exercises.map((exercise) => exercise.id);
+
+          // Starting a session from a plan moves that plan to IN_PROGRESS.
+          await plansApi.update(planId, {
+            name: plan.name,
+            description: plan.description,
+            startDate: plan.startDate,
+            endDate: plan.endDate,
+            status: 'IN_PROGRESS',
+            exerciseIds: plan.exercises.map((exercise) => exercise.id),
+          });
         }
 
         if (!sessionDogId) {
@@ -60,7 +73,7 @@ export default function NewSessionScreen() {
         for (const exerciseId of ids) {
           await sessionsApi.addExercise(session.id, { exerciseId, repetitions: 0, successfulRepetitions: 0 });
         }
-        router.replace(`/session/${session.id}`);
+        router.replace(planId ? `/session/${session.id}?planId=${planId}` : `/session/${session.id}`);
       } catch (error) {
         setErrorMessage(getApiErrorMessage(error, "Couldn't start this training session"));
       }
@@ -71,7 +84,9 @@ export default function NewSessionScreen() {
     <ThemedView style={{ flex: 1 }}>
       <Stack.Screen options={{ title: 'Starting Session' }} />
       {errorMessage ? (
-        <EmptyState icon="alert-circle-outline" title="Couldn't start session" message={errorMessage} />
+        <EmptyState icon="alert-circle-outline" title="Couldn't start session" message={errorMessage}>
+          <PrimaryButton title="Exit" variant="secondary" onPress={() => router.replace('/(tabs)')} />
+        </EmptyState>
       ) : (
         <ThemedView style={styles.center}>
           <ActivityIndicator color={colors.primary} />

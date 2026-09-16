@@ -4,6 +4,7 @@ import { ActivityIndicator } from 'react-native';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { EmptyState } from '@/components/empty-state';
 import { GoalForm } from '@/components/goal-form';
+import { PrimaryButton } from '@/components/primary-button';
 import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
 import { useDeleteGoal, useGoal, useUpdateGoal } from '@/hooks/use-goals';
@@ -40,7 +41,9 @@ export default function EditGoalScreen() {
   if (isError || !goal) {
     return (
       <ThemedView style={{ flex: 1 }}>
-        <EmptyState icon="alert-circle-outline" title="Couldn't load this goal" message={getApiErrorMessage(error)} />
+        <EmptyState icon="alert-circle-outline" title="Couldn't load this goal" message={getApiErrorMessage(error)}>
+          <PrimaryButton title="Exit" variant="secondary" onPress={() => router.replace('/(tabs)')} />
+        </EmptyState>
       </ThemedView>
     );
   }

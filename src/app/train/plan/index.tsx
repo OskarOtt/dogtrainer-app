@@ -89,7 +89,9 @@ export default function PlanTrainingScreen() {
       {isLoadingPlans ? (
         <ActivityIndicator style={styles.loading} color={colors.primary} />
       ) : isError ? (
-        <EmptyState icon="alert-circle-outline" title="Couldn't load training plans" message={getApiErrorMessage(error)} />
+        <EmptyState icon="alert-circle-outline" title="Couldn't load training plans" message={getApiErrorMessage(error)}>
+          <PrimaryButton title="Exit" variant="secondary" onPress={() => router.replace('/(tabs)')} />
+        </EmptyState>
       ) : (
         <FlatList
           data={plans ?? []}

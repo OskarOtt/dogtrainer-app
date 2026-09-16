@@ -14,7 +14,7 @@ import type { CatalogExercise } from '@/types/training';
  * instead of drilling into category → activity → exercise.
  */
 export default function TrainScreen() {
-  const { dogId, sessionId } = useLocalSearchParams<{ dogId: string; sessionId?: string }>();
+  const { dogId, sessionId, planId } = useLocalSearchParams<{ dogId: string; sessionId?: string; planId?: string }>();
   const router = useRouter();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const addSessionExercise = useAddSessionExercise(sessionId ?? '');
@@ -33,7 +33,7 @@ export default function TrainScreen() {
         for (const exerciseId of selectedIds) {
           await addSessionExercise.mutateAsync({ exerciseId, repetitions: 0, successfulRepetitions: 0 });
         }
-        router.replace(`/session/${sessionId}`);
+        router.replace(planId ? `/session/${sessionId}?planId=${planId}` : `/session/${sessionId}`);
       } finally {
         setIsAdding(false);
       }

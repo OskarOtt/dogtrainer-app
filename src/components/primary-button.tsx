@@ -7,7 +7,7 @@ export interface PrimaryButtonProps {
   onPress: () => void;
   disabled?: boolean;
   loading?: boolean;
-  variant?: 'primary' | 'secondary' | 'danger';
+  variant?: 'primary' | 'secondary' | 'danger' | 'success';
   style?: ViewStyle;
 }
 
@@ -32,7 +32,13 @@ export function PrimaryButton({
 
   const isFilled = variant !== 'secondary';
   const backgroundColor =
-    variant === 'danger' ? colors.danger : variant === 'secondary' ? colors.backgroundElement : colors.primary;
+    variant === 'danger'
+      ? colors.danger
+      : variant === 'success'
+        ? colors.success
+        : variant === 'secondary'
+          ? colors.backgroundElement
+          : colors.primary;
   const textColor = variant === 'secondary' ? colors.primary : colors.onPrimary;
 
   return (

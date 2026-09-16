@@ -4,7 +4,7 @@ export interface ConfirmDialogProps {
   /** Label of the trigger button itself (mirrors {@link PrimaryButtonProps.title}). */
   title: string;
   /** Visual variant of the trigger button — mirrors `PrimaryButton`'s variants. */
-  variant?: 'primary' | 'secondary' | 'danger';
+  variant?: 'primary' | 'secondary' | 'danger' | 'success';
   loading?: boolean;
   disabled?: boolean;
   style?: ViewStyle;

@@ -16,6 +16,7 @@ export interface FormTextInputProps
     | 'numberOfLines'
     | 'editable'
     | 'onBlur'
+    | 'maxLength'
   > {
   /** Uncontrolled initial text — the field manages its own state internally. */
   defaultValue?: string;
@@ -41,6 +42,7 @@ export function FormTextInput({
   numberOfLines,
   editable,
   onBlur,
+  maxLength,
   style,
 }: FormTextInputProps) {
   const colors = useTheme();
@@ -67,6 +69,7 @@ export function FormTextInput({
         numberOfLines={numberOfLines}
         editable={editable}
         onBlur={onBlur}
+        maxLength={maxLength}
         textStyle={{ color: colors.text, fontSize: 17 }}
         style={{
           paddingHorizontal: Spacing.three,

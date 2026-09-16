@@ -22,7 +22,9 @@ export default function DogGoalsScreen() {
       {isLoading ? (
         <ActivityIndicator style={styles.loading} color={colors.primary} />
       ) : isError ? (
-        <EmptyState icon="alert-circle-outline" title="Couldn't load goals" message={getApiErrorMessage(error)} />
+        <EmptyState icon="alert-circle-outline" title="Couldn't load goals" message={getApiErrorMessage(error)}>
+          <PrimaryButton title="Exit" variant="secondary" onPress={() => router.replace('/(tabs)')} />
+        </EmptyState>
       ) : (
         <FlatList
           data={goals ?? []}

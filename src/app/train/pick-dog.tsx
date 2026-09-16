@@ -45,7 +45,9 @@ export default function PickDogScreen() {
     return (
       <ThemedView style={styles.container}>
         <SafeAreaView style={styles.safeArea} edges={['top']}>
-          <EmptyState icon="alert-circle-outline" title="Couldn't load dogs" message={getApiErrorMessage(error)} />
+          <EmptyState icon="alert-circle-outline" title="Couldn't load dogs" message={getApiErrorMessage(error)}>
+            <PrimaryButton title="Exit" variant="secondary" onPress={() => router.replace('/(tabs)')} />
+          </EmptyState>
         </SafeAreaView>
       </ThemedView>
     );
