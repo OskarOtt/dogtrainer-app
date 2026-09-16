@@ -12,6 +12,7 @@ import { useDeletePost } from '@/hooks/use-posts';
 import { useTheme } from '@/hooks/use-theme';
 import type { Post } from '@/types/post';
 import { formatRelativeTime } from '@/utils/date';
+import { ensureMediaUri } from '@/utils/media';
 
 export interface PostCardProps {
   post: Post;
@@ -67,7 +68,7 @@ export function PostCard({ post, onPress, onDeleted }: PostCardProps) {
 
       <Pressable onPress={onPress ?? (() => router.push(`/post/${post.id}`))}>
         <ThemedText style={styles.content}>{post.content}</ThemedText>
-        {post.imageUrl ? <Image source={{ uri: post.imageUrl }} style={styles.image} contentFit="cover" /> : null}
+        {post.imageUrl ? <Image source={{ uri: ensureMediaUri(post.imageUrl) }} style={styles.image} contentFit="cover" /> : null}
       </Pressable>
 
       {post.dogId || post.trainingSessionId ? (

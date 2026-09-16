@@ -3,6 +3,7 @@ import { Image } from 'expo-image';
 import { StyleSheet, View } from 'react-native';
 
 import { useTheme } from '@/hooks/use-theme';
+import { ensureMediaUri } from '@/utils/media';
 
 export interface AvatarProps {
   uri: string | null | undefined;
@@ -20,7 +21,7 @@ export function Avatar({ uri, size = 40 }: AvatarProps) {
         { width: size, height: size, borderRadius: size / 2, backgroundColor: colors.backgroundSelected },
       ]}>
       {uri ? (
-        <Image source={{ uri }} style={styles.image} contentFit="cover" />
+        <Image source={{ uri: ensureMediaUri(uri) }} style={styles.image} contentFit="cover" />
       ) : (
         <Ionicons name="person" size={size * 0.5} color={colors.primary} />
       )}

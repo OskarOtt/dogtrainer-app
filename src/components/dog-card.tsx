@@ -7,6 +7,7 @@ import { Radii, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import type { Dog } from '@/types/dog';
 import { formatAge } from '@/utils/date';
+import { ensureMediaUri } from '@/utils/media';
 
 export interface DogCardProps {
   dog: Dog;
@@ -33,7 +34,7 @@ export function DogCard({ dog, onPress, onLongPress, disabled }: DogCardProps) {
       ]}>
       <View style={[styles.avatar, { backgroundColor: colors.backgroundSelected }]}>
         {dog.mediaUrl && dog.mediaType !== 'VIDEO' ? (
-          <Image source={{ uri: dog.mediaUrl }} style={styles.avatarImage} contentFit="cover" />
+          <Image source={{ uri: ensureMediaUri(dog.mediaUrl) }} style={styles.avatarImage} contentFit="cover" />
         ) : dog.mediaType === 'VIDEO' ? (
           <Ionicons name="videocam" size={28} color={colors.primary} />
         ) : (

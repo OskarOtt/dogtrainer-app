@@ -6,6 +6,7 @@ import { ActivityIndicator, Alert, Pressable, StyleSheet, View } from 'react-nat
 import { Radii } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import type { DogMediaType } from '@/types/dog';
+import { ensureMediaUri } from '@/utils/media';
 
 export interface MediaAvatarPickerProps {
   uri: string | null;
@@ -70,7 +71,7 @@ export function MediaAvatarPicker({
           },
         ]}>
         {uri && !isVideo ? (
-          <Image source={{ uri }} style={styles.image} contentFit="cover" />
+          <Image source={{ uri: ensureMediaUri(uri) }} style={styles.image} contentFit="cover" />
         ) : (
           <Ionicons name={isVideo ? 'videocam' : placeholderIcon} size={size * 0.4} color={colors.primary} />
         )}
