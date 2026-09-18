@@ -52,6 +52,7 @@ function RootNavigator() {
         <Stack.Screen name="user/[id]/followers" options={{ headerShown: true }} />
         <Stack.Screen name="user/[id]/following" options={{ headerShown: true }} />
         <Stack.Screen name="user/[id]/posts" options={{ headerShown: true }} />
+        <Stack.Screen name="blocked-users" options={{ headerShown: true }} />
       </Stack.Protected>
       <Stack.Protected guard={!isAuthenticated}>
         <Stack.Screen name="(auth)" />

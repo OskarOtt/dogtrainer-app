@@ -1,11 +1,13 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { ActivityIndicator, ScrollView, StyleSheet } from 'react-native';
 
+import { CommentList } from '@/components/comment-list';
 import { EmptyState } from '@/components/empty-state';
 import { PostCard } from '@/components/post-card';
 import { PrimaryButton } from '@/components/primary-button';
 import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
+import { useAuth } from '@/hooks/use-auth';
 import { usePost } from '@/hooks/use-posts';
 import { useTheme } from '@/hooks/use-theme';
 import { getApiErrorMessage } from '@/utils/apiError';
@@ -14,6 +16,7 @@ export default function PostDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const colors = useTheme();
+  const { user } = useAuth();
   const { data: post, isLoading, isError, error } = usePost(id);
 
   if (isLoading) {
@@ -39,6 +42,7 @@ export default function PostDetailScreen() {
       <Stack.Screen options={{ title: 'Post' }} />
       <ScrollView contentContainerStyle={styles.scroll}>
         <PostCard post={post} onPress={() => {}} onDeleted={() => router.back()} />
+        <CommentList postId={post.id} isPostOwner={post.authorId === user?.id} />
       </ScrollView>
     </ThemedView>
   );
@@ -46,5 +50,5 @@ export default function PostDetailScreen() {
 
 const styles = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  scroll: { padding: Spacing.four },
+  scroll: { padding: Spacing.four, gap: Spacing.four },
 });
