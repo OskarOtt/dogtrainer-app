@@ -1,10 +1,13 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
+import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Avatar } from '@/components/avatar';
 import { ConfirmDialog } from '@/components/confirm-dialog';
+import { LikeButton } from '@/components/like-button';
+import { ReportPostSheet } from '@/components/report-post-sheet';
 import { ThemedText } from '@/components/themed-text';
 import { Radii, Spacing } from '@/constants/theme';
 import { useAuth } from '@/hooks/use-auth';
@@ -29,6 +32,7 @@ export function PostCard({ post, onPress, onDeleted }: PostCardProps) {
   const { user } = useAuth();
   const deletePost = useDeletePost();
   const isOwnPost = post.authorId === user?.id;
+  const [isReportSheetVisible, setIsReportSheetVisible] = useState(false);
 
   function goToAuthor() {
     router.push(isOwnPost ? '/(tabs)/profile' : `/user/${post.authorId}`);
@@ -63,7 +67,16 @@ export function PostCard({ post, onPress, onDeleted }: PostCardProps) {
               deletePost.mutate({ id: post.id, authorId: post.authorId }, { onSuccess: onDeleted })
             }
           />
-        ) : null}
+        ) : (
+          <Pressable
+            onPress={() => setIsReportSheetVisible(true)}
+            hitSlop={8}
+            style={styles.reportButton}
+            accessibilityLabel="Report or block"
+          >
+            <Ionicons name="alert-circle-outline" size={18} color={colors.textSecondary} />
+          </Pressable>
+        )}
       </View>
 
       <Pressable onPress={onPress ?? (() => router.push(`/post/${post.id}`))}>
@@ -88,6 +101,29 @@ export function PostCard({ post, onPress, onDeleted }: PostCardProps) {
             />
           ) : null}
         </View>
+      ) : null}
+
+      <View style={styles.engagementRow}>
+        <LikeButton postId={post.id} likeCount={post.likeCount} likedByMe={post.likedByMe} />
+        <Pressable
+          onPress={onPress ?? (() => router.push(`/post/${post.id}`))}
+          hitSlop={8}
+          style={styles.row}
+          accessibilityLabel="Comments"
+        >
+          <Ionicons name="chatbubble-outline" size={18} color={colors.textSecondary} />
+          {post.commentCount > 0 ? <ThemedText themeColor="textSecondary">{post.commentCount}</ThemedText> : null}
+        </Pressable>
+      </View>
+
+      {!isOwnPost ? (
+        <ReportPostSheet
+          visible={isReportSheetVisible}
+          onClose={() => setIsReportSheetVisible(false)}
+          postId={post.id}
+          authorId={post.authorId}
+          authorName={post.authorName}
+        />
       ) : null}
     </View>
   );
@@ -123,9 +159,12 @@ const styles = StyleSheet.create({
   authorInfo: { flex: 1, gap: 2 },
   authorName: { fontSize: 15, lineHeight: 20 },
   deleteButton: { height: 32, width: 76 },
+  reportButton: { padding: Spacing.one },
   content: { fontSize: 16, lineHeight: 22 },
   image: { width: '100%', aspectRatio: 4 / 3, borderRadius: Radii.medium, marginTop: Spacing.one },
   tagRow: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.two },
+  engagementRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.four },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   tag: {
     flexDirection: 'row',
     alignItems: 'center',

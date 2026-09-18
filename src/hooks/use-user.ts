@@ -31,3 +31,10 @@ export function useRemoveAvatar() {
     },
   });
 }
+
+/** Only sends the request — the caller (profile screen) clears the local session on success. */
+export function useDeleteAccount() {
+  return useMutation({
+    mutationFn: (password: string) => usersApi.deleteAccount(password),
+  });
+}

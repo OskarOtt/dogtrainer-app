@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
@@ -43,6 +43,27 @@ export function SessionExerciseCard({
   const successRatePercent = Math.round(sessionExercise.successRate * 100);
   const fail = sessionExercise.repetitions - sessionExercise.successfulRepetitions;
   const [notes, setNotes] = useState(sessionExercise.notes ?? '');
+  // Debounced auto-save as a safety net: tapping straight from this field to the "Finish"
+  // button (or another exercise's card) may not reliably fire onBlur before the session is
+  // completed, which was silently dropping the last-typed notes. Blur still saves immediately too.
+  const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (!onNotesBlur || disabled) {
+      return;
+    }
+    if (debounceTimer.current) {
+      clearTimeout(debounceTimer.current);
+    }
+    debounceTimer.current = setTimeout(() => {
+      onNotesBlur(notes.trim() || null);
+    }, 600);
+    return () => {
+      if (debounceTimer.current) {
+        clearTimeout(debounceTimer.current);
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only re-run when the typed text changes
+  }, [notes]);
 
   return (
     <View style={[styles.card, { backgroundColor: colors.backgroundElement, borderColor: colors.border }]}>

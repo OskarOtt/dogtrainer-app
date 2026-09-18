@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { DeleteAccountModal } from '@/components/delete-account-modal';
 import { EmptyState } from '@/components/empty-state';
 import { GoalCard } from '@/components/goal-card';
 import { MediaAvatarPicker } from '@/components/media-avatar-picker';
@@ -27,6 +28,7 @@ export default function ProfileScreen() {
   const { user, logout } = useAuth();
   const colors = useTheme();
   const router = useRouter();
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
 
   const updateAvatar = useUpdateAvatar();
   const removeAvatar = useRemoveAvatar();
@@ -210,6 +212,13 @@ export default function ProfileScreen() {
         </ThemedText>
         <ThemedText themeColor="textSecondary">View all</ThemedText>
       </Pressable>
+
+      <Pressable style={styles.myPostsRow} onPress={() => router.push('/blocked-users')}>
+        <ThemedText type="subtitle" style={styles.sectionTitle}>
+          Blocked Users
+        </ThemedText>
+        <ThemedText themeColor="textSecondary">Manage</ThemedText>
+      </Pressable>
     </View>
   );
 
@@ -222,9 +231,26 @@ export default function ProfileScreen() {
           renderItem={null}
           contentContainerStyle={styles.scrollContent}
           ListHeaderComponent={header}
-          ListFooterComponent={<PrimaryButton title="Log Out" onPress={logout} variant="danger" style={styles.logoutButton} />}
+          ListFooterComponent={
+            <View style={styles.footer}>
+              <PrimaryButton title="Log Out" onPress={logout} variant="danger" style={styles.logoutButton} />
+              <Pressable onPress={() => setIsDeleteModalVisible(true)} hitSlop={8}>
+                <ThemedText themeColor="danger" style={styles.deleteAccountLink}>
+                  Delete Account
+                </ThemedText>
+              </Pressable>
+            </View>
+          }
         />
       </SafeAreaView>
+      <DeleteAccountModal
+        visible={isDeleteModalVisible}
+        onClose={() => setIsDeleteModalVisible(false)}
+        onDeleted={() => {
+          setIsDeleteModalVisible(false);
+          logout();
+        }}
+      />
     </ThemedView>
   );
 }
@@ -268,5 +294,7 @@ const styles = StyleSheet.create({
   },
   emptyText: { marginBottom: Spacing.one },
   list: { gap: Spacing.two },
-  logoutButton: { marginTop: Spacing.two, marginBottom: Spacing.four },
+  footer: { marginTop: Spacing.two, marginBottom: Spacing.four, gap: Spacing.three, alignItems: 'center' },
+  logoutButton: { alignSelf: 'stretch' },
+  deleteAccountLink: { fontSize: 14 },
 });

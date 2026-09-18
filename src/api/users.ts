@@ -32,4 +32,21 @@ export const usersApi = {
   async removeAvatar(): Promise<void> {
     await apiClient.delete('/users/me/avatar');
   },
+
+  async deleteAccount(password: string): Promise<void> {
+    await apiClient.delete('/users/me', { data: { password } });
+  },
+
+  async blockUser(userId: string): Promise<void> {
+    await apiClient.post(`/users/${userId}/block`);
+  },
+
+  async unblockUser(userId: string): Promise<void> {
+    await apiClient.delete(`/users/${userId}/block`);
+  },
+
+  async getBlockedUsers(): Promise<PublicUser[]> {
+    const { data } = await apiClient.get<PublicUser[]>('/users/me/blocked');
+    return data;
+  },
 };

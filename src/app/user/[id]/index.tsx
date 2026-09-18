@@ -1,6 +1,6 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useMemo } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
+import { Alert, ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Avatar } from '@/components/avatar';
@@ -13,7 +13,7 @@ import { Spacing } from '@/constants/theme';
 import { useAuth } from '@/hooks/use-auth';
 import { useFollowers, useFollowing, useFollowUser, useUnfollowUser } from '@/hooks/use-follows';
 import { useUserPosts } from '@/hooks/use-posts';
-import { usePublicUser } from '@/hooks/use-users';
+import { useBlockedUsers, useBlockUser, usePublicUser, useUnblockUser } from '@/hooks/use-users';
 import { useTheme } from '@/hooks/use-theme';
 import { getApiErrorMessage } from '@/utils/apiError';
 
@@ -29,9 +29,24 @@ export default function UserProfileScreen() {
   const { data: myFollowing } = useFollowing(currentUser?.id);
   const followUser = useFollowUser(currentUser?.id);
   const unfollowUser = useUnfollowUser(currentUser?.id);
+  const { data: blockedUsers } = useBlockedUsers();
+  const blockUser = useBlockUser();
+  const unblockUser = useUnblockUser();
 
   const isFollowing = useMemo(() => myFollowing?.some((u) => u.id === id) ?? false, [myFollowing, id]);
   const followMutation = isFollowing ? unfollowUser : followUser;
+  const isBlocked = useMemo(() => blockedUsers?.some((u) => u.id === id) ?? false, [blockedUsers, id]);
+
+  function handleToggleBlock() {
+    if (isBlocked) {
+      unblockUser.mutate(id);
+      return;
+    }
+    Alert.alert(`Block ${profile?.name ?? 'this user'}?`, "You won't see each other's posts and you'll stop following each other.", [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Block', style: 'destructive', onPress: () => blockUser.mutate(id) },
+    ]);
+  }
 
   const {
     data: postsData,
@@ -70,13 +85,21 @@ export default function UserProfileScreen() {
             {profile.name}
           </ThemedText>
           {currentUser?.id !== id ? (
-            <PrimaryButton
-              title={isFollowing ? 'Unfollow' : 'Follow'}
-              variant={isFollowing ? 'secondary' : 'primary'}
-              loading={followMutation.isPending}
-              onPress={() => followMutation.mutate(id)}
-              style={styles.followButton}
-            />
+            <View style={styles.actionRow}>
+              <PrimaryButton
+                title={isFollowing ? 'Unfollow' : 'Follow'}
+                variant={isFollowing ? 'secondary' : 'primary'}
+                loading={followMutation.isPending}
+                disabled={isBlocked}
+                onPress={() => followMutation.mutate(id)}
+                style={styles.followButton}
+              />
+              <Pressable onPress={handleToggleBlock} hitSlop={8} style={styles.blockLink}>
+                <ThemedText themeColor="danger" type="small">
+                  {isBlocked ? 'Unblock' : 'Block'}
+                </ThemedText>
+              </Pressable>
+            </View>
           ) : null}
         </View>
       </View>
@@ -133,6 +156,8 @@ const styles = StyleSheet.create({
   profileInfo: { flex: 1, gap: Spacing.two },
   name: { fontSize: 22 },
   followButton: { alignSelf: 'flex-start', minWidth: 120 },
+  actionRow: { gap: Spacing.one, alignItems: 'flex-start' },
+  blockLink: { paddingVertical: Spacing.one },
   followRow: { flexDirection: 'row', gap: Spacing.four },
   followStat: { alignItems: 'center', flex: 1 },
   followCount: { fontSize: 20 },

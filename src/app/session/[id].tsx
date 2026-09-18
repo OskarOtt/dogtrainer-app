@@ -337,6 +337,12 @@ export default function ActiveSessionScreen() {
           isDark={isDark}
           colors={{ border: colors.border, primary: colors.primary, text: colors.text, textSecondary: colors.textSecondary, background: colors.backgroundElement }}
           onBlurHtml={isActive ? handleNotesBlur : undefined}
+          // The WebView's contentEditable often never fires a native `blur` when the user taps
+          // straight from Notes to the native "Finish"/"Cancel" buttons or switches tabs (the pane
+          // is just hidden via display:none, not unmounted) — so blur-only saving can silently drop
+          // the last-typed notes. This debounced change handler (already built into the editor) acts
+          // as a safety net so notes are persisted while typing too, not only on an explicit blur.
+          onChangeHtml={isActive ? handleNotesBlur : undefined}
           style={styles.notesEditor}
           dom={{
             onRenderProcessGone: handleNotesEditorProcessGone,

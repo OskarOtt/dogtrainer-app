@@ -10,6 +10,9 @@ export interface Post {
   content: string;
   imageUrl: string | null;
   createdAt: string;
+  likeCount: number;
+  commentCount: number;
+  likedByMe: boolean;
 }
 
 export interface CreatePostPayload {
