@@ -1,13 +1,14 @@
 import { Host, TextInput } from '@expo/ui';
+import { Image } from 'expo-image';
 import { Link, useRouter } from 'expo-router';
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, useColorScheme } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { PrimaryButton } from '@/components/primary-button';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Radii, Spacing } from '@/constants/theme';
+import { AuthBrandColors, Radii, Spacing } from '@/constants/theme';
 import { useAuth } from '@/hooks/use-auth';
 import { useTheme } from '@/hooks/use-theme';
 import { getApiErrorMessage } from '@/utils/apiError';
@@ -16,6 +17,8 @@ export default function RegisterScreen() {
   const { register } = useAuth();
   const router = useRouter();
   const colors = useTheme();
+  const scheme = useColorScheme();
+  const isLight = scheme !== 'dark';
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -43,6 +46,16 @@ export default function RegisterScreen() {
       <SafeAreaView style={styles.safeArea}>
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
           <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
+            {isLight ? (
+              <ThemedView style={[styles.logoBackdrop, { backgroundColor: AuthBrandColors.lightBlue }]}>
+                <Image
+                  source={require('@/assets/images/noborder-doglogo.png')}
+                  style={styles.logo}
+                  contentFit="cover"
+                />
+              </ThemedView>
+            ) : null}
+
             <ThemedText type="title" style={styles.title}>
               Create account
             </ThemedText>
@@ -110,11 +123,16 @@ export default function RegisterScreen() {
               onPress={handleSubmit}
               loading={isSubmitting}
               disabled={!canSubmit}
-              style={styles.button}
+              style={isLight ? { ...styles.button, backgroundColor: AuthBrandColors.green } : styles.button}
             />
 
             <Link href="/(auth)/login" style={styles.link}>
-              <ThemedText themeColor="primary">Already have an account? Log in</ThemedText>
+              <ThemedText
+                themeColor="primary"
+                style={isLight ? { color: AuthBrandColors.green } : undefined}
+              >
+                Already have an account? Log in
+              </ThemedText>
             </Link>
           </ScrollView>
         </KeyboardAvoidingView>
@@ -132,6 +150,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.four,
     gap: Spacing.three,
   },
+  logoBackdrop: {
+    alignSelf: 'center',
+    width: 86,
+    height: 86,
+    borderRadius: Radii.large,
+    overflow: 'hidden',
+    marginBottom: Spacing.two,
+  },
+  logo: { width: '100%', height: '100%' },
   title: { fontSize: 32 },
   subtitle: { marginBottom: Spacing.three },
   inputHost: {

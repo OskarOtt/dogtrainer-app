@@ -33,7 +33,7 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
+          "backgroundColor": "#3E8760",
           "image": "./assets/images/noborder-doglogo.png",
           "imageWidth": 76
         }

@@ -85,6 +85,15 @@ export const Radii = {
   pill: 999,
 } as const;
 
+/**
+ * Brand accents for the (auth) login/register screens — light mode only.
+ * Dark mode intentionally keeps the standard `Colors.dark` palette untouched.
+ */
+export const AuthBrandColors = {
+  green: '#3E8760',
+  lightBlue: Colors.light.backgroundSelected,
+} as const;
+
 /** Difficulty badge colors — intentionally theme-independent accent colors. */
 export const DifficultyColors = {
   BEGINNER: '#1EA672',

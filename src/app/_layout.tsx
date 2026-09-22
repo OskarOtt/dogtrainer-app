@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import { useColorScheme } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
+import { LoadingScreen } from '@/components/loading-screen';
 import { queryClient } from '@/data/queryClient';
 import { AuthProvider, useAuth } from '@/hooks/use-auth';
 
@@ -13,14 +14,15 @@ SplashScreen.preventAutoHideAsync();
 function RootNavigator() {
   const { isAuthenticated, isLoading } = useAuth();
 
+  // Hide the native splash screen as soon as JS has taken over, and show our
+  // own green loading screen (with logo + text) until auth status resolves,
+  // instead of leaving the native splash up or rendering a blank screen.
   useEffect(() => {
-    if (!isLoading) {
-      SplashScreen.hideAsync();
-    }
-  }, [isLoading]);
+    SplashScreen.hideAsync();
+  }, []);
 
   if (isLoading) {
-    return null;
+    return <LoadingScreen />;
   }
 
   return (
