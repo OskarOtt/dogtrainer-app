@@ -1,5 +1,12 @@
 import { apiClient } from '@/api/client';
-import type { AuthTokensResponse, LoginPayload, RegisterPayload, User } from '@/types/auth';
+import type {
+  AuthMethod,
+  AuthTokensResponse,
+  LoginPayload,
+  RegisterPayload,
+  SocialAuthPayload,
+  User,
+} from '@/types/auth';
 
 /**
  * Thin wrapper around the /auth endpoints. UI code and hooks should only ever
@@ -13,6 +20,16 @@ export const authApi = {
 
   async login(payload: LoginPayload): Promise<AuthTokensResponse> {
     const { data } = await apiClient.post<AuthTokensResponse>('/auth/login', payload);
+    return data;
+  },
+
+  async socialLogin(payload: SocialAuthPayload): Promise<AuthTokensResponse> {
+    const { data } = await apiClient.post<AuthTokensResponse>('/auth/social', payload);
+    return data;
+  },
+
+  async linkSocialIdentity(payload: SocialAuthPayload): Promise<AuthMethod[]> {
+    const { data } = await apiClient.post<AuthMethod[]>('/auth/social/link', payload);
     return data;
   },
 

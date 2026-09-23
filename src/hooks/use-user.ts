@@ -3,6 +3,7 @@ import type { ImagePickerAsset } from 'expo-image-picker';
 
 import { usersApi } from '@/api/users';
 import { useAuth } from '@/hooks/use-auth';
+import type { DeleteAccountPayload } from '@/types/auth';
 import { getAssetFileSize, resolveContentType, uploadAssetToPresignedUrl } from '@/utils/upload';
 
 /** Full presign → upload → confirm flow for the current user's avatar. */
@@ -35,6 +36,6 @@ export function useRemoveAvatar() {
 /** Only sends the request — the caller (profile screen) clears the local session on success. */
 export function useDeleteAccount() {
   return useMutation({
-    mutationFn: (password: string) => usersApi.deleteAccount(password),
+    mutationFn: (payload: DeleteAccountPayload) => usersApi.deleteAccount(payload),
   });
 }

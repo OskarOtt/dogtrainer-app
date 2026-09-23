@@ -5,30 +5,32 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { FormTextInput } from '@/components/form-text-input';
 import { PrimaryButton } from '@/components/primary-button';
+import { SocialAuthButtons } from '@/components/social-auth-buttons';
 import { ThemedText } from '@/components/themed-text';
 import { Spacing } from '@/constants/theme';
 import { useDeleteAccount } from '@/hooks/use-user';
 import { useTheme } from '@/hooks/use-theme';
+import type { AuthMethod, SocialAuthPayload, SocialProvider } from '@/types/auth';
 import { getApiErrorMessage } from '@/utils/apiError';
 
 export interface DeleteAccountModalProps {
   visible: boolean;
   onClose: () => void;
-  /** Called once the account has actually been deleted server-side. */
   onDeleted: () => void;
+  authMethods: AuthMethod[];
 }
 
-/**
- * Confirms permanent account deletion. Requires the current password (re-entered as a safety
- * check) — the destructive button enables as soon as a password is typed.
- */
-export function DeleteAccountModal({ visible, onClose, onDeleted }: DeleteAccountModalProps) {
+export function DeleteAccountModal({ visible, onClose, onDeleted, authMethods }: DeleteAccountModalProps) {
   const colors = useTheme();
   const deleteAccount = useDeleteAccount();
   const [password, setPassword] = useState('');
+  const [providerError, setProviderError] = useState<unknown>(null);
+  const socialMethods = authMethods.filter((method): method is SocialProvider => method !== 'PASSWORD');
+  const hasPassword = authMethods.includes('PASSWORD');
 
   function handleClose() {
     setPassword('');
+    setProviderError(null);
     deleteAccount.reset();
     onClose();
   }
@@ -37,7 +39,17 @@ export function DeleteAccountModal({ visible, onClose, onDeleted }: DeleteAccoun
     if (!password) {
       return;
     }
-    deleteAccount.mutate(password, { onSuccess: onDeleted });
+    deleteAccount.mutate({ method: 'PASSWORD', password }, { onSuccess: onDeleted });
+  }
+
+  async function handleSocialConfirm(credential: SocialAuthPayload) {
+    setProviderError(null);
+    await deleteAccount.mutateAsync({
+      method: credential.provider,
+      idToken: credential.idToken,
+      authorizationCode: credential.authorizationCode,
+    });
+    onDeleted();
   }
 
   return (
@@ -58,30 +70,47 @@ export function DeleteAccountModal({ visible, onClose, onDeleted }: DeleteAccoun
             others&apos; followers/following. This can&apos;t be undone.
           </ThemedText>
 
-          <FormTextInput
-            defaultValue={password}
-            onChangeText={(text) => {
-              setPassword(text);
-              deleteAccount.reset();
-            }}
-            placeholder="Enter your password"
-            secureTextEntry
-            autoCapitalize="none"
-          />
-
-          {deleteAccount.isError ? (
-            <ThemedText style={[styles.message, { color: colors.danger }]}>
-              {getApiErrorMessage(deleteAccount.error, 'Incorrect password.')}
-            </ThemedText>
+          {hasPassword ? (
+            <>
+              <FormTextInput
+                defaultValue={password}
+                onChangeText={(text) => {
+                  setPassword(text);
+                  deleteAccount.reset();
+                }}
+                placeholder="Enter your password"
+                secureTextEntry
+                autoCapitalize="none"
+              />
+              <PrimaryButton
+                title="Delete my account"
+                variant="danger"
+                onPress={handleConfirm}
+                loading={deleteAccount.isPending}
+                disabled={!password}
+              />
+            </>
           ) : null}
 
-          <PrimaryButton
-            title="Delete my account"
-            variant="danger"
-            onPress={handleConfirm}
-            loading={deleteAccount.isPending}
-            disabled={!password}
-          />
+          {socialMethods.length > 0 ? (
+            <>
+              <ThemedText style={[styles.reauthenticate, { color: colors.textSecondary }]}>
+                Confirm with a linked provider to delete your account.
+              </ThemedText>
+              <SocialAuthButtons
+                providers={socialMethods}
+                disabled={deleteAccount.isPending}
+                onCredential={handleSocialConfirm}
+                onError={setProviderError}
+              />
+            </>
+          ) : null}
+
+          {deleteAccount.isError || providerError ? (
+            <ThemedText style={[styles.message, { color: colors.danger }]}>
+              {getApiErrorMessage(providerError ?? deleteAccount.error, 'Could not confirm account deletion.')}
+            </ThemedText>
+          ) : null}
         </SafeAreaView>
       </View>
     </Modal>
@@ -113,5 +142,10 @@ const styles = StyleSheet.create({
   message: {
     fontSize: 14,
     marginBottom: Spacing.two,
+  },
+  reauthenticate: {
+    fontSize: 13,
+    marginBottom: Spacing.two,
+    textAlign: 'center',
   },
 });

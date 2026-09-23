@@ -2,19 +2,21 @@ import { Host, TextInput } from '@expo/ui';
 import { Image } from 'expo-image';
 import { Link, useRouter } from 'expo-router';
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, useColorScheme } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, useColorScheme, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { PrimaryButton } from '@/components/primary-button';
+import { SocialAuthButtons } from '@/components/social-auth-buttons';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { AuthBrandColors, Radii, Spacing } from '@/constants/theme';
 import { useAuth } from '@/hooks/use-auth';
 import { useTheme } from '@/hooks/use-theme';
 import { getApiErrorMessage } from '@/utils/apiError';
+import type { SocialAuthPayload } from '@/types/auth';
 
 export default function RegisterScreen() {
-  const { register } = useAuth();
+  const { register, socialLogin } = useAuth();
   const router = useRouter();
   const colors = useTheme();
   const scheme = useColorScheme();
@@ -25,6 +27,7 @@ export default function RegisterScreen() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSocialAuth, setShowSocialAuth] = useState(false);
 
   const canSubmit = name.trim().length > 0 && email.trim().length > 0 && password.length >= 8;
 
@@ -39,6 +42,12 @@ export default function RegisterScreen() {
     } finally {
       setIsSubmitting(false);
     }
+  }
+
+  async function handleSocialLogin(payload: SocialAuthPayload) {
+    setError(null);
+    await socialLogin(payload);
+    router.replace('/(tabs)');
   }
 
   return (
@@ -62,6 +71,21 @@ export default function RegisterScreen() {
             <ThemedText themeColor="textSecondary" style={styles.subtitle}>
               Track training progress for every dog you love.
             </ThemedText>
+
+            <SocialAuthButtons
+              defaultDisplayName={name}
+              disabled={isSubmitting}
+              onCredential={handleSocialLogin}
+              onError={(err) => setError(getApiErrorMessage(err, 'Could not continue with this provider.'))}
+              onVisibilityChange={setShowSocialAuth}
+            />
+            {showSocialAuth ? (
+              <View style={styles.dividerRow}>
+                <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
+                <ThemedText themeColor="textSecondary">or use email</ThemedText>
+                <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
+              </View>
+            ) : null}
 
             <Host style={[styles.inputHost, { borderColor: colors.border, backgroundColor: colors.backgroundElement }]}>
               <TextInput
@@ -161,6 +185,12 @@ const styles = StyleSheet.create({
   logo: { width: '100%', height: '100%' },
   title: { fontSize: 32 },
   subtitle: { marginBottom: Spacing.three },
+  dividerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.two,
+  },
+  dividerLine: { flex: 1, height: StyleSheet.hairlineWidth },
   inputHost: {
     height: 56,
     borderWidth: 1,

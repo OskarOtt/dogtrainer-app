@@ -1,5 +1,5 @@
 import { apiClient } from '@/api/client';
-import type { User } from '@/types/auth';
+import type { DeleteAccountPayload, User } from '@/types/auth';
 import type { UploadUrlRequest, UploadUrlResponse } from '@/types/media';
 import type { PublicUser } from '@/types/user';
 
@@ -33,8 +33,8 @@ export const usersApi = {
     await apiClient.delete('/users/me/avatar');
   },
 
-  async deleteAccount(password: string): Promise<void> {
-    await apiClient.delete('/users/me', { data: { password } });
+  async deleteAccount(payload: DeleteAccountPayload): Promise<void> {
+    await apiClient.delete('/users/me', { data: payload });
   },
 
   async blockUser(userId: string): Promise<void> {

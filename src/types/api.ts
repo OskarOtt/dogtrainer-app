@@ -11,6 +11,7 @@ export interface ApiErrorResponse {
   timestamp: string;
   status: number;
   error: string;
+  code: string | null;
   message: string;
   path: string;
   fieldErrors: FieldError[];
