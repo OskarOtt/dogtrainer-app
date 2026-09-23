@@ -13,6 +13,7 @@ import { AuthBrandColors, Radii, Spacing } from '@/constants/theme';
 import { useAuth } from '@/hooks/use-auth';
 import { useTheme } from '@/hooks/use-theme';
 import { getApiErrorMessage } from '@/utils/apiError';
+import { getPasswordError, isValidEmail } from '@/utils/validation';
 import type { SocialAuthPayload } from '@/types/auth';
 
 export default function RegisterScreen() {
@@ -33,6 +34,18 @@ export default function RegisterScreen() {
 
   async function handleSubmit() {
     setError(null);
+
+    if (!isValidEmail(email)) {
+      setError('Please enter a valid email address (e.g. xx@xxx.xyz).');
+      return;
+    }
+
+    const passwordError = getPasswordError(password);
+    if (passwordError) {
+      setError(passwordError);
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       await register({ name: name.trim(), email: email.trim(), password });
@@ -123,7 +136,7 @@ export default function RegisterScreen() {
               <TextInput
                 defaultValue={password}
                 onChangeText={setPassword}
-                placeholder="Password (min. 8 characters)"
+                placeholder="Password (min. 8 chars, 1 capital, 1 symbol)"
                 placeholderTextColor={colors.textSecondary}
                 secureTextEntry
                 autoComplete="new-password"
