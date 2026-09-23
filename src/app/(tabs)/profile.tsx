@@ -8,6 +8,7 @@ import { EmptyState } from '@/components/empty-state';
 import { GoalCard } from '@/components/goal-card';
 import { MediaAvatarPicker } from '@/components/media-avatar-picker';
 import { PrimaryButton } from '@/components/primary-button';
+import { SocialAuthButtons } from '@/components/social-auth-buttons';
 import { StatCard } from '@/components/stat-card';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -23,12 +24,14 @@ import { useTheme } from '@/hooks/use-theme';
 import { useRemoveAvatar, useUpdateAvatar } from '@/hooks/use-user';
 import { getApiErrorMessage } from '@/utils/apiError';
 import { formatDuration } from '@/utils/date';
+import type { SocialAuthPayload, SocialProvider } from '@/types/auth';
 
 export default function ProfileScreen() {
-  const { user, logout } = useAuth();
+  const { user, logout, linkSocialIdentity } = useAuth();
   const colors = useTheme();
   const router = useRouter();
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [linkError, setLinkError] = useState<unknown>(null);
 
   const updateAvatar = useUpdateAvatar();
   const removeAvatar = useRemoveAvatar();
@@ -52,6 +55,14 @@ export default function ProfileScreen() {
   const { data: sessions } = useDogSessions(activeDog?.id);
   const { data: goals } = useDogGoals(activeDog?.id);
   const activeGoals = goals?.filter((goal) => goal.status !== 'COMPLETED') ?? [];
+  const authMethods = user?.authMethods ?? ['PASSWORD'];
+  const unlinkedProviders = (['APPLE'] as SocialProvider[])
+    .filter((provider) => !authMethods.includes(provider));
+
+  async function handleProviderLink(credential: SocialAuthPayload) {
+    setLinkError(null);
+    await linkSocialIdentity(credential);
+  }
 
   const header = (
     <View style={styles.headerContent}>
@@ -107,6 +118,27 @@ export default function ProfileScreen() {
           {user?.name ?? 'Trainer'}
         </ThemedText>
         <ThemedText themeColor="textSecondary">{user?.email}</ThemedText>
+      </ThemedView>
+
+      <ThemedView style={[styles.card, { backgroundColor: colors.backgroundElement, borderColor: colors.border }]}>
+        <ThemedText type="subtitle" style={styles.cardTitle}>
+          Sign-in methods
+        </ThemedText>
+        <ThemedText themeColor="textSecondary">
+          Connected: {authMethods.map(formatAuthMethod).join(', ')}
+        </ThemedText>
+        {unlinkedProviders.length > 0 ? (
+          <SocialAuthButtons
+            providers={unlinkedProviders}
+            onCredential={handleProviderLink}
+            onError={setLinkError}
+          />
+        ) : null}
+        {linkError ? (
+          <ThemedText themeColor="danger" style={styles.error}>
+            {getApiErrorMessage(linkError, 'Could not connect this sign-in method.')}
+          </ThemedText>
+        ) : null}
       </ThemedView>
 
       {isLoadingDogs ? (
@@ -245,6 +277,7 @@ export default function ProfileScreen() {
       </SafeAreaView>
       <DeleteAccountModal
         visible={isDeleteModalVisible}
+        authMethods={authMethods}
         onClose={() => setIsDeleteModalVisible(false)}
         onDeleted={() => {
           setIsDeleteModalVisible(false);
@@ -253,6 +286,10 @@ export default function ProfileScreen() {
       />
     </ThemedView>
   );
+}
+
+function formatAuthMethod(method: string): string {
+  return method.charAt(0) + method.slice(1).toLowerCase();
 }
 
 const styles = StyleSheet.create({

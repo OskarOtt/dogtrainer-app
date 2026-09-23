@@ -14,3 +14,7 @@ export function getApiErrorMessage(error: unknown, fallback = 'Something went wr
   }
   return fallback;
 }
+
+export function getApiErrorCode(error: unknown): string | null {
+  return isAxiosError<ApiErrorResponse>(error) ? (error.response?.data?.code ?? null) : null;
+}

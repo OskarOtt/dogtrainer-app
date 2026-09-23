@@ -4,7 +4,7 @@ import { createContext, useCallback, useContext, useEffect, useState, type React
 
 import { authApi } from '@/api/auth';
 import { registerRefreshHandler } from '@/api/client';
-import type { LoginPayload, RegisterPayload, User } from '@/types/auth';
+import type { LoginPayload, RegisterPayload, SocialAuthPayload, User } from '@/types/auth';
 import { tokenStorage } from '@/utils/tokenStorage';
 
 interface AuthContextValue {
@@ -13,6 +13,8 @@ interface AuthContextValue {
   isAuthenticated: boolean;
   login: (payload: LoginPayload) => Promise<void>;
   register: (payload: RegisterPayload) => Promise<void>;
+  socialLogin: (payload: SocialAuthPayload) => Promise<void>;
+  linkSocialIdentity: (payload: SocialAuthPayload) => Promise<void>;
   logout: () => Promise<void>;
   /** Updates the locally held user, e.g. after an avatar upload/removal returns fresh data. */
   setUser: (user: User) => void;
@@ -83,6 +85,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(me);
   }, []);
 
+  const socialLogin = useCallback(async (payload: SocialAuthPayload) => {
+    const tokens = await authApi.socialLogin(payload);
+    await tokenStorage.setTokens(tokens);
+    const me = await authApi.me();
+    setUser(me);
+  }, []);
+
+  const linkSocialIdentity = useCallback(async (payload: SocialAuthPayload) => {
+    const authMethods = await authApi.linkSocialIdentity(payload);
+    setUser((current) => (current ? { ...current, authMethods } : current));
+  }, []);
+
   const logout = useCallback(async () => {
     const refreshToken = await tokenStorage.getRefreshToken();
     if (refreshToken) {
@@ -102,6 +116,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isAuthenticated: user !== null,
     login,
     register,
+    socialLogin,
+    linkSocialIdentity,
     logout,
     setUser,
   };
