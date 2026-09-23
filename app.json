@@ -2,7 +2,7 @@
   "expo": {
     "name": "Flink",
     "slug": "dogtrainer-app",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "description": "Track training sessions, plans, and progress for your dog.",
     "orientation": "portrait",
     "icon": "./assets/images/noborder-doglogo.png",
