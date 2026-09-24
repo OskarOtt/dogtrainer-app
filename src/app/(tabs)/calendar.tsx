@@ -97,7 +97,7 @@ export default function CalendarScreen() {
               height={windowHeight - 200 - BottomTabInset}
               mode="month"
               locale={locale}
-              weekStartsOn={locale === 'nb' ? 1 : 0}
+              weekStartsOn={1}
               moreLabel={t('calendar.moreLabel')}
               swipeEnabled
               showAdjacentMonths

@@ -16,7 +16,10 @@
       "distribution": "internal"
     },
     "production": {
-      "autoIncrement": true
+      "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://dogtrainer-api.oskott.com/api/v1"
+      }
     }
   },
   "submit": {
