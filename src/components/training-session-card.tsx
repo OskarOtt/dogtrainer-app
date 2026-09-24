@@ -4,6 +4,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { Radii, Spacing, StatusColors } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
+import { t, type TranslationKey } from '@/i18n';
 import type { TrainingSession } from '@/types/session';
 import { formatDateTime, formatDuration } from '@/utils/date';
 
@@ -14,10 +15,10 @@ export interface TrainingSessionCardProps {
   dogName?: string | null;
 }
 
-const STATUS_LABELS: Record<TrainingSession['status'], string> = {
-  IN_PROGRESS: 'In Progress',
-  COMPLETED: 'Completed',
-  CANCELLED: 'Cancelled',
+const STATUS_LABELS: Record<TrainingSession['status'], TranslationKey> = {
+  IN_PROGRESS: 'status.inProgress',
+  COMPLETED: 'status.completed',
+  CANCELLED: 'status.cancelled',
 };
 
 /** Card summarizing a training session for use in history/progress lists. */
@@ -45,7 +46,7 @@ export function TrainingSessionCard({ session, onPress, dogName }: TrainingSessi
           </ThemedText>
           <View style={[styles.badge, { backgroundColor: statusColor + '22' }]}>
             <ThemedText type="small" style={{ color: statusColor }}>
-              {STATUS_LABELS[session.status]}
+              {t(STATUS_LABELS[session.status])}
             </ThemedText>
           </View>
         </View>
@@ -58,7 +59,7 @@ export function TrainingSessionCard({ session, onPress, dogName }: TrainingSessi
           {[
             session.location,
             session.durationMinutes != null ? formatDuration(session.durationMinutes) : null,
-            `${session.exercises.length} exercise${session.exercises.length === 1 ? '' : 's'}`,
+            t('common.exercises', { count: session.exercises.length }),
           ]
             .filter(Boolean)
             .join(' · ')}

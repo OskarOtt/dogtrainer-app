@@ -1,5 +1,6 @@
 import type { ICalendarEventBase } from 'react-native-big-calendar';
 
+import { t } from '@/i18n';
 import type { Dog } from '@/types/dog';
 import type { Goal } from '@/types/goal';
 import type { TrainingPlan } from '@/types/plan';
@@ -68,7 +69,7 @@ export function buildCalendarEvents(
         refId: session.id,
         dogId: session.dogId,
         dogName: dog.name,
-        title: `${dog.name} training`,
+        title: t('calendar.sessionTitle', { name: dog.name }),
         start,
         end,
       },

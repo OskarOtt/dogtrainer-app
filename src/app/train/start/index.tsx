@@ -1,6 +1,7 @@
 import { Stack, useRouter } from 'expo-router';
 import { ActivityIndicator, FlatList, StyleSheet, View } from 'react-native';
 
+import { t } from '@/i18n';
 import { EmptyState } from '@/components/empty-state';
 import { PrimaryButton } from '@/components/primary-button';
 import { ThemedText } from '@/components/themed-text';
@@ -27,7 +28,7 @@ export default function StartTrainingScreen() {
   if (isLoadingDogs) {
     return (
       <ThemedView style={styles.container}>
-        <Stack.Screen options={{ title: 'Start Training' }} />
+        <Stack.Screen options={{ title: t('dog.startTraining') }} />
         <View style={styles.center}>
           <ActivityIndicator color={colors.primary} />
         </View>
@@ -38,9 +39,9 @@ export default function StartTrainingScreen() {
   if (!dogs || dogs.length === 0) {
     return (
       <ThemedView style={styles.container}>
-        <Stack.Screen options={{ title: 'Start Training' }} />
-        <EmptyState icon="paw-outline" title="No dogs yet" message="Add a dog before starting a training session.">
-          <PrimaryButton title="Add a Dog" onPress={() => router.push('/dog/new')} style={styles.emptyButton} />
+        <Stack.Screen options={{ title: t('dog.startTraining') }} />
+        <EmptyState icon="paw-outline" title={t('dog.noDogs')} message={t('dog.noDogsTraining')}>
+          <PrimaryButton title={t('dog.addADog')} onPress={() => router.push('/dog/new')} style={styles.emptyButton} />
         </EmptyState>
       </ThemedView>
     );
@@ -48,7 +49,7 @@ export default function StartTrainingScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <Stack.Screen options={{ title: 'Start Training' }} />
+      <Stack.Screen options={{ title: t('dog.startTraining') }} />
       <FlatList
         data={plans ?? []}
         keyExtractor={(plan) => plan.id}
@@ -56,12 +57,12 @@ export default function StartTrainingScreen() {
         ListHeaderComponent={
           <View style={styles.emptyStartSection}>
             <PrimaryButton
-              title="Start Empty Training"
+              title={t('training.startEmpty')}
               onPress={() => router.push('/train/pick-dog')}
               style={styles.emptyStartButton}
             />
             <ThemedText type="subtitle" style={styles.sectionTitle}>
-              Or start from a training plan
+              {t('train.orStartPlan')}
             </ThemedText>
             {isLoadingPlans ? <ActivityIndicator style={styles.loading} color={colors.primary} /> : null}
             {isError ? <ThemedText themeColor="danger">{getApiErrorMessage(error)}</ThemedText> : null}
@@ -70,7 +71,7 @@ export default function StartTrainingScreen() {
         ListEmptyComponent={
           !isLoadingPlans && !isError ? (
             <ThemedText themeColor="textSecondary" style={styles.emptyPlansText}>
-              No training plans yet. Create one from the Plan Training screen.
+              {t('train.noPlans')}
             </ThemedText>
           ) : null
         }

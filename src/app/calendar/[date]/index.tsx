@@ -2,6 +2,7 @@ import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useMemo } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 
+import { getLocaleTag, t } from '@/i18n';
 import { EmptyState } from '@/components/empty-state';
 import { GoalCard } from '@/components/goal-card';
 import { PrimaryButton } from '@/components/primary-button';
@@ -41,7 +42,7 @@ export default function CalendarDayScreen() {
 
   const parsedDate = parseIsoDateLocal(date);
   const heading = parsedDate
-    ? parsedDate.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
+    ? parsedDate.toLocaleDateString(getLocaleTag(), { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
     : (date ?? '');
 
   if (isLoading) {
@@ -55,8 +56,8 @@ export default function CalendarDayScreen() {
   if (isError) {
     return (
       <ThemedView style={{ flex: 1 }}>
-        <EmptyState icon="alert-circle-outline" title="Couldn't load this day" message={getApiErrorMessage(plansError)}>
-          <PrimaryButton title="Exit" variant="secondary" onPress={() => router.replace('/(tabs)')} />
+        <EmptyState icon="alert-circle-outline" title={t('calendar.dayLoadError')} message={getApiErrorMessage(plansError)}>
+          <PrimaryButton title={t('common.exit')} variant="secondary" onPress={() => router.replace('/(tabs)')} />
         </EmptyState>
       </ThemedView>
     );
@@ -71,17 +72,17 @@ export default function CalendarDayScreen() {
         </ThemedText>
 
         <PrimaryButton
-          title="New Plan"
+          title={t('calendar.newPlan')}
           onPress={() => router.push(`/calendar/${date}/new-plan`)}
           style={styles.newPlanButton}
         />
 
         <ThemedText type="smallBold" style={styles.sectionTitle}>
-          Training Plans
+          {t('calendar.trainingPlans')}
         </ThemedText>
         {dayPlans.length === 0 ? (
           <ThemedText themeColor="textSecondary" style={styles.emptyText}>
-            No training plans scheduled for this day.
+            {t('calendar.noPlansDay')}
           </ThemedText>
         ) : (
           <View style={styles.list}>
@@ -94,7 +95,7 @@ export default function CalendarDayScreen() {
                 />
                 <View style={styles.itemActions}>
                   <PrimaryButton
-                    title="Start Training"
+                    title={t('dog.startTraining')}
                     variant="secondary"
                     onPress={() => router.push(`/session/new?planId=${plan.id}`)}
                     style={styles.actionButton}
@@ -106,11 +107,11 @@ export default function CalendarDayScreen() {
         )}
 
         <ThemedText type="smallBold" style={styles.sectionTitle}>
-          Completed Trainings
+          {t('calendar.completedTrainings')}
         </ThemedText>
         {daySessions.length === 0 ? (
           <ThemedText themeColor="textSecondary" style={styles.emptyText}>
-            No completed trainings on this day.
+            {t('calendar.noTrainingsDay')}
           </ThemedText>
         ) : (
           <View style={styles.list}>
@@ -127,11 +128,11 @@ export default function CalendarDayScreen() {
         )}
 
         <ThemedText type="smallBold" style={styles.sectionTitle}>
-          Goals
+          {t('calendar.goals')}
         </ThemedText>
         {dayGoals.length === 0 ? (
           <ThemedText themeColor="textSecondary" style={styles.emptyText}>
-            No goals targeted for this day.
+            {t('calendar.noGoalsDay')}
           </ThemedText>
         ) : (
           <View style={styles.list}>

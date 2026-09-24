@@ -3,6 +3,7 @@ import { frame } from '@expo/ui/swift-ui/modifiers';
 import { StyleSheet } from 'react-native';
 
 import type { RichTextToolbarProps } from '@/components/rich-text/rich-text-toolbar.types';
+import { t } from '@/i18n';
 
 /**
  * iOS variant of the formatting toolbar: buttons are grouped in a native SwiftUI
@@ -17,32 +18,32 @@ export function RichTextToolbar({ onInsertInline, onToggleLinePrefix }: RichText
     <Host style={styles.host} matchContents>
       <ControlGroup>
         <Button
-          label="Title"
+          label={t('richText.title')}
           systemImage="textformat.size.larger"
           onPress={() => onToggleLinePrefix('heading1')}
           modifiers={[frame({ height: 36 })]}
         />
         <Button
-          label="Subtitle"
+          label={t('richText.subtitle')}
           systemImage="textformat.size.smaller"
           onPress={() => onToggleLinePrefix('heading2')}
           modifiers={[frame({ height: 36 })]}
         />
-        <Button label="Bold" systemImage="bold" onPress={() => onInsertInline('**bold**')} modifiers={[frame({ height: 36 })]} />
+        <Button label={t('richText.bold')} systemImage="bold" onPress={() => onInsertInline('**bold**')} modifiers={[frame({ height: 36 })]} />
         <Button
-          label="Italic"
+          label={t('richText.italic')}
           systemImage="italic"
           onPress={() => onInsertInline('*italic*')}
           modifiers={[frame({ height: 36 })]}
         />
         <Button
-          label="Bullet list"
+          label={t('richText.bulletList')}
           systemImage="list.bullet"
           onPress={() => onToggleLinePrefix('bullet')}
           modifiers={[frame({ height: 36 })]}
         />
         <Button
-          label="Checklist"
+          label={t('richText.checklist')}
           systemImage="checklist"
           onPress={() => onToggleLinePrefix('checklist')}
           modifiers={[frame({ height: 36 })]}

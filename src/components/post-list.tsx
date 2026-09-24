@@ -1,5 +1,6 @@
 import { ActivityIndicator, FlatList, RefreshControl, StyleSheet, type ListRenderItemInfo } from 'react-native';
 
+import { t } from '@/i18n';
 import { EmptyState } from '@/components/empty-state';
 import { PostCard } from '@/components/post-card';
 import { BottomTabInset, Spacing } from '@/constants/theme';
@@ -26,7 +27,7 @@ export function PostList({
   isFetchingNextPage,
   refreshing,
   onRefresh,
-  emptyTitle = 'No posts yet',
+  emptyTitle = t('posts.noPosts'),
   emptyMessage,
   ListHeaderComponent,
   ListFooterComponent,

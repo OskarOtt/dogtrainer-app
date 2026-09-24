@@ -2,6 +2,7 @@ import { Host, TextInput, useNativeState } from '@expo/ui';
 import { useState } from 'react';
 import { Pressable, StyleSheet, View, type ViewStyle } from 'react-native';
 
+import { t } from '@/i18n';
 import { RichTextToolbar } from '@/components/rich-text/rich-text-toolbar';
 import { RichTextView } from '@/components/rich-text/rich-text-view';
 import { Radii, Spacing } from '@/constants/theme';
@@ -62,7 +63,7 @@ export function RichTextEditor({ defaultValue, onChangeText, onBlur, editable = 
   if (!isFocused) {
     return (
       <Pressable onPress={() => setIsFocused(true)} style={[styles.previewHost, { borderColor: colors.border, backgroundColor: colors.backgroundElement }]}>
-        <RichTextView value={text} onToggleChecklistLine={handleToggleChecklistLine} placeholder={placeholder ?? 'Tap to add notes…'} />
+        <RichTextView value={text} onToggleChecklistLine={handleToggleChecklistLine} placeholder={placeholder ?? t('training.notesPlaceholder')} />
       </Pressable>
     );
   }

@@ -40,6 +40,12 @@ export interface LexicalNotesEditorProps {
     textSecondary: string;
     background: string;
   };
+  labels: {
+    bold: string;
+    italic: string;
+    bulletList: string;
+    placeholder: string;
+  };
   /**
    * Style applied to the outer native WebView wrapper (not used inside this file — the
    * generated native-side wrapper forwards it directly to the underlying `WebView`).
@@ -58,11 +64,13 @@ function $isListNodeType(node: LexicalNode): boolean {
 
 function ToolbarButton({
   label,
+  text,
   active,
   onPress,
   colors,
 }: {
   label: string;
+  text: string;
   active: boolean;
   onPress: () => void;
   colors: NonNullable<LexicalNotesEditorProps['colors']>;
@@ -70,6 +78,7 @@ function ToolbarButton({
   return (
     <button
       type="button"
+      aria-label={label}
       // Prevent the contentEditable from losing focus/selection when tapping a toolbar button.
       onMouseDown={(event) => event.preventDefault()}
       onClick={onPress}
@@ -86,12 +95,18 @@ function ToolbarButton({
         backgroundColor: active ? colors.primary : 'transparent',
       }}
     >
-      {label}
+      {text}
     </button>
   );
 }
 
-function Toolbar({ colors }: { colors: NonNullable<LexicalNotesEditorProps['colors']> }) {
+function Toolbar({
+  colors,
+  labels,
+}: {
+  colors: NonNullable<LexicalNotesEditorProps['colors']>;
+  labels: NonNullable<LexicalNotesEditorProps['labels']>;
+}) {
   const [editor] = useLexicalComposerContext();
   const [isBold, setIsBold] = useState(false);
   const [isItalic, setIsItalic] = useState(false);
@@ -123,10 +138,11 @@ function Toolbar({ colors }: { colors: NonNullable<LexicalNotesEditorProps['colo
       }}
     >
       <div style={{ display: 'flex', flex: 1, gap: 4 }}>
-        <ToolbarButton label="B" active={isBold} colors={colors} onPress={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'bold')} />
-        <ToolbarButton label="I" active={isItalic} colors={colors} onPress={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'italic')} />
+        <ToolbarButton label={labels.bold} text="B" active={isBold} colors={colors} onPress={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'bold')} />
+        <ToolbarButton label={labels.italic} text="I" active={isItalic} colors={colors} onPress={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'italic')} />
         <ToolbarButton
-          label="•"
+          label={labels.bulletList}
+          text="•"
           active={isBulletList}
           colors={colors}
           onPress={() => editor.dispatchCommand(isBulletList ? REMOVE_LIST_COMMAND : INSERT_UNORDERED_LIST_COMMAND, undefined)}
@@ -211,6 +227,7 @@ export default function LexicalNotesEditor({
   editable = true,
   isDark = false,
   colors = DEFAULT_COLORS,
+  labels,
 }: LexicalNotesEditorProps) {
   const onChangeHtmlRef = useRef(onChangeHtml);
   useEffect(() => {
@@ -304,10 +321,16 @@ export default function LexicalNotesEditor({
         .lexical-listitem { margin: 4px 0; }
       `}</style>
       <LexicalComposer initialConfig={initialConfig}>
-        {editable ? <Toolbar colors={colors} /> : null}
+        {editable ? <Toolbar colors={colors} labels={labels} /> : null}
         <div className="lexical-content-wrapper">
           <RichTextPlugin
-            contentEditable={<ContentEditable className="lexical-content" aria-placeholder="Tap to add notes…" placeholder={<div className="lexical-placeholder">Tap to add notes…</div>} />}
+            contentEditable={
+              <ContentEditable
+                className="lexical-content"
+                aria-placeholder={labels.placeholder}
+                placeholder={<div className="lexical-placeholder">{labels.placeholder}</div>}
+              />
+            }
             ErrorBoundary={LexicalErrorBoundary}
           />
         </div>

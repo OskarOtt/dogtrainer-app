@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { Alert, ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { t } from '@/i18n';
 import { Avatar } from '@/components/avatar';
 import { EmptyState } from '@/components/empty-state';
 import { PostList } from '@/components/post-list';
@@ -42,9 +43,9 @@ export default function UserProfileScreen() {
       unblockUser.mutate(id);
       return;
     }
-    Alert.alert(`Block ${profile?.name ?? 'this user'}?`, "You won't see each other's posts and you'll stop following each other.", [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Block', style: 'destructive', onPress: () => blockUser.mutate(id) },
+    Alert.alert(t('social.blockUserTitle', { name: profile?.name ?? t('social.blockUserFallback') }), t('social.blockMessage'), [
+      { text: t('common.cancel'), style: 'cancel' },
+      { text: t('common.block'), style: 'destructive', onPress: () => blockUser.mutate(id) },
     ]);
   }
 
@@ -69,8 +70,8 @@ export default function UserProfileScreen() {
   if (isError || !profile) {
     return (
       <ThemedView style={{ flex: 1 }}>
-        <EmptyState icon="alert-circle-outline" title="Couldn't load this profile" message={getApiErrorMessage(error)}>
-          <PrimaryButton title="Exit" variant="secondary" onPress={() => router.replace('/(tabs)')} />
+        <EmptyState icon="alert-circle-outline" title={t('social.profileLoadError')} message={getApiErrorMessage(error)}>
+          <PrimaryButton title={t('common.exit')} variant="secondary" onPress={() => router.replace('/(tabs)')} />
         </EmptyState>
       </ThemedView>
     );
@@ -87,7 +88,7 @@ export default function UserProfileScreen() {
           {currentUser?.id !== id ? (
             <View style={styles.actionRow}>
               <PrimaryButton
-                title={isFollowing ? 'Unfollow' : 'Follow'}
+                title={isFollowing ? t('social.unfollow') : t('social.follow')}
                 variant={isFollowing ? 'secondary' : 'primary'}
                 loading={followMutation.isPending}
                 disabled={isBlocked}
@@ -96,7 +97,7 @@ export default function UserProfileScreen() {
               />
               <Pressable onPress={handleToggleBlock} hitSlop={8} style={styles.blockLink}>
                 <ThemedText themeColor="danger" type="small">
-                  {isBlocked ? 'Unblock' : 'Block'}
+                  {isBlocked ? t('common.unblock') : t('common.block')}
                 </ThemedText>
               </Pressable>
             </View>
@@ -109,18 +110,18 @@ export default function UserProfileScreen() {
           <ThemedText type="subtitle" style={styles.followCount}>
             {followers?.length ?? 0}
           </ThemedText>
-          <ThemedText themeColor="textSecondary">Followers</ThemedText>
+          <ThemedText themeColor="textSecondary">{t('social.followers')}</ThemedText>
         </Pressable>
         <Pressable style={styles.followStat} onPress={() => router.push(`/user/${id}/following`)}>
           <ThemedText type="subtitle" style={styles.followCount}>
             {following?.length ?? 0}
           </ThemedText>
-          <ThemedText themeColor="textSecondary">Following</ThemedText>
+          <ThemedText themeColor="textSecondary">{t('social.following')}</ThemedText>
         </Pressable>
       </View>
 
       <ThemedText type="subtitle" style={styles.sectionTitle}>
-        Posts
+        {t('social.posts')}
       </ThemedText>
     </View>
   );
@@ -140,7 +141,7 @@ export default function UserProfileScreen() {
           isFetchingNextPage={isFetchingNextPage}
           refreshing={isRefetching}
           onRefresh={refetch}
-          emptyTitle="No posts yet"
+          emptyTitle={t('posts.noPosts')}
         />
       </SafeAreaView>
     </ThemedView>

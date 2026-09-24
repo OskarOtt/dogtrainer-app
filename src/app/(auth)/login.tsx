@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, useColorScheme, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { t } from '@/i18n';
 import { PrimaryButton } from '@/components/primary-button';
 import { SocialAuthButtons } from '@/components/social-auth-buttons';
 import { ThemedText } from '@/components/themed-text';
@@ -35,7 +36,7 @@ export default function LoginScreen() {
       await login({ email: email.trim(), password });
       router.replace('/(tabs)');
     } catch (err) {
-      setError(getApiErrorMessage(err, 'Could not log in. Check your email and password.'));
+      setError(getApiErrorMessage(err, t('auth.loginError')));
     } finally {
       setIsSubmitting(false);
     }
@@ -63,22 +64,22 @@ export default function LoginScreen() {
             ) : null}
 
             <ThemedText type="title" style={styles.title}>
-              Welcome back
+              {t('auth.welcomeBack')}
             </ThemedText>
             <ThemedText themeColor="textSecondary" style={styles.subtitle}>
-              Log in to keep training your dog.
+              {t('auth.loginSubtitle')}
             </ThemedText>
 
             <SocialAuthButtons
               disabled={isSubmitting}
               onCredential={handleSocialLogin}
-              onError={(err) => setError(getApiErrorMessage(err, 'Could not continue with this provider.'))}
+              onError={(err) => setError(getApiErrorMessage(err, t('auth.providerError')))}
               onVisibilityChange={setShowSocialAuth}
             />
             {showSocialAuth ? (
               <View style={styles.dividerRow}>
                 <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
-                <ThemedText themeColor="textSecondary">or use email</ThemedText>
+                <ThemedText themeColor="textSecondary">{t('auth.orUseEmail')}</ThemedText>
                 <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
               </View>
             ) : null}
@@ -87,7 +88,7 @@ export default function LoginScreen() {
               <TextInput
                 defaultValue={email}
                 onChangeText={setEmail}
-                placeholder="Email"
+                placeholder={t('auth.email')}
                 placeholderTextColor={colors.textSecondary}
                 autoCapitalize="none"
                 keyboardType="email-address"
@@ -104,7 +105,7 @@ export default function LoginScreen() {
               <TextInput
                 defaultValue={password}
                 onChangeText={setPassword}
-                placeholder="Password"
+                placeholder={t('auth.password')}
                 placeholderTextColor={colors.textSecondary}
                 secureTextEntry
                 autoComplete="password"
@@ -124,7 +125,7 @@ export default function LoginScreen() {
             ) : null}
 
             <PrimaryButton
-              title="Log In"
+              title={t('auth.logIn')}
               onPress={handleSubmit}
               loading={isSubmitting}
               disabled={!email || !password}
@@ -136,7 +137,7 @@ export default function LoginScreen() {
                 themeColor="primary"
                 style={isLight ? { color: AuthBrandColors.green } : undefined}
               >
-                Don&apos;t have an account? Sign up
+                {t('auth.noAccount')}
               </ThemedText>
             </Link>
           </ScrollView>

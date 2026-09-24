@@ -3,6 +3,7 @@ import { useRouter } from 'expo-router';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { t } from '@/i18n';
 import { PrimaryButton } from '@/components/primary-button';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -25,16 +26,16 @@ export default function TrainScreen() {
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea} edges={['top']}>
         <ThemedText type="title" style={styles.title}>
-          Train
+          {t('train.title')}
         </ThemedText>
         <ThemedText themeColor="textSecondary" style={styles.subtitle}>
-          Start a training session or build a training plan.
+          {t('train.subtitle')}
         </ThemedText>
 
         {inProgressSessions && inProgressSessions.length > 0 ? (
           <View style={styles.resumeSection}>
             <ThemedText type="smallBold" style={styles.resumeTitle}>
-              Resume Session
+              {t('train.resumeSession')}
             </ThemedText>
             {inProgressSessions.map(({ session, dog }) => (
               <Pressable
@@ -50,7 +51,7 @@ export default function TrainScreen() {
                     {dog.name}
                   </ThemedText>
                   <ThemedText themeColor="textSecondary" type="small">
-                    {session.exercises.length} exercise{session.exercises.length === 1 ? '' : 's'} in progress
+                    {t('train.exerciseInProgress', { count: session.exercises.length })}
                   </ThemedText>
                 </View>
                 <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
@@ -60,9 +61,9 @@ export default function TrainScreen() {
         ) : null}
 
         <View style={styles.buttons}>
-          <PrimaryButton title="Start Training" onPress={() => router.push('/train/start')} />
-          <PrimaryButton title="Plan Training" variant="secondary" onPress={() => router.push('/train/plan')} />
-          <PrimaryButton title="Add Goal" variant="secondary" onPress={() => router.push('/dog/goals/pick-dog')} />
+          <PrimaryButton title={t('dog.startTraining')} onPress={() => router.push('/train/start')} />
+          <PrimaryButton title={t('plans.planTraining')} variant="secondary" onPress={() => router.push('/train/plan')} />
+          <PrimaryButton title={t('goals.addGoal')} variant="secondary" onPress={() => router.push('/dog/goals/pick-dog')} />
         </View>
       </SafeAreaView>
     </ThemedView>

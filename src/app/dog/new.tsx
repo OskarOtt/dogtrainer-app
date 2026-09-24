@@ -1,5 +1,6 @@
 import { Stack, useRouter } from 'expo-router';
 
+import { t } from '@/i18n';
 import { DogForm } from '@/components/dog-form';
 import { ThemedView } from '@/components/themed-view';
 import { useCreateDog } from '@/hooks/use-dogs';
@@ -20,9 +21,9 @@ export default function NewDogScreen() {
 
   return (
     <ThemedView style={{ flex: 1 }}>
-      <Stack.Screen options={{ title: 'Add Dog', presentation: 'modal' }} />
+      <Stack.Screen options={{ title: t('dog.addDog'), presentation: 'modal' }} />
       <DogForm
-        submitLabel="Add Dog"
+        submitLabel={t('dog.addDog')}
         isSubmitting={createDog.isPending}
         errorMessage={createDog.isError ? getApiErrorMessage(createDog.error) : null}
         onSubmit={handleSubmit}

@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable, StyleSheet } from 'react-native';
 
+import { t } from '@/i18n';
 import { ThemedText } from '@/components/themed-text';
 import { Spacing } from '@/constants/theme';
 import { useToggleLike } from '@/hooks/use-likes';
@@ -22,7 +23,7 @@ export function LikeButton({ postId, likeCount, likedByMe }: LikeButtonProps) {
       onPress={() => toggleLike.mutate(!likedByMe)}
       hitSlop={8}
       style={styles.row}
-      accessibilityLabel={likedByMe ? 'Unlike' : 'Like'}
+      accessibilityLabel={likedByMe ? t('accessibility.unlike') : t('accessibility.like')}
     >
       <Ionicons name={likedByMe ? 'heart' : 'heart-outline'} size={20} color={likedByMe ? colors.danger : colors.textSecondary} />
       {likeCount > 0 ? <ThemedText themeColor="textSecondary">{likeCount}</ThemedText> : null}

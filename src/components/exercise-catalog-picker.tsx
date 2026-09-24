@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, FlatList, View } from 'react-native';
 
+import { t } from '@/i18n';
 import { CatalogExerciseCard } from '@/components/catalog-exercise-card';
 import { EmptyState } from '@/components/empty-state';
 import { FormTextInput } from '@/components/form-text-input';
@@ -69,7 +70,7 @@ export function ExerciseCatalogPicker({
     <View style={styles.container}>
       <View style={styles.searchArea}>
         <FormTextInput
-          placeholder="Search by exercise, activity or category"
+          placeholder={t('training.searchPlaceholder')}
           onChangeText={setSearch}
           autoCapitalize="none"
           style={styles.searchInput}
@@ -105,9 +106,9 @@ export function ExerciseCatalogPicker({
       {isLoading ? (
         <ActivityIndicator style={styles.loading} color={colors.primary} />
       ) : isError ? (
-        <EmptyState icon="alert-circle-outline" title="Couldn't load exercises" message={getApiErrorMessage(error)} />
+        <EmptyState icon="alert-circle-outline" title={t('training.loadExercisesError')} message={getApiErrorMessage(error)} />
       ) : filtered.length === 0 ? (
-        <EmptyState icon="checkmark-circle-outline" title="No exercises found" message="Try a different search or filter." />
+        <EmptyState icon="checkmark-circle-outline" title={t('training.noExercisesFound')} message={t('training.trySearch')} />
       ) : (
         <FlatList
           data={filtered}
@@ -131,8 +132,8 @@ export function ExerciseCatalogPicker({
       <View style={[styles.footer, { backgroundColor: colors.background, borderTopColor: colors.border }]}>
         <ThemedText themeColor="textSecondary" style={styles.summary}>
           {selectedIds.length === 0
-            ? 'No exercises selected'
-            : `${selectedIds.length} exercise${selectedIds.length === 1 ? '' : 's'} selected`}
+            ? t('training.selectedNone')
+            : t('training.selectedCount', { count: selectedIds.length })}
         </ThemedText>
         {actionButton}
       </View>

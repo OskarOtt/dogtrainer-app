@@ -1,5 +1,6 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios';
 
+import { getLocaleTag } from '@/i18n';
 import { tokenStorage } from '@/utils/tokenStorage';
 
 /**
@@ -14,6 +15,7 @@ export const apiClient = axios.create({
 });
 
 apiClient.interceptors.request.use(async (config) => {
+  config.headers.set('Accept-Language', getLocaleTag());
   const accessToken = await tokenStorage.getAccessToken();
   if (accessToken) {
     config.headers.set('Authorization', `Bearer ${accessToken}`);

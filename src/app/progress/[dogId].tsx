@@ -1,6 +1,7 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 
+import { t } from '@/i18n';
 import { EmptyState } from '@/components/empty-state';
 import { PrimaryButton } from '@/components/primary-button';
 import { ProgressCard } from '@/components/progress-card';
@@ -14,6 +15,7 @@ import { useDogProgress } from '@/hooks/use-stats';
 import { useTheme } from '@/hooks/use-theme';
 import { getApiErrorMessage } from '@/utils/apiError';
 import { formatDuration } from '@/utils/date';
+import { formatDecimal, formatPercent } from '@/utils/number';
 
 export default function DogProgressScreen() {
   const { dogId } = useLocalSearchParams<{ dogId: string }>();
@@ -33,8 +35,8 @@ export default function DogProgressScreen() {
   if (isError || !progress) {
     return (
       <ThemedView style={{ flex: 1 }}>
-        <EmptyState icon="alert-circle-outline" title="Couldn't load progress" message={getApiErrorMessage(error)}>
-          <PrimaryButton title="Exit" variant="secondary" onPress={() => router.replace('/(tabs)')} />
+        <EmptyState icon="alert-circle-outline" title={t('progress.loadError')} message={getApiErrorMessage(error)}>
+          <PrimaryButton title={t('common.exit')} variant="secondary" onPress={() => router.replace('/(tabs)')} />
         </EmptyState>
       </ThemedView>
     );
@@ -42,25 +44,29 @@ export default function DogProgressScreen() {
 
   return (
     <ThemedView style={{ flex: 1 }}>
-      <Stack.Screen options={{ title: dog ? `${dog.name}'s Progress` : 'Progress' }} />
+      <Stack.Screen options={{ title: dog ? t('progress.dogTitle', { name: dog.name }) : t('progress.title') }} />
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.statsGrid}>
-          <StatCard icon="time-outline" label="Total training time" value={formatDuration(progress.totalTrainingMinutes)} />
-          <StatCard icon="calendar-outline" label="Sessions / week" value={progress.sessionsPerWeek.toFixed(1)} />
-          <StatCard icon="flame-outline" label="Current streak" value={`${progress.currentStreakWeeks} ${progress.currentStreakWeeks === 1 ? 'week' : 'weeks'}`} />
+          <StatCard icon="time-outline" label={t('progress.totalTime')} value={formatDuration(progress.totalTrainingMinutes)} />
+          <StatCard
+            icon="calendar-outline"
+            label={t('progress.sessionsPerWeek')}
+            value={formatDecimal(progress.sessionsPerWeek)}
+          />
+          <StatCard icon="flame-outline" label={t('progress.currentStreak')} value={t('time.week', { count: progress.currentStreakWeeks })} />
           <StatCard
             icon="checkmark-circle-outline"
-            label="Avg. success rate"
-            value={`${Math.round(progress.averageSuccessRate * 100)}%`}
+            label={t('progress.averageSuccess')}
+            value={formatPercent(progress.averageSuccessRate)}
           />
         </View>
 
         <ThemedText type="subtitle" style={styles.sectionTitle}>
-          Exercise Progress
+          {t('progress.exerciseProgress')}
         </ThemedText>
         {progress.exerciseProgress.length === 0 ? (
           <ThemedText themeColor="textSecondary" style={styles.emptyText}>
-            Complete some exercises to see progress over time.
+            {t('progress.exerciseEmpty')}
           </ThemedText>
         ) : (
           <View style={styles.progressList}>
@@ -71,11 +77,11 @@ export default function DogProgressScreen() {
         )}
 
         <ThemedText type="subtitle" style={styles.sectionTitle}>
-          Training History
+          {t('progress.trainingHistory')}
         </ThemedText>
         {progress.history.length === 0 ? (
           <ThemedText themeColor="textSecondary" style={styles.emptyText}>
-            No training sessions yet.
+            {t('progress.noSessions')}
           </ThemedText>
         ) : (
           <View style={styles.progressList}>

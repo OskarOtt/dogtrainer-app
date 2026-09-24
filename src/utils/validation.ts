@@ -1,3 +1,5 @@
+import { t } from '@/i18n';
+
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PASSWORD_UPPERCASE_REGEX = /[A-Z]/;
 const PASSWORD_SYMBOL_REGEX = /[!"#$%&'()*+,\-./:;<=>?@[\]^_`{|}~\\]/;
@@ -9,13 +11,13 @@ export function isValidEmail(email: string): boolean {
 
 export function getPasswordError(password: string): string | null {
   if (password.length < PASSWORD_MIN_LENGTH) {
-    return `Password must be at least ${PASSWORD_MIN_LENGTH} characters long.`;
+    return t('auth.passwordLength', { count: PASSWORD_MIN_LENGTH });
   }
   if (!PASSWORD_UPPERCASE_REGEX.test(password)) {
-    return 'Password must contain at least one capital letter.';
+    return t('auth.passwordCapital');
   }
   if (!PASSWORD_SYMBOL_REGEX.test(password)) {
-    return 'Password must contain at least one symbol (e.g. ! " #).';
+    return t('auth.passwordSymbol');
   }
   return null;
 }

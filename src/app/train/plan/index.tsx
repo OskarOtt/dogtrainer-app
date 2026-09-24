@@ -2,6 +2,7 @@ import { Stack, useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, ScrollView, StyleSheet } from 'react-native';
 
+import { t } from '@/i18n';
 import { EmptyState } from '@/components/empty-state';
 import { PrimaryButton } from '@/components/primary-button';
 import { ThemedText } from '@/components/themed-text';
@@ -38,7 +39,7 @@ export default function PlanTrainingScreen() {
   if (isLoadingDogs) {
     return (
       <ThemedView style={styles.container}>
-        <Stack.Screen options={{ title: 'Plan Training' }} />
+        <Stack.Screen options={{ title: t('plans.planTraining') }} />
         <ActivityIndicator style={styles.center} color={colors.primary} />
       </ThemedView>
     );
@@ -47,9 +48,9 @@ export default function PlanTrainingScreen() {
   if (!dogs || dogs.length === 0) {
     return (
       <ThemedView style={styles.container}>
-        <Stack.Screen options={{ title: 'Plan Training' }} />
-        <EmptyState icon="paw-outline" title="No dogs yet" message="Add a dog before creating a training plan.">
-          <PrimaryButton title="Add a Dog" onPress={() => router.push('/dog/new')} style={styles.emptyButton} />
+        <Stack.Screen options={{ title: t('plans.planTraining') }} />
+        <EmptyState icon="paw-outline" title={t('dog.noDogs')} message={t('dog.noDogsPlan')}>
+          <PrimaryButton title={t('dog.addADog')} onPress={() => router.push('/dog/new')} style={styles.emptyButton} />
         </EmptyState>
       </ThemedView>
     );
@@ -57,7 +58,7 @@ export default function PlanTrainingScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <Stack.Screen options={{ title: 'Plan Training' }} />
+      <Stack.Screen options={{ title: t('plans.planTraining') }} />
       {dogs.length > 1 ? (
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.dogPicker}>
           {dogs.map((dog) => {
@@ -81,7 +82,7 @@ export default function PlanTrainingScreen() {
       ) : null}
 
       <PrimaryButton
-        title="Add Plan"
+        title={t('plans.addPlan')}
         onPress={() => router.push(`/train/plan/${activeDog?.id}/new`)}
         style={styles.addButton}
       />
@@ -89,8 +90,8 @@ export default function PlanTrainingScreen() {
       {isLoadingPlans ? (
         <ActivityIndicator style={styles.loading} color={colors.primary} />
       ) : isError ? (
-        <EmptyState icon="alert-circle-outline" title="Couldn't load training plans" message={getApiErrorMessage(error)}>
-          <PrimaryButton title="Exit" variant="secondary" onPress={() => router.replace('/(tabs)')} />
+        <EmptyState icon="alert-circle-outline" title={t('plans.loadError')} message={getApiErrorMessage(error)}>
+          <PrimaryButton title={t('common.exit')} variant="secondary" onPress={() => router.replace('/(tabs)')} />
         </EmptyState>
       ) : (
         <FlatList
@@ -99,14 +100,14 @@ export default function PlanTrainingScreen() {
           contentContainerStyle={styles.list}
           ListHeaderComponent={
             <ThemedText type="subtitle" style={styles.plansTitle}>
-              Plans
+              {t('train.plans')}
             </ThemedText>
           }
           ListEmptyComponent={
             <EmptyState
               icon="calendar-outline"
-              title="No training plans yet"
-              message={`Create a plan to structure ${activeDog?.name}'s upcoming sessions.`}
+              title={t('plans.empty')}
+              message={t('plans.emptyMessage', { name: activeDog?.name ?? '' })}
             />
           }
           renderItem={({ item }) => (

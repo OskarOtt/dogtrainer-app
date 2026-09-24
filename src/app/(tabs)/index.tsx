@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { t } from '@/i18n';
 import { AddFriendModal } from '@/components/add-friend-modal';
 import { EmptyState } from '@/components/empty-state';
 import { PostList } from '@/components/post-list';
@@ -37,7 +38,7 @@ export default function FeedScreen() {
       <SafeAreaView style={styles.safeArea} edges={['top']}>
         <View style={styles.header}>
           <ThemedText type="title" style={styles.title}>
-            Feed
+            {t('navigation.feed')}
           </ThemedText>
           <View style={styles.headerActions}>
             <Pressable
@@ -62,7 +63,7 @@ export default function FeedScreen() {
             <ActivityIndicator color={colors.primary} />
           </View>
         ) : isError ? (
-          <EmptyState icon="alert-circle-outline" title="Couldn't load your feed" message={getApiErrorMessage(error)} />
+          <EmptyState icon="alert-circle-outline" title={t('posts.feedLoadError')} message={getApiErrorMessage(error)} />
         ) : (
           <PostList
             posts={posts}
@@ -74,8 +75,8 @@ export default function FeedScreen() {
             isFetchingNextPage={isFetchingNextPage}
             refreshing={isRefetching}
             onRefresh={refetch}
-            emptyTitle="No posts yet"
-            emptyMessage="Follow other trainers or share your own training moments."
+            emptyTitle={t('posts.noPosts')}
+            emptyMessage={t('posts.noPostsFeed')}
           />
         )}
       </SafeAreaView>

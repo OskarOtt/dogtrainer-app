@@ -1,0 +1,10 @@
+{
+  "ios": {
+    "CFBundleDisplayName": "Flink",
+    "CFBundleName": "Flink",
+    "NSPhotoLibraryUsageDescription": "Allow Flink to access your photos to set a profile picture or dog photo."
+  },
+  "android": {
+    "app_name": "Flink"
+  }
+}

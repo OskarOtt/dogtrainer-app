@@ -1,6 +1,7 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { ActivityIndicator } from 'react-native';
 
+import { t } from '@/i18n';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { EmptyState } from '@/components/empty-state';
 import { GoalForm } from '@/components/goal-form';
@@ -41,8 +42,8 @@ export default function EditGoalScreen() {
   if (isError || !goal) {
     return (
       <ThemedView style={{ flex: 1 }}>
-        <EmptyState icon="alert-circle-outline" title="Couldn't load this goal" message={getApiErrorMessage(error)}>
-          <PrimaryButton title="Exit" variant="secondary" onPress={() => router.replace('/(tabs)')} />
+        <EmptyState icon="alert-circle-outline" title={t('goals.loadOneError')} message={getApiErrorMessage(error)}>
+          <PrimaryButton title={t('common.exit')} variant="secondary" onPress={() => router.replace('/(tabs)')} />
         </EmptyState>
       </ThemedView>
     );
@@ -50,22 +51,22 @@ export default function EditGoalScreen() {
 
   return (
     <ThemedView style={{ flex: 1 }}>
-      <Stack.Screen options={{ title: 'Edit Goal' }} />
+      <Stack.Screen options={{ title: t('goals.editGoal') }} />
       <GoalForm
         initialValue={goal}
-        submitLabel="Save Changes"
+        submitLabel={t('common.saveChanges')}
         isSubmitting={updateGoal.isPending}
         errorMessage={updateGoal.isError ? getApiErrorMessage(updateGoal.error) : null}
         onSubmit={handleSubmit}
       />
       <ConfirmDialog
-        title="Delete Goal"
+        title={t('goals.deleteGoal')}
         variant="danger"
         loading={deleteGoal.isPending}
         style={{ marginHorizontal: Spacing.four, marginBottom: Spacing.four }}
-        dialogTitle="Delete goal"
-        dialogMessage="Remove this goal?"
-        confirmLabel="Delete"
+        dialogTitle={t('goals.deleteTitle')}
+        dialogMessage={t('goals.deleteMessage')}
+        confirmLabel={t('common.delete')}
         destructive
         onConfirm={handleDelete}
       />

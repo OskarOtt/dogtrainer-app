@@ -6,6 +6,7 @@ import { FormTextInput } from '@/components/form-text-input';
 import { PrimaryButton } from '@/components/primary-button';
 import { ThemedText } from '@/components/themed-text';
 import { Spacing } from '@/constants/theme';
+import { t, type TranslationKey } from '@/i18n';
 import type { Goal, GoalPayload, GoalStatus } from '@/types/goal';
 
 export interface GoalFormProps {
@@ -16,11 +17,11 @@ export interface GoalFormProps {
   onSubmit: (payload: GoalPayload) => void;
 }
 
-const STATUS_OPTIONS: { label: string; value: GoalStatus }[] = [
-  { label: 'Not Started', value: 'NOT_STARTED' },
-  { label: 'In Progress', value: 'IN_PROGRESS' },
-  { label: 'Paused', value: 'PAUSED' },
-  { label: 'Completed', value: 'COMPLETED' },
+const STATUS_OPTIONS: { label: TranslationKey; value: GoalStatus }[] = [
+  { label: 'status.notStarted', value: 'NOT_STARTED' },
+  { label: 'status.inProgress', value: 'IN_PROGRESS' },
+  { label: 'status.paused', value: 'PAUSED' },
+  { label: 'status.completed', value: 'COMPLETED' },
 ];
 
 /** Shared add/edit form used by both the "new goal" and "edit goal" screens. */
@@ -41,30 +42,30 @@ export function GoalForm({ initialValue, submitLabel, isSubmitting, errorMessage
 
   return (
     <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-      <ThemedText type="smallBold">Title</ThemedText>
-      <FormTextInput defaultValue={title} onChangeText={setTitle} placeholder="e.g. Master recall" />
+      <ThemedText type="smallBold">{t('goals.title')}</ThemedText>
+      <FormTextInput defaultValue={title} onChangeText={setTitle} placeholder={t('goals.exampleTitle')} />
 
-      <ThemedText type="smallBold">Description</ThemedText>
+      <ThemedText type="smallBold">{t('goals.description')}</ThemedText>
       <FormTextInput
         defaultValue={description}
         onChangeText={setDescription}
-        placeholder="What does success look like?"
+        placeholder={t('goals.successPlaceholder')}
         multiline
         numberOfLines={4}
         style={styles.multilineHost}
       />
 
-      <ThemedText type="smallBold">Target date</ThemedText>
-      <DatePicker value={targetDate || null} onChange={setTargetDate} placeholder="Select target date" />
+      <ThemedText type="smallBold">{t('goals.targetDate')}</ThemedText>
+      <DatePicker value={targetDate || null} onChange={setTargetDate} placeholder={t('goals.selectTargetDate')} />
 
       {initialValue ? (
         <>
-          <ThemedText type="smallBold">Status</ThemedText>
+          <ThemedText type="smallBold">{t('goals.status')}</ThemedText>
           <View style={styles.statusGrid}>
             {STATUS_OPTIONS.map((option) => (
               <PrimaryButton
                 key={option.value}
-                title={option.label}
+                title={t(option.label)}
                 variant={status === option.value ? 'primary' : 'secondary'}
                 onPress={() => setStatus(option.value)}
                 style={styles.statusButton}

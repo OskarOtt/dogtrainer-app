@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, BackHandler, FlatList, Platform, Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { t } from '@/i18n';
 import { EmptyState } from '@/components/empty-state';
 import { PrimaryButton } from '@/components/primary-button';
 import LexicalNotesEditor from '@/components/rich-text/lexical-notes-editor.dom';
@@ -53,7 +54,7 @@ function SessionExerciseRow({
   return (
     <SessionExerciseCard
       sessionExercise={sessionExercise}
-      exerciseName={exercise?.name ?? 'Exercise'}
+      exerciseName={exercise?.name ?? t('common.exercise')}
       disabled={disabled}
       onRemove={onRemove}
       onIncrementSuccess={onIncrementSuccess}
@@ -150,8 +151,8 @@ export default function ActiveSessionScreen() {
     console.error('Notes editor WebView process was killed (OOM or crash) — reloading it');
     setNotesEditorGeneration((generation) => generation + 1);
     Alert.alert(
-      'Notes editor reloaded',
-      'The notes editor ran out of memory and had to reload. Any unsaved changes since your last pause may be lost — please check your notes.'
+      t('training.notesReloadedTitle'),
+      t('training.notesReloadedMessage')
     );
   }, []);
 
@@ -166,8 +167,8 @@ export default function ActiveSessionScreen() {
   if (isError || !session) {
     return (
       <ThemedView style={{ flex: 1 }}>
-        <EmptyState icon="alert-circle-outline" title="Couldn't load this session" message={getApiErrorMessage(error)}>
-          <PrimaryButton title="Exit" variant="secondary" onPress={() => router.replace('/(tabs)')} />
+        <EmptyState icon="alert-circle-outline" title={t('training.loadSessionError')} message={getApiErrorMessage(error)}>
+          <PrimaryButton title={t('common.exit')} variant="secondary" onPress={() => router.replace('/(tabs)')} />
         </EmptyState>
       </ThemedView>
     );
@@ -264,7 +265,7 @@ export default function ActiveSessionScreen() {
             <View style={styles.backButtonPlaceholder} />
           )}
           <ThemedText type="title" style={styles.pageTitle}>
-            {isActive ? 'Training Session' : 'Session Summary'}
+            {isActive ? t('training.session') : t('training.summary')}
           </ThemedText>
         </View>
       </SafeAreaView>
@@ -272,16 +273,16 @@ export default function ActiveSessionScreen() {
       <View style={[styles.timerBar, { backgroundColor: colors.backgroundElement, borderColor: colors.border }]}>
         <Ionicons name="time-outline" size={22} color={colors.primary} />
         <ThemedText type="title" style={styles.timerText}>
-          {isActive ? formatTimer(elapsedSeconds) : `${session.durationMinutes ?? 0}m`}
+          {isActive ? formatTimer(elapsedSeconds) : t('time.shortMinute', { count: session.durationMinutes ?? 0 })}
         </ThemedText>
-        <ThemedText themeColor="textSecondary">{isActive ? 'Elapsed' : 'Duration'}</ThemedText>
+        <ThemedText themeColor="textSecondary">{isActive ? t('training.elapsed') : t('training.duration')}</ThemedText>
       </View>
 
       <View style={styles.tabsHost}>
         <SegmentedControl
-          values={['Exercises', 'Notes']}
+          values={[t('training.exercises'), t('training.notes')]}
           selectedIndex={activeTab === 'exercises' ? 0 : 1}
-          onValueChange={(value) => setActiveTab(value === 'Notes' ? 'notes' : 'exercises')}
+          onValueChange={(value) => setActiveTab(value === t('training.notes') ? 'notes' : 'exercises')}
           style={styles.tabs}
         />
       </View>
@@ -294,7 +295,7 @@ export default function ActiveSessionScreen() {
           ListHeaderComponent={
             isActive ? (
               <PrimaryButton
-                title="Add Exercise"
+                title={t('training.addExercise')}
                 variant="secondary"
                 onPress={() =>
                   router.push(
@@ -322,8 +323,8 @@ export default function ActiveSessionScreen() {
           ListEmptyComponent={
             <EmptyState
               icon="barbell-outline"
-              title="No exercises yet"
-              message={isActive ? 'Add an exercise to start recording reps.' : 'No exercises were recorded.'}
+              title={t('training.noExercises')}
+              message={isActive ? t('training.noExercisesActive') : t('training.noExercisesRecorded')}
             />
           }
         />
@@ -334,6 +335,12 @@ export default function ActiveSessionScreen() {
           key={`${session.id}-${notesEditorGeneration}`}
           initialContent={session.notes}
           editable={isActive}
+          labels={{
+            bold: t('richText.bold'),
+            italic: t('richText.italic'),
+            bulletList: t('richText.bulletList'),
+            placeholder: t('training.notesPlaceholder'),
+          }}
           isDark={isDark}
           colors={{ border: colors.border, primary: colors.primary, text: colors.text, textSecondary: colors.textSecondary, background: colors.backgroundElement }}
           onBlurHtml={isActive ? handleNotesBlur : undefined}
@@ -367,7 +374,7 @@ export default function ActiveSessionScreen() {
             { backgroundColor: colors.background, borderTopColor: colors.border },
           ]}>
           <PrimaryButton
-            title="Share to Feed"
+            title={t('training.shareToFeed')}
             onPress={() => router.push(`/post/new?sessionId=${session.id}`)}
             style={styles.shareButton}
           />

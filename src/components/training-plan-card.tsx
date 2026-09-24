@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { Radii, Spacing, StatusColors } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
+import { t, type TranslationKey } from '@/i18n';
 import type { TrainingPlan } from '@/types/plan';
 import { formatIsoDateDMY } from '@/utils/date';
 import { stripRichTextMarkup } from '@/utils/richText';
@@ -14,11 +15,11 @@ export interface TrainingPlanCardProps {
   showDogName?: boolean;
 }
 
-const STATUS_LABELS: Record<TrainingPlan['status'], string> = {
-  NOT_STARTED: 'Not Started',
-  IN_PROGRESS: 'In Progress',
-  COMPLETED: 'Completed',
-  PAUSED: 'Paused',
+const STATUS_LABELS: Record<TrainingPlan['status'], TranslationKey> = {
+  NOT_STARTED: 'status.notStarted',
+  IN_PROGRESS: 'status.inProgress',
+  COMPLETED: 'status.completed',
+  PAUSED: 'status.paused',
 };
 
 /** Card summarizing a training plan for use in the Plan/Start Training screens. */
@@ -39,7 +40,7 @@ export function TrainingPlanCard({ plan, onPress, showDogName }: TrainingPlanCar
         </ThemedText>
         <View style={[styles.badge, { backgroundColor: statusColor + '22' }]}>
           <ThemedText type="small" style={{ color: statusColor }}>
-            {STATUS_LABELS[plan.status]}
+            {t(STATUS_LABELS[plan.status])}
           </ThemedText>
         </View>
       </View>
@@ -54,7 +55,7 @@ export function TrainingPlanCard({ plan, onPress, showDogName }: TrainingPlanCar
         </ThemedText>
       ) : null}
       <ThemedText themeColor="textSecondary" type="small">
-        {(plan.exercises ?? []).length} {(plan.exercises ?? []).length === 1 ? 'exercise' : 'exercises'}
+        {t('common.exercises', { count: (plan.exercises ?? []).length })}
       </ThemedText>
       {plan.startDate || plan.endDate ? (
         <ThemedText themeColor="textSecondary" type="small">

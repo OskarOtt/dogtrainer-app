@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { Radii, Spacing, StatusColors } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
+import { t, type TranslationKey } from '@/i18n';
 import type { Goal } from '@/types/goal';
 import { formatIsoDateDMY } from '@/utils/date';
 
@@ -11,11 +12,11 @@ export interface GoalCardProps {
   onPress?: () => void;
 }
 
-const STATUS_LABELS: Record<Goal['status'], string> = {
-  NOT_STARTED: 'Not Started',
-  IN_PROGRESS: 'In Progress',
-  COMPLETED: 'Completed',
-  PAUSED: 'Paused',
+const STATUS_LABELS: Record<Goal['status'], TranslationKey> = {
+  NOT_STARTED: 'status.notStarted',
+  IN_PROGRESS: 'status.inProgress',
+  COMPLETED: 'status.completed',
+  PAUSED: 'status.paused',
 };
 
 /** Card summarizing a training goal for use in dog details and Home's active-goals list. */
@@ -36,7 +37,7 @@ export function GoalCard({ goal, onPress }: GoalCardProps) {
         </ThemedText>
         <View style={[styles.badge, { backgroundColor: statusColor + '22' }]}>
           <ThemedText type="small" style={{ color: statusColor }}>
-            {STATUS_LABELS[goal.status]}
+            {t(STATUS_LABELS[goal.status])}
           </ThemedText>
         </View>
       </View>
@@ -47,7 +48,7 @@ export function GoalCard({ goal, onPress }: GoalCardProps) {
       ) : null}
       {goal.targetDate ? (
         <ThemedText themeColor="textSecondary" type="small">
-          Target: {formatIsoDateDMY(goal.targetDate)}
+          {t('goals.targetPrefix', { date: formatIsoDateDMY(goal.targetDate) })}
         </ThemedText>
       ) : null}
     </Pressable>

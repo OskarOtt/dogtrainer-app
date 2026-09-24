@@ -1,5 +1,6 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 
+import { t } from '@/i18n';
 import { PlanForm } from '@/components/plan-form';
 import { ThemedView } from '@/components/themed-view';
 import { useCreatePlan } from '@/hooks/use-plans';
@@ -23,9 +24,9 @@ export default function NewPlanScreen() {
 
   return (
     <ThemedView style={{ flex: 1 }}>
-      <Stack.Screen options={{ title: 'Add Plan', presentation: 'modal' }} />
+      <Stack.Screen options={{ title: t('plans.addPlan'), presentation: 'modal' }} />
       <PlanForm
-        submitLabel="Add Plan"
+        submitLabel={t('plans.addPlan')}
         isSubmitting={createPlan.isPending}
         errorMessage={createPlan.isError ? getApiErrorMessage(createPlan.error) : null}
         onSubmit={handleSubmit}

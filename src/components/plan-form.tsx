@@ -9,6 +9,7 @@ import { PrimaryButton } from '@/components/primary-button';
 import { ThemedText } from '@/components/themed-text';
 import { Radii, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
+import { t, type TranslationKey } from '@/i18n';
 import { resetPlanPickerSelection, setPlanPickerSelection, usePlanPickerSelection } from '@/store/plan-exercise-picker';
 import type { PlanStatus, TrainingPlan, TrainingPlanPayload } from '@/types/plan';
 
@@ -24,11 +25,11 @@ export interface PlanFormProps {
   initialStartDate?: string;
 }
 
-const STATUS_OPTIONS: { label: string; value: PlanStatus }[] = [
-  { label: 'Not Started', value: 'NOT_STARTED' },
-  { label: 'In Progress', value: 'IN_PROGRESS' },
-  { label: 'Paused', value: 'PAUSED' },
-  { label: 'Completed', value: 'COMPLETED' },
+const STATUS_OPTIONS: { label: TranslationKey; value: PlanStatus }[] = [
+  { label: 'status.notStarted', value: 'NOT_STARTED' },
+  { label: 'status.inProgress', value: 'IN_PROGRESS' },
+  { label: 'status.paused', value: 'PAUSED' },
+  { label: 'status.completed', value: 'COMPLETED' },
 ];
 
 /** Shared add/edit form used by both the "new plan" and "edit plan" screens. */
@@ -83,29 +84,29 @@ export function PlanForm({
 
   return (
     <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-      <ThemedText type="smallBold">Name</ThemedText>
-      <FormTextInput defaultValue={name} onChangeText={setName} placeholder="e.g. 8-week obedience plan" />
+      <ThemedText type="smallBold">{t('plans.name')}</ThemedText>
+      <FormTextInput defaultValue={name} onChangeText={setName} placeholder={t('plans.exampleName')} />
 
-      <ThemedText type="smallBold">Description</ThemedText>
+      <ThemedText type="smallBold">{t('plans.description')}</ThemedText>
       <FormTextInput
         defaultValue={description}
         onChangeText={setDescription}
-        placeholder="What does this plan cover?"
+        placeholder={t('plans.descriptionPlaceholder')}
         multiline
         numberOfLines={9}
         style={styles.descriptionHost}
       />
 
-      <ThemedText type="smallBold">Start date</ThemedText>
-      <DatePicker value={startDate || null} onChange={setStartDate} placeholder="Select start date" />
+      <ThemedText type="smallBold">{t('plans.startDate')}</ThemedText>
+      <DatePicker value={startDate || null} onChange={setStartDate} placeholder={t('plans.selectStartDate')} />
 
-      <ThemedText type="smallBold">End date</ThemedText>
-      <DatePicker value={endDate || null} onChange={setEndDate} placeholder="Select end date" />
+      <ThemedText type="smallBold">{t('plans.endDate')}</ThemedText>
+      <DatePicker value={endDate || null} onChange={setEndDate} placeholder={t('plans.selectEndDate')} />
 
-      <ThemedText type="smallBold">Exercises</ThemedText>
+      <ThemedText type="smallBold">{t('plans.exercises')}</ThemedText>
       {exercises.length === 0 ? (
         <ThemedText themeColor="textSecondary" style={styles.noExercises}>
-          No exercises added yet.
+          {t('plans.noExercisesAdded')}
         </ThemedText>
       ) : (
         <View style={styles.exerciseList}>
@@ -124,7 +125,7 @@ export function PlanForm({
         </View>
       )}
       <PrimaryButton
-        title="Add Exercises"
+        title={t('plans.addExercises')}
         variant="secondary"
         onPress={handleAddExercises}
         style={styles.addExercisesButton}
@@ -132,12 +133,12 @@ export function PlanForm({
 
       {initialValue ? (
         <>
-          <ThemedText type="smallBold">Status</ThemedText>
+          <ThemedText type="smallBold">{t('plans.status')}</ThemedText>
           <View style={styles.statusGrid}>
             {STATUS_OPTIONS.map((option) => (
               <PrimaryButton
                 key={option.value}
-                title={option.label}
+                title={t(option.label)}
                 variant={status === option.value ? 'primary' : 'secondary'}
                 onPress={() => setStatus(option.value)}
                 style={styles.statusButton}

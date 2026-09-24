@@ -4,6 +4,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import type { RichTextToolbarProps } from '@/components/rich-text/rich-text-toolbar.types';
 import { Radii, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
+import { t } from '@/i18n';
 
 const ICON_SIZE = 20;
 
@@ -15,12 +16,12 @@ export function RichTextToolbar({ onInsertInline, onToggleLinePrefix, disabled }
   const colors = useTheme();
 
   const buttons: { icon: keyof typeof MaterialCommunityIcons.glyphMap; onPress: () => void; label: string }[] = [
-    { icon: 'format-header-1', onPress: () => onToggleLinePrefix('heading1'), label: 'Title' },
-    { icon: 'format-header-2', onPress: () => onToggleLinePrefix('heading2'), label: 'Subtitle' },
-    { icon: 'format-bold', onPress: () => onInsertInline('**bold**'), label: 'Bold' },
-    { icon: 'format-italic', onPress: () => onInsertInline('*italic*'), label: 'Italic' },
-    { icon: 'format-list-bulleted', onPress: () => onToggleLinePrefix('bullet'), label: 'Bullet list' },
-    { icon: 'format-list-checks', onPress: () => onToggleLinePrefix('checklist'), label: 'Checklist' },
+    { icon: 'format-header-1', onPress: () => onToggleLinePrefix('heading1'), label: t('richText.title') },
+    { icon: 'format-header-2', onPress: () => onToggleLinePrefix('heading2'), label: t('richText.subtitle') },
+    { icon: 'format-bold', onPress: () => onInsertInline('**bold**'), label: t('richText.bold') },
+    { icon: 'format-italic', onPress: () => onInsertInline('*italic*'), label: t('richText.italic') },
+    { icon: 'format-list-bulleted', onPress: () => onToggleLinePrefix('bullet'), label: t('richText.bulletList') },
+    { icon: 'format-list-checks', onPress: () => onToggleLinePrefix('checklist'), label: t('richText.checklist') },
   ];
 
   return (

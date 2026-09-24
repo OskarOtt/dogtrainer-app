@@ -4,7 +4,9 @@ import { StyleSheet, View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { Radii, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
+import { t } from '@/i18n';
 import type { ExerciseProgressEntry } from '@/types/stats';
+import { formatPercent } from '@/utils/number';
 
 export interface ProgressCardProps {
   entry: ExerciseProgressEntry;
@@ -43,7 +45,7 @@ export function ProgressCard({ entry }: ProgressCardProps) {
       </View>
 
       <ThemedText themeColor="textSecondary" type="small">
-        Latest: {latest ? Math.round(latest.successRate * 100) : 0}% success rate
+        {t('progress.successRate', { rate: formatPercent(latest?.successRate ?? 0) })}
       </ThemedText>
     </View>
   );

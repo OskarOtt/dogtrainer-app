@@ -3,6 +3,8 @@ import { StyleSheet, TextInput } from 'react-native';
 
 import { Radii, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
+import { t } from '@/i18n';
+import { useTranslation } from '@/i18n/provider';
 import { formatIsoDateDMY, parseDMYToIso } from '@/utils/date';
 
 export interface DatePickerProps {
@@ -22,12 +24,15 @@ export interface DatePickerProps {
  * Web fallback for {@link DatePicker}: @expo/ui's native `DateTimePicker` only supports
  * iOS and Android, so on web this renders a plain dd-mm-yyyy text field instead.
  */
-export function DatePicker({ value, onChange, placeholder = 'dd-mm-yyyy', disabled }: DatePickerProps) {
+export function DatePicker({ value, onChange, placeholder = t('datePicker.formatPlaceholder'), disabled }: DatePickerProps) {
   const colors = useTheme();
-  const [text, setText] = useState(formatIsoDateDMY(value));
+  const { locale } = useTranslation();
+  const valueKey = `${locale}:${value ?? ''}`;
+  const [draft, setDraft] = useState({ valueKey, text: formatIsoDateDMY(value) });
+  const text = draft.valueKey === valueKey ? draft.text : formatIsoDateDMY(value);
 
   function handleChangeText(next: string) {
-    setText(next);
+    setDraft({ valueKey, text: next });
     const iso = parseDMYToIso(next);
     if (iso) {
       onChange(iso);

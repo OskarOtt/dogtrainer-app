@@ -5,6 +5,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { Radii, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
+import { t } from '@/i18n';
 import type { Dog } from '@/types/dog';
 import { formatAge } from '@/utils/date';
 import { ensureMediaUri } from '@/utils/media';
@@ -47,7 +48,7 @@ export function DogCard({ dog, onPress, onLongPress, disabled }: DogCardProps) {
           {dog.name}
         </ThemedText>
         <ThemedText themeColor="textSecondary" numberOfLines={1}>
-          {[dog.breed, age].filter(Boolean).join(' · ') || 'No details yet'}
+          {[dog.breed, age].filter(Boolean).join(' · ') || t('common.noDetails')}
         </ThemedText>
       </View>
 

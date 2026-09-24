@@ -1,5 +1,6 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 
+import { t } from '@/i18n';
 import { ExerciseCatalogPicker } from '@/components/exercise-catalog-picker';
 import { PrimaryButton } from '@/components/primary-button';
 import { ThemedView } from '@/components/themed-view';
@@ -25,12 +26,12 @@ export default function PlanPickerScreen() {
 
   return (
     <ThemedView style={{ flex: 1 }}>
-      <Stack.Screen options={{ title: 'Select Exercises' }} />
+      <Stack.Screen options={{ title: t('training.selectExercises') }} />
       <ExerciseCatalogPicker
-        headerMessage="Tap exercises to add or remove them from this plan."
+        headerMessage={t('training.selectForPlan')}
         selectedIds={selectedIds}
         onToggle={toggle}
-        actionButton={<PrimaryButton title="Done" onPress={() => router.dismissTo(returnTo as never)} />}
+        actionButton={<PrimaryButton title={t('common.done')} onPress={() => router.dismissTo(returnTo as never)} />}
       />
     </ThemedView>
   );

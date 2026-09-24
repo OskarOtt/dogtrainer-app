@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, useColorScheme, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { t } from '@/i18n';
 import { PrimaryButton } from '@/components/primary-button';
 import { SocialAuthButtons } from '@/components/social-auth-buttons';
 import { ThemedText } from '@/components/themed-text';
@@ -36,7 +37,7 @@ export default function RegisterScreen() {
     setError(null);
 
     if (!isValidEmail(email)) {
-      setError('Please enter a valid email address (e.g. xx@xxx.xyz).');
+      setError(t('auth.invalidEmail'));
       return;
     }
 
@@ -51,7 +52,7 @@ export default function RegisterScreen() {
       await register({ name: name.trim(), email: email.trim(), password });
       router.replace('/(tabs)');
     } catch (err) {
-      setError(getApiErrorMessage(err, 'Could not create your account. Please try again.'));
+      setError(getApiErrorMessage(err, t('auth.registerError')));
     } finally {
       setIsSubmitting(false);
     }
@@ -79,23 +80,23 @@ export default function RegisterScreen() {
             ) : null}
 
             <ThemedText type="title" style={styles.title}>
-              Create account
+              {t('auth.createAccount')}
             </ThemedText>
             <ThemedText themeColor="textSecondary" style={styles.subtitle}>
-              Track training progress for every dog you love.
+              {t('auth.registerSubtitle')}
             </ThemedText>
 
             <SocialAuthButtons
               defaultDisplayName={name}
               disabled={isSubmitting}
               onCredential={handleSocialLogin}
-              onError={(err) => setError(getApiErrorMessage(err, 'Could not continue with this provider.'))}
+              onError={(err) => setError(getApiErrorMessage(err, t('auth.providerError')))}
               onVisibilityChange={setShowSocialAuth}
             />
             {showSocialAuth ? (
               <View style={styles.dividerRow}>
                 <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
-                <ThemedText themeColor="textSecondary">or use email</ThemedText>
+                <ThemedText themeColor="textSecondary">{t('auth.orUseEmail')}</ThemedText>
                 <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
               </View>
             ) : null}
@@ -104,7 +105,7 @@ export default function RegisterScreen() {
               <TextInput
                 defaultValue={name}
                 onChangeText={setName}
-                placeholder="Name"
+                placeholder={t('auth.name')}
                 placeholderTextColor={colors.textSecondary}
                 autoComplete="name"
                 textStyle={{ color: colors.text, fontSize: 17 }}
@@ -119,7 +120,7 @@ export default function RegisterScreen() {
               <TextInput
                 defaultValue={email}
                 onChangeText={setEmail}
-                placeholder="Email"
+                placeholder={t('auth.email')}
                 placeholderTextColor={colors.textSecondary}
                 autoCapitalize="none"
                 keyboardType="email-address"
@@ -136,7 +137,7 @@ export default function RegisterScreen() {
               <TextInput
                 defaultValue={password}
                 onChangeText={setPassword}
-                placeholder="Password (min. 8 chars, 1 capital, 1 symbol)"
+                placeholder={t('auth.passwordHint')}
                 placeholderTextColor={colors.textSecondary}
                 secureTextEntry
                 autoComplete="new-password"
@@ -156,7 +157,7 @@ export default function RegisterScreen() {
             ) : null}
 
             <PrimaryButton
-              title="Sign Up"
+              title={t('auth.signUp')}
               onPress={handleSubmit}
               loading={isSubmitting}
               disabled={!canSubmit}
@@ -168,7 +169,7 @@ export default function RegisterScreen() {
                 themeColor="primary"
                 style={isLight ? { color: AuthBrandColors.green } : undefined}
               >
-                Already have an account? Log in
+                {t('auth.hasAccount')}
               </ThemedText>
             </Link>
           </ScrollView>

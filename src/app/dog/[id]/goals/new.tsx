@@ -1,5 +1,6 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 
+import { t } from '@/i18n';
 import { GoalForm } from '@/components/goal-form';
 import { ThemedView } from '@/components/themed-view';
 import { useCreateGoal } from '@/hooks/use-goals';
@@ -19,9 +20,9 @@ export default function NewGoalScreen() {
 
   return (
     <ThemedView style={{ flex: 1 }}>
-      <Stack.Screen options={{ title: 'Add Goal', presentation: 'modal' }} />
+      <Stack.Screen options={{ title: t('goals.addGoal'), presentation: 'modal' }} />
       <GoalForm
-        submitLabel="Add Goal"
+        submitLabel={t('goals.addGoal')}
         isSubmitting={createGoal.isPending}
         errorMessage={createGoal.isError ? getApiErrorMessage(createGoal.error) : null}
         onSubmit={handleSubmit}

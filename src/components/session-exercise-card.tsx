@@ -2,10 +2,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useRef, useState } from 'react';
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 
+import { t } from '@/i18n';
 import { ThemedText } from '@/components/themed-text';
 import { Radii, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import type { SessionExercise } from '@/types/session';
+import { formatPercent } from '@/utils/number';
 
 export interface SessionExerciseCardProps {
   sessionExercise: SessionExercise;
@@ -40,7 +42,6 @@ export function SessionExerciseCard({
   disabled,
 }: SessionExerciseCardProps) {
   const colors = useTheme();
-  const successRatePercent = Math.round(sessionExercise.successRate * 100);
   const fail = sessionExercise.repetitions - sessionExercise.successfulRepetitions;
   const [notes, setNotes] = useState(sessionExercise.notes ?? '');
   // Debounced auto-save as a safety net: tapping straight from this field to the "Finish"
@@ -82,7 +83,7 @@ export function SessionExerciseCard({
             {fail}
           </ThemedText>
           <ThemedText themeColor="textSecondary" type="smallBold">
-            Fail
+            {t('sessionExercise.fail')}
           </ThemedText>
           <View style={styles.counterButtonsRow}>
             <Pressable
@@ -111,7 +112,7 @@ export function SessionExerciseCard({
             {sessionExercise.successfulRepetitions}
           </ThemedText>
           <ThemedText themeColor="textSecondary" type="smallBold">
-            Success
+            {t('sessionExercise.success')}
           </ThemedText>
           <View style={styles.counterButtonsRow}>
             <Pressable
@@ -141,10 +142,10 @@ export function SessionExerciseCard({
 
       <View style={[styles.summaryRow, { borderTopColor: colors.border }]}>
         <ThemedText themeColor="textSecondary" type="small">
-          Success rate: {successRatePercent}%
+          {t('sessionExercise.successRate', { rate: formatPercent(sessionExercise.successRate) })}
         </ThemedText>
         <ThemedText themeColor="textSecondary" type="small">
-          Total reps: {sessionExercise.repetitions}
+          {t('sessionExercise.totalReps', { count: sessionExercise.repetitions })}
         </ThemedText>
       </View>
 
@@ -154,7 +155,7 @@ export function SessionExerciseCard({
           value={notes}
           onChangeText={setNotes}
           onBlur={() => onNotesBlur(notes.trim() || null)}
-          placeholder="Notes for this exercise…"
+          placeholder={t('training.exerciseNotes')}
           placeholderTextColor={colors.textSecondary}
           multiline
           style={[styles.notesInput, { color: colors.text, borderColor: colors.border, backgroundColor: colors.backgroundElement }]}

@@ -6,6 +6,7 @@ import { FormTextInput } from '@/components/form-text-input';
 import { PrimaryButton } from '@/components/primary-button';
 import { ThemedText } from '@/components/themed-text';
 import { Spacing } from '@/constants/theme';
+import { t, type TranslationKey } from '@/i18n';
 import type { Dog, DogPayload, DogSex } from '@/types/dog';
 
 export interface DogFormProps {
@@ -16,9 +17,9 @@ export interface DogFormProps {
   onSubmit: (payload: DogPayload) => void;
 }
 
-const SEX_OPTIONS: { label: string; value: DogSex }[] = [
-  { label: 'Male', value: 'MALE' },
-  { label: 'Female', value: 'FEMALE' },
+const SEX_OPTIONS: { label: TranslationKey; value: DogSex }[] = [
+  { label: 'dog.male', value: 'MALE' },
+  { label: 'dog.female', value: 'FEMALE' },
 ];
 
 /** Shared add/edit form used by both the "new dog" and "edit dog" screens. */
@@ -30,7 +31,7 @@ export function DogForm({ initialValue, submitLabel, isSubmitting, errorMessage,
   const [weight, setWeight] = useState(initialValue?.weight != null ? String(initialValue.weight) : '');
 
   function handleSubmit() {
-    const parsedWeight = weight.trim() ? Number(weight.trim()) : null;
+    const parsedWeight = weight.trim() ? Number(weight.trim().replace(',', '.')) : null;
     onSubmit({
       name: name.trim(),
       breed: breed.trim() || null,
@@ -42,29 +43,29 @@ export function DogForm({ initialValue, submitLabel, isSubmitting, errorMessage,
 
   return (
     <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-      <ThemedText type="smallBold">Name</ThemedText>
-      <FormTextInput defaultValue={name} onChangeText={setName} placeholder="Dog's name" />
+      <ThemedText type="smallBold">{t('dog.name')}</ThemedText>
+      <FormTextInput defaultValue={name} onChangeText={setName} placeholder={t('dog.namePlaceholder')} />
 
-      <ThemedText type="smallBold">Breed</ThemedText>
-      <FormTextInput defaultValue={breed} onChangeText={setBreed} placeholder="e.g. Labrador Retriever" />
+      <ThemedText type="smallBold">{t('dog.breed')}</ThemedText>
+      <FormTextInput defaultValue={breed} onChangeText={setBreed} placeholder={t('dog.breedExample')} />
 
-      <ThemedText type="smallBold">Birth date</ThemedText>
+      <ThemedText type="smallBold">{t('dog.birthDate')}</ThemedText>
       <DatePicker
         value={birthDate || null}
         onChange={setBirthDate}
-        placeholder="Select birth date"
+        placeholder={t('dog.selectBirthDate')}
         minYear={new Date().getFullYear() - 30}
         maxYear={new Date().getFullYear()}
       />
 
-      <ThemedText type="smallBold">Sex</ThemedText>
+      <ThemedText type="smallBold">{t('dog.sex')}</ThemedText>
       <View style={styles.sexRow}>
         {SEX_OPTIONS.map((option) => {
           const selected = sex === option.value;
           return (
             <PrimaryButton
               key={option.value}
-              title={option.label}
+              title={t(option.label)}
               variant={selected ? 'primary' : 'secondary'}
               onPress={() => setSex(selected ? null : option.value)}
               style={styles.sexButton}
@@ -73,8 +74,13 @@ export function DogForm({ initialValue, submitLabel, isSubmitting, errorMessage,
         })}
       </View>
 
-      <ThemedText type="smallBold">Weight (kg)</ThemedText>
-      <FormTextInput defaultValue={weight} onChangeText={setWeight} placeholder="e.g. 25.5" keyboardType="decimal-pad" />
+      <ThemedText type="smallBold">{t('dog.weight')}</ThemedText>
+      <FormTextInput
+        defaultValue={weight}
+        onChangeText={setWeight}
+        placeholder={t('dog.weightExample')}
+        keyboardType="decimal-pad"
+      />
 
       {errorMessage ? (
         <ThemedText themeColor="danger" style={styles.error}>

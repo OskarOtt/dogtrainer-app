@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { Alert, Modal, Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { t } from '@/i18n';
+import type { TranslationKey } from '@/i18n';
 import { FormTextInput } from '@/components/form-text-input';
 import { PrimaryButton } from '@/components/primary-button';
 import { ThemedText } from '@/components/themed-text';
@@ -22,6 +24,14 @@ export interface ReportPostSheetProps {
 }
 
 type Step = 'menu' | 'report' | 'done';
+
+const REPORT_REASON_LABELS: Record<ReportReason, TranslationKey> = {
+  Spam: 'posts.reportReasons.spam',
+  'Inappropriate content': 'posts.reportReasons.inappropriate',
+  'Harassment or bullying': 'posts.reportReasons.harassment',
+  'Animal welfare concern': 'posts.reportReasons.welfare',
+  Other: 'posts.reportReasons.other',
+};
 
 /**
  * Compact "..." sheet on a post, deliberately kept tiny per Apple's UGC guidelines: report a
@@ -60,9 +70,9 @@ export function ReportPostSheet({ visible, onClose, postId, authorId, authorName
 
   function handleBlock() {
     handleClose();
-    Alert.alert(`Block ${authorName}?`, "You won't see each other's posts and you'll stop following each other.", [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Block', style: 'destructive', onPress: () => blockUser.mutate(authorId) },
+    Alert.alert(t('social.blockUserTitle', { name: authorName }), t('social.blockMessage'), [
+      { text: t('common.cancel'), style: 'cancel' },
+      { text: t('common.block'), style: 'destructive', onPress: () => blockUser.mutate(authorId) },
     ]);
   }
 
@@ -72,7 +82,7 @@ export function ReportPostSheet({ visible, onClose, postId, authorId, authorName
         <SafeAreaView edges={['bottom']} style={[styles.sheet, { backgroundColor: colors.backgroundElement }]}>
           <View style={styles.header}>
             <ThemedText type="subtitle" style={styles.title}>
-              {step === 'menu' ? 'Post options' : step === 'report' ? 'Report post' : 'Thanks'}
+              {step === 'menu' ? t('posts.options') : step === 'report' ? t('posts.reportPost') : t('posts.reportThanks')}
             </ThemedText>
             <Pressable onPress={handleClose} hitSlop={8}>
               <Ionicons name="close" size={24} color={colors.text} />
@@ -83,11 +93,11 @@ export function ReportPostSheet({ visible, onClose, postId, authorId, authorName
             <View style={styles.menu}>
               <Pressable style={styles.menuRow} onPress={() => setStep('report')}>
                 <Ionicons name="flag-outline" size={18} color={colors.text} />
-                <ThemedText>Report post</ThemedText>
+                <ThemedText>{t('posts.reportPost')}</ThemedText>
               </Pressable>
               <Pressable style={styles.menuRow} onPress={handleBlock}>
                 <Ionicons name="ban-outline" size={18} color={colors.danger} />
-                <ThemedText themeColor="danger">Block {authorName}</ThemedText>
+                <ThemedText themeColor="danger">{t('posts.blockAuthor', { name: authorName })}</ThemedText>
               </Pressable>
             </View>
           ) : null}
@@ -98,7 +108,7 @@ export function ReportPostSheet({ visible, onClose, postId, authorId, authorName
                 const selected = option === reason;
                 return (
                   <Pressable
-                    key={option}
+                    key=                    {t(REPORT_REASON_LABELS[option])}
                     style={[
                       styles.reasonRow,
                       { borderColor: selected ? colors.primary : colors.border, backgroundColor: colors.background },
@@ -118,18 +128,18 @@ export function ReportPostSheet({ visible, onClose, postId, authorId, authorName
               <FormTextInput
                 defaultValue={details}
                 onChangeText={setDetails}
-                placeholder="Add details (optional)"
+                placeholder={t('posts.reportDetails')}
                 multiline
               />
 
               {createReport.isError ? (
                 <ThemedText themeColor="danger" style={styles.message}>
-                  {getApiErrorMessage(createReport.error, 'Could not submit this report.')}
+                  {getApiErrorMessage(createReport.error, t('posts.reportError'))}
                 </ThemedText>
               ) : null}
 
               <PrimaryButton
-                title="Submit report"
+                title={t('posts.reportSubmit')}
                 onPress={handleSubmitReport}
                 loading={createReport.isPending}
                 disabled={!reason}
@@ -139,8 +149,8 @@ export function ReportPostSheet({ visible, onClose, postId, authorId, authorName
 
           {step === 'done' ? (
             <View style={styles.doneState}>
-              <ThemedText themeColor="textSecondary">We&apos;ve received your report and will review it.</ThemedText>
-              <PrimaryButton title="Close" variant="secondary" onPress={handleClose} />
+              <ThemedText themeColor="textSecondary">{t('posts.reportReceived')}</ThemedText>
+              <PrimaryButton title={t('common.close')} variant="secondary" onPress={handleClose} />
             </View>
           ) : null}
         </SafeAreaView>

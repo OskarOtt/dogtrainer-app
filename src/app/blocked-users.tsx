@@ -1,6 +1,7 @@
 import { Stack, useRouter } from 'expo-router';
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, View } from 'react-native';
 
+import { t } from '@/i18n';
 import { Avatar } from '@/components/avatar';
 import { EmptyState } from '@/components/empty-state';
 import { ThemedText } from '@/components/themed-text';
@@ -26,7 +27,7 @@ export default function BlockedUsersScreen() {
 
   return (
     <ThemedView style={{ flex: 1 }}>
-      <Stack.Screen options={{ title: 'Blocked Users' }} />
+      <Stack.Screen options={{ title: t('social.blockedUsers') }} />
       <FlatList
         data={blockedUsers ?? []}
         keyExtractor={(item: PublicUser) => item.id}
@@ -39,12 +40,12 @@ export default function BlockedUsersScreen() {
             </Pressable>
             <Pressable onPress={() => unblockUser.mutate(item.id)} hitSlop={8}>
               <ThemedText themeColor="primary" type="small">
-                Unblock
+                {t('common.unblock')}
               </ThemedText>
             </Pressable>
           </View>
         )}
-        ListEmptyComponent={<EmptyState icon="ban-outline" title="No blocked users" />}
+        ListEmptyComponent={<EmptyState icon="ban-outline" title={t('social.noBlockedUsers')} />}
       />
     </ThemedView>
   );

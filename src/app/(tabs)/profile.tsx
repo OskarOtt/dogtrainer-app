@@ -3,9 +3,11 @@ import { useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { t } from '@/i18n';
 import { DeleteAccountModal } from '@/components/delete-account-modal';
 import { EmptyState } from '@/components/empty-state';
 import { GoalCard } from '@/components/goal-card';
+import { LanguageSelectorModal } from '@/components/language-selector-modal';
 import { MediaAvatarPicker } from '@/components/media-avatar-picker';
 import { PrimaryButton } from '@/components/primary-button';
 import { SocialAuthButtons } from '@/components/social-auth-buttons';
@@ -22,8 +24,10 @@ import { useDogSessions } from '@/hooks/use-sessions';
 import { useDogStatistics } from '@/hooks/use-stats';
 import { useTheme } from '@/hooks/use-theme';
 import { useRemoveAvatar, useUpdateAvatar } from '@/hooks/use-user';
+import { useTranslation } from '@/i18n/provider';
 import { getApiErrorMessage } from '@/utils/apiError';
 import { formatDuration } from '@/utils/date';
+import { formatPercent } from '@/utils/number';
 import type { SocialAuthPayload, SocialProvider } from '@/types/auth';
 
 export default function ProfileScreen() {
@@ -31,7 +35,9 @@ export default function ProfileScreen() {
   const colors = useTheme();
   const router = useRouter();
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [isLanguageSelectorVisible, setIsLanguageSelectorVisible] = useState(false);
   const [linkError, setLinkError] = useState<unknown>(null);
+  const { languagePreference, setLanguagePreference } = useTranslation();
 
   const updateAvatar = useUpdateAvatar();
   const removeAvatar = useRemoveAvatar();
@@ -67,7 +73,7 @@ export default function ProfileScreen() {
   const header = (
     <View style={styles.headerContent}>
       <ThemedText type="title" style={styles.title}>
-        Profile
+        {t('profile.title')}
       </ThemedText>
 
       <ThemedView style={styles.avatarSection}>
@@ -80,7 +86,7 @@ export default function ProfileScreen() {
         />
         {user?.avatarUrl ? (
           <PrimaryButton
-            title="Remove Photo"
+            title={t('common.removePhoto')}
             variant="secondary"
             disabled={isBusy}
             onPress={() => removeAvatar.mutate()}
@@ -101,7 +107,7 @@ export default function ProfileScreen() {
           <ThemedText type="subtitle" style={styles.followCount}>
             {followers?.length ?? 0}
           </ThemedText>
-          <ThemedText themeColor="textSecondary">Followers</ThemedText>
+          <ThemedText themeColor="textSecondary">{t('social.followers')}</ThemedText>
         </Pressable>
         <Pressable
             style={styles.followStat}
@@ -109,23 +115,23 @@ export default function ProfileScreen() {
           <ThemedText type="subtitle" style={styles.followCount}>
             {following?.length ?? 0}
           </ThemedText>
-          <ThemedText themeColor="textSecondary">Following</ThemedText>
+          <ThemedText themeColor="textSecondary">{t('social.following')}</ThemedText>
         </Pressable>
       </View>
 
       <ThemedView style={[styles.card, { backgroundColor: colors.backgroundElement, borderColor: colors.border }]}>
         <ThemedText type="subtitle" style={styles.cardTitle}>
-          {user?.name ?? 'Trainer'}
+          {user?.name ?? t('common.trainer')}
         </ThemedText>
         <ThemedText themeColor="textSecondary">{user?.email}</ThemedText>
       </ThemedView>
 
       <ThemedView style={[styles.card, { backgroundColor: colors.backgroundElement, borderColor: colors.border }]}>
         <ThemedText type="subtitle" style={styles.cardTitle}>
-          Sign-in methods
+          {t('profile.signInMethods')}
         </ThemedText>
         <ThemedText themeColor="textSecondary">
-          Connected: {authMethods.map(formatAuthMethod).join(', ')}
+          {t('profile.connected', { methods: authMethods.map(formatAuthMethod).join(', ') })}
         </ThemedText>
         {unlinkedProviders.length > 0 ? (
           <SocialAuthButtons
@@ -136,21 +142,46 @@ export default function ProfileScreen() {
         ) : null}
         {linkError ? (
           <ThemedText themeColor="danger" style={styles.error}>
-            {getApiErrorMessage(linkError, 'Could not connect this sign-in method.')}
+            {getApiErrorMessage(linkError, t('auth.linkError'))}
           </ThemedText>
         ) : null}
+      </ThemedView>
+
+      <ThemedView style={[styles.card, { backgroundColor: colors.backgroundElement, borderColor: colors.border }]}>
+        <ThemedText type="subtitle" style={styles.cardTitle}>
+          {t('language.title')}
+        </ThemedText>
+        <ThemedText themeColor="textSecondary">{t('language.description')}</ThemedText>
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => setIsLanguageSelectorVisible(true)}
+          style={[
+            styles.languageSelector,
+            { backgroundColor: colors.background, borderColor: colors.border },
+          ]}>
+          <ThemedText style={styles.languageSelectorLabel}>
+            {t(
+              languagePreference === 'system'
+                ? 'language.followSystem'
+                : languagePreference === 'nb'
+                  ? 'language.norwegianBokmal'
+                  : 'language.english',
+            )}
+          </ThemedText>
+          <ThemedText themeColor="textSecondary">{t('common.edit')}</ThemedText>
+        </Pressable>
       </ThemedView>
 
       {isLoadingDogs ? (
         <ActivityIndicator color={colors.primary} style={styles.dogsLoading} />
       ) : !dogs || dogs.length === 0 ? (
-        <EmptyState icon="paw-outline" title="Add a dog" message="Add a dog to see your training overview here.">
-          <PrimaryButton title="Add a Dog" onPress={() => router.push('/dog/new')} style={styles.emptyButton} />
+        <EmptyState icon="paw-outline" title={t('profile.addDog')} message={t('profile.addDogMessage')}>
+          <PrimaryButton title={t('dog.addADog')} onPress={() => router.push('/dog/new')} style={styles.emptyButton} />
         </EmptyState>
       ) : (
         <>
           <ThemedText type="subtitle" style={styles.sectionTitle}>
-            Training Overview
+            {t('profile.trainingOverview')}
           </ThemedText>
 
           {dogs.length > 1 ? (
@@ -180,32 +211,32 @@ export default function ProfileScreen() {
               <View style={styles.statsGrid}>
                 <StatCard
                   icon="calendar-outline"
-                  label="Sessions this week"
+                  label={t('progress.sessionsThisWeek')}
                   value={`${statistics?.sessionsThisWeek ?? 0}`}
                 />
                 <StatCard
                   icon="flame-outline"
-                  label="Training streak"
-                  value={`${statistics?.currentStreakWeeks ?? 0} ${(statistics?.currentStreakWeeks ?? 0) === 1 ? 'week' : 'weeks'}`}
+                  label={t('progress.trainingStreak')}
+                  value={t('time.week', { count: statistics?.currentStreakWeeks ?? 0 })}
                 />
                 <StatCard
                   icon="time-outline"
-                  label="Total training time"
+                  label={t('progress.totalTime')}
                   value={formatDuration(statistics?.totalTrainingMinutes ?? 0)}
                 />
                 <StatCard
                   icon="checkmark-circle-outline"
-                  label="Avg. success rate"
-                  value={`${Math.round((statistics?.averageSuccessRate ?? 0) * 100)}%`}
+                  label={t('progress.averageSuccess')}
+                  value={formatPercent(statistics?.averageSuccessRate ?? 0)}
                 />
               </View>
 
               <ThemedText type="subtitle" style={styles.subsectionTitle}>
-                Active Goals
+                {t('profile.activeGoals')}
               </ThemedText>
               {activeGoals.length === 0 ? (
                 <ThemedText themeColor="textSecondary" style={styles.emptyText}>
-                  No active goals yet.
+                  {t('profile.noActiveGoals')}
                 </ThemedText>
               ) : (
                 <View style={styles.list}>
@@ -216,11 +247,11 @@ export default function ProfileScreen() {
               )}
 
               <ThemedText type="subtitle" style={styles.subsectionTitle}>
-                Recent Sessions
+                {t('profile.recentSessions')}
               </ThemedText>
               {!sessions || sessions.length === 0 ? (
                 <ThemedText themeColor="textSecondary" style={styles.emptyText}>
-                  No sessions yet. Start training to build history.
+                  {t('profile.noRecentSessions')}
                 </ThemedText>
               ) : (
                 <View style={styles.list}>
@@ -240,16 +271,16 @@ export default function ProfileScreen() {
 
       <Pressable style={styles.myPostsRow} onPress={() => user && router.push(`/user/${user.id}/posts`)}>
         <ThemedText type="subtitle" style={styles.sectionTitle}>
-          My Posts
+          {t('profile.myPosts')}
         </ThemedText>
-        <ThemedText themeColor="textSecondary">View all</ThemedText>
+        <ThemedText themeColor="textSecondary">{t('common.viewAll')}</ThemedText>
       </Pressable>
 
       <Pressable style={styles.myPostsRow} onPress={() => router.push('/blocked-users')}>
         <ThemedText type="subtitle" style={styles.sectionTitle}>
-          Blocked Users
+          {t('profile.blockedUsers')}
         </ThemedText>
-        <ThemedText themeColor="textSecondary">Manage</ThemedText>
+        <ThemedText themeColor="textSecondary">{t('common.manage')}</ThemedText>
       </Pressable>
     </View>
   );
@@ -265,10 +296,10 @@ export default function ProfileScreen() {
           ListHeaderComponent={header}
           ListFooterComponent={
             <View style={styles.footer}>
-              <PrimaryButton title="Log Out" onPress={logout} variant="danger" style={styles.logoutButton} />
+              <PrimaryButton title={t('auth.logOut')} onPress={logout} variant="danger" style={styles.logoutButton} />
               <Pressable onPress={() => setIsDeleteModalVisible(true)} hitSlop={8}>
                 <ThemedText themeColor="danger" style={styles.deleteAccountLink}>
-                  Delete Account
+                  {t('profile.deleteAccount')}
                 </ThemedText>
               </Pressable>
             </View>
@@ -284,12 +315,21 @@ export default function ProfileScreen() {
           logout();
         }}
       />
+      <LanguageSelectorModal
+        visible={isLanguageSelectorVisible}
+        preference={languagePreference}
+        onClose={() => setIsLanguageSelectorVisible(false)}
+        onSelect={(preference) => {
+          setLanguagePreference(preference);
+          setIsLanguageSelectorVisible(false);
+        }}
+      />
     </ThemedView>
   );
 }
 
 function formatAuthMethod(method: string): string {
-  return method.charAt(0) + method.slice(1).toLowerCase();
+  return method === 'PASSWORD' ? t('auth.passwordMethod') : method === 'APPLE' ? t('auth.appleMethod') : method;
 }
 
 const styles = StyleSheet.create({
@@ -308,6 +348,19 @@ const styles = StyleSheet.create({
     gap: Spacing.one,
   },
   cardTitle: { fontSize: 20 },
+  languageSelectorLabel: { fontWeight: 700 },
+  languageSelector: {
+    minHeight: 48,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: Spacing.three,
+    borderWidth: 1,
+    borderRadius: Radii.medium,
+    paddingHorizontal: Spacing.three,
+    paddingVertical: Spacing.two,
+    marginTop: Spacing.two,
+  },
   followRow: { flexDirection: 'row', gap: Spacing.four },
   followStat: { alignItems: 'center', flex: 1 },
   followCount: { fontSize: 20 },
