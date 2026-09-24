@@ -8,6 +8,7 @@ import type {
   UpdateSessionExercisePayload,
   UpdateTrainingSessionPayload,
 } from '@/types/session';
+import { isVisibleTrainingSession } from '@/utils/session';
 
 const dogSessionsKey = (dogId: string) => ['dogs', dogId, 'training-sessions'] as const;
 const sessionKey = (id: string) => ['training-sessions', id] as const;
@@ -17,6 +18,7 @@ export function useDogSessions(dogId: string | undefined) {
     queryKey: dogSessionsKey(dogId ?? ''),
     queryFn: () => sessionsApi.listForDog(dogId as string),
     enabled: !!dogId,
+    select: (sessions) => sessions.filter(isVisibleTrainingSession),
   });
 }
 
@@ -75,7 +77,7 @@ export function useAllSessions() {
   const isError = sessionQueries.some((query) => query.isError);
   const sessions = (dogs ?? []).flatMap((dog, index) => {
     const dogSessions = sessionQueries[index]?.data ?? [];
-    return dogSessions.map((session) => ({ session, dog }));
+    return dogSessions.filter(isVisibleTrainingSession).map((session) => ({ session, dog }));
   });
 
   return { data: sessions, isLoading, isError };

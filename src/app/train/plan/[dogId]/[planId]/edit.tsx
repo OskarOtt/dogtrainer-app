@@ -1,6 +1,7 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { ActivityIndicator } from 'react-native';
 
+import { t } from '@/i18n';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { EmptyState } from '@/components/empty-state';
 import { PlanForm } from '@/components/plan-form';
@@ -45,8 +46,8 @@ export default function EditPlanScreen() {
   if (isError || !plan) {
     return (
       <ThemedView style={{ flex: 1 }}>
-        <EmptyState icon="alert-circle-outline" title="Couldn't load this plan" message={getApiErrorMessage(error)}>
-          <PrimaryButton title="Exit" variant="secondary" onPress={() => router.replace('/(tabs)')} />
+        <EmptyState icon="alert-circle-outline" title={t('plans.loadOneError')} message={getApiErrorMessage(error)}>
+          <PrimaryButton title={t('common.exit')} variant="secondary" onPress={() => router.replace('/(tabs)')} />
         </EmptyState>
       </ThemedView>
     );
@@ -54,23 +55,23 @@ export default function EditPlanScreen() {
 
   return (
     <ThemedView style={{ flex: 1 }}>
-      <Stack.Screen options={{ title: 'Edit Plan' }} />
+      <Stack.Screen options={{ title: t('plans.editPlan') }} />
       <PlanForm
         initialValue={plan}
-        submitLabel="Save Changes"
+        submitLabel={t('common.saveChanges')}
         isSubmitting={updatePlan.isPending}
         errorMessage={updatePlan.isError ? getApiErrorMessage(updatePlan.error) : null}
         onSubmit={handleSubmit}
         pickerHref={`/train/plan-picker?returnTo=${encodeURIComponent(`/train/plan/${dogId}/${planId}/edit`)}`}
       />
       <ConfirmDialog
-        title="Delete Plan"
+        title={t('plans.deletePlan')}
         variant="danger"
         loading={deletePlan.isPending}
         style={{ marginHorizontal: Spacing.four, marginBottom: Spacing.four }}
-        dialogTitle="Delete plan"
-        dialogMessage="Remove this training plan?"
-        confirmLabel="Delete"
+        dialogTitle={t('plans.deleteTitle')}
+        dialogMessage={t('plans.deleteMessage')}
+        confirmLabel={t('common.delete')}
         destructive
         onConfirm={handleDelete}
       />

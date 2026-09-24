@@ -1,5 +1,6 @@
 import { Stack, useLocalSearchParams } from 'expo-router';
 
+import { t } from '@/i18n';
 import { PostList } from '@/components/post-list';
 import { ThemedView } from '@/components/themed-view';
 import { useUserPosts } from '@/hooks/use-posts';
@@ -19,7 +20,7 @@ export default function UserPostsScreen() {
 
   return (
     <ThemedView style={{ flex: 1 }}>
-      <Stack.Screen options={{ title: 'My Posts' }} />
+      <Stack.Screen options={{ title: t('posts.myPosts') }} />
       <PostList
         posts={posts}
         onEndReached={() => {
@@ -30,8 +31,8 @@ export default function UserPostsScreen() {
         isFetchingNextPage={isFetchingNextPage}
         refreshing={isRefetching}
         onRefresh={refetch}
-        emptyTitle="No posts yet"
-        emptyMessage="Share a training session or a photo of your dog."
+        emptyTitle={t('posts.noPosts')}
+        emptyMessage={t('posts.noPostsUser')}
       />
     </ThemedView>
   );

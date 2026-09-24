@@ -8,6 +8,8 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { LoadingScreen } from '@/components/loading-screen';
 import { queryClient } from '@/data/queryClient';
 import { AuthProvider, useAuth } from '@/hooks/use-auth';
+import { t } from '@/i18n';
+import { LocalizationProvider, useTranslation } from '@/i18n/provider';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -26,7 +28,7 @@ function RootNavigator() {
   }
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
+    <Stack screenOptions={{ headerShown: false, headerBackButtonDisplayMode: 'minimal' }}>
       <Stack.Protected guard={isAuthenticated}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="dog/new" options={{ headerShown: true }} />
@@ -34,9 +36,9 @@ function RootNavigator() {
         <Stack.Screen name="dog/[id]/edit" options={{ headerShown: true }} />
         <Stack.Screen name="dog/[id]/goals/index" options={{ headerShown: true }} />
         <Stack.Screen name="dog/[id]/goals/new" options={{ headerShown: true }} />
-        <Stack.Screen name="dog/goals/pick-dog" options={{ headerShown: true }} />
+        <Stack.Screen name="dog/goals/pick-dog" options={{ headerShown: true, title: t('goals.addGoal') }} />
         <Stack.Screen name="dog/[id]/goals/[goalId]/edit" options={{ headerShown: true }} />
-        <Stack.Screen name="train/pick-dog" options={{ headerShown: true }} />
+        <Stack.Screen name="train/pick-dog" options={{ headerShown: true, title: t('dog.startTraining') }} />
         <Stack.Screen name="train/[dogId]/index" options={{ headerShown: true }} />
         <Stack.Screen name="train/start/index" options={{ headerShown: true }} />
         <Stack.Screen name="train/plan/index" options={{ headerShown: true }} />
@@ -47,7 +49,7 @@ function RootNavigator() {
         <Stack.Screen name="session/[id]" options={{ headerShown: false }} />
         <Stack.Screen name="progress/[dogId]" options={{ headerShown: true }} />
         <Stack.Screen name="calendar/[date]/index" options={{ headerShown: true }} />
-        <Stack.Screen name="calendar/[date]/new-plan" options={{ headerShown: true }} />
+        <Stack.Screen name="calendar/[date]/new-plan" options={{ headerShown: true, title: t('plans.addPlan') }} />
         <Stack.Screen name="post/new" options={{ headerShown: true }} />
         <Stack.Screen name="post/[id]" options={{ headerShown: true }} />
         <Stack.Screen name="user/[id]/index" options={{ headerShown: true }} />
@@ -63,17 +65,26 @@ function RootNavigator() {
   );
 }
 
-export default function RootLayout() {
+function RootLayoutContent() {
   const colorScheme = useColorScheme();
+  const { locale } = useTranslation();
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-            <RootNavigator />
-          </ThemeProvider>
-        </AuthProvider>
-      </QueryClientProvider>
+      <AuthProvider>
+        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+          <RootNavigator key={locale} />
+        </ThemeProvider>
+      </AuthProvider>
     </GestureHandlerRootView>
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <LocalizationProvider>
+        <RootLayoutContent />
+      </LocalizationProvider>
+    </QueryClientProvider>
   );
 }

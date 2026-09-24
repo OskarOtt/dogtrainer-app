@@ -1,6 +1,8 @@
 import { File, UploadType } from 'expo-file-system';
 import type { ImagePickerAsset } from 'expo-image-picker';
 
+import { t } from '@/i18n';
+
 /**
  * The backend binds contentType into the presigned URL's signature, so R2 rejects a PUT whose
  * actual Content-Type header doesn't match — mimeType is usually present, but some Android
@@ -32,6 +34,6 @@ export async function uploadAssetToPresignedUrl(
     headers: { 'Content-Type': contentType },
   });
   if (result.status < 200 || result.status >= 300) {
-    throw new Error(`Upload failed with status ${result.status}`);
+    throw new Error(t('errors.uploadStatus', { status: result.status }));
   }
 }

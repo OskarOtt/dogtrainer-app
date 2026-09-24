@@ -1,5 +1,6 @@
 import { StyleSheet, View } from 'react-native';
 
+import { t } from '@/i18n';
 import { Avatar } from '@/components/avatar';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { ThemedText } from '@/components/themed-text';
@@ -38,13 +39,13 @@ export function CommentItem({ comment, postId, isPostOwner }: CommentItemProps) 
       </View>
       {canDelete ? (
         <ConfirmDialog
-          title="Delete"
+          title={t('common.delete')}
           variant="danger"
           loading={deleteComment.isPending}
           style={styles.deleteButton}
-          dialogTitle="Delete comment"
-          dialogMessage="This can't be undone."
-          confirmLabel="Delete"
+          dialogTitle={t('comments.deleteTitle')}
+          dialogMessage={t('comments.deleteMessage')}
+          confirmLabel={t('common.delete')}
           destructive
           onConfirm={() => deleteComment.mutate(comment.id)}
         />

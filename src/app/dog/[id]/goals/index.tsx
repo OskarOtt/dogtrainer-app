@@ -1,6 +1,7 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { ActivityIndicator, FlatList, StyleSheet } from 'react-native';
 
+import { t } from '@/i18n';
 import { EmptyState } from '@/components/empty-state';
 import { GoalCard } from '@/components/goal-card';
 import { PrimaryButton } from '@/components/primary-button';
@@ -18,12 +19,12 @@ export default function DogGoalsScreen() {
 
   return (
     <ThemedView style={{ flex: 1 }}>
-      <Stack.Screen options={{ title: 'Goals' }} />
+      <Stack.Screen options={{ title: t('goals.goals') }} />
       {isLoading ? (
         <ActivityIndicator style={styles.loading} color={colors.primary} />
       ) : isError ? (
-        <EmptyState icon="alert-circle-outline" title="Couldn't load goals" message={getApiErrorMessage(error)}>
-          <PrimaryButton title="Exit" variant="secondary" onPress={() => router.replace('/(tabs)')} />
+        <EmptyState icon="alert-circle-outline" title={t('goals.loadError')} message={getApiErrorMessage(error)}>
+          <PrimaryButton title={t('common.exit')} variant="secondary" onPress={() => router.replace('/(tabs)')} />
         </EmptyState>
       ) : (
         <FlatList
@@ -31,14 +32,14 @@ export default function DogGoalsScreen() {
           keyExtractor={(goal) => goal.id}
           contentContainerStyle={styles.list}
           ListEmptyComponent={
-            <EmptyState icon="flag-outline" title="No goals yet" message="Set a training goal to track progress." />
+            <EmptyState icon="flag-outline" title={t('goals.empty')} message={t('goals.emptyMessage')} />
           }
           renderItem={({ item }) => (
             <GoalCard goal={item} onPress={() => router.push(`/dog/${id}/goals/${item.id}/edit`)} />
           )}
         />
       )}
-      <PrimaryButton title="Add Goal" onPress={() => router.push(`/dog/${id}/goals/new`)} style={styles.addButton} />
+      <PrimaryButton title={t('goals.addGoal')} onPress={() => router.push(`/dog/${id}/goals/new`)} style={styles.addButton} />
     </ThemedView>
   );
 }

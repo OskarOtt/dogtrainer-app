@@ -1,6 +1,8 @@
 import * as Calendar from 'expo-calendar';
 import { Platform } from 'react-native';
 
+import { t } from '@/i18n';
+
 /**
  * Requests (or confirms existing) permission to read/write the device's calendars.
  * Returns whether permission is currently granted.
@@ -29,12 +31,12 @@ async function getOrCreateWritableCalendar(): Promise<Calendar.ExpoCalendar> {
   if (Platform.OS === 'ios') {
     const defaultCalendar = Calendar.getDefaultCalendarSync();
     return Calendar.createCalendar({
-      title: 'Dog Trainer',
+      title: t('calendar.deviceCalendarName'),
       color: '#2F6FED',
       entityType: Calendar.EntityTypes.EVENT,
       sourceId: defaultCalendar.source.id,
       source: defaultCalendar.source,
-      name: 'Dog Trainer',
+      name: t('calendar.deviceCalendarName'),
       ownerAccount: defaultCalendar.source.name,
       accessLevel: Calendar.CalendarAccessLevel.OWNER,
     });
@@ -42,16 +44,16 @@ async function getOrCreateWritableCalendar(): Promise<Calendar.ExpoCalendar> {
 
   const localSource = calendars.find((calendar) => calendar.source?.type === Calendar.SourceType.LOCAL)?.source ?? {
     isLocalAccount: true,
-    name: 'Dog Trainer',
+    name: t('calendar.deviceCalendarName'),
     type: Calendar.SourceType.LOCAL,
   };
   return Calendar.createCalendar({
-    title: 'Dog Trainer',
+    title: t('calendar.deviceCalendarName'),
     color: '#2F6FED',
     entityType: Calendar.EntityTypes.EVENT,
     source: localSource,
-    name: 'Dog Trainer',
-    ownerAccount: 'Dog Trainer',
+    name: t('calendar.deviceCalendarName'),
+    ownerAccount: t('calendar.deviceCalendarName'),
     accessLevel: Calendar.CalendarAccessLevel.OWNER,
   });
 }
@@ -68,7 +70,7 @@ export interface AddDeviceCalendarEventInput {
 export async function addEventToDeviceCalendar(input: AddDeviceCalendarEventInput): Promise<void> {
   const granted = await ensureCalendarPermission();
   if (!granted) {
-    throw new Error('Calendar permission was not granted.');
+    throw new Error(t('calendar.permissionError'));
   }
   const calendar = await getOrCreateWritableCalendar();
   await calendar.createEvent({

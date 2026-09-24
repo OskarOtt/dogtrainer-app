@@ -3,7 +3,9 @@ import { useState } from 'react';
 import { Modal, Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { t } from '@/i18n';
 import { FormTextInput } from '@/components/form-text-input';
+import { KeyboardAwareView } from '@/components/keyboard-aware-layout';
 import { PrimaryButton } from '@/components/primary-button';
 import { ThemedText } from '@/components/themed-text';
 import { Spacing } from '@/constants/theme';
@@ -52,22 +54,22 @@ export function AddFriendModal({ visible, onClose }: AddFriendModalProps) {
       onSuccess: (foundUser) => {
         followUser.mutate(foundUser.id, {
           onSuccess: () => setSuccessName(foundUser.name),
-          onError: (followError) => setError(getApiErrorMessage(followError, 'Could not follow this user.')),
+          onError: (followError) => setError(getApiErrorMessage(followError, t('social.followError'))),
         });
       },
       onError: (lookupError) => {
-        setError(getApiErrorMessage(lookupError, 'No user found with that email.'));
+        setError(getApiErrorMessage(lookupError, t('social.noUser')));
       },
     });
   }
 
   return (
     <Modal visible={visible} animationType="slide" transparent onRequestClose={handleClose}>
-      <View style={styles.backdrop}>
+      <KeyboardAwareView style={styles.backdrop}>
         <SafeAreaView edges={['bottom']} style={[styles.sheet, { backgroundColor: colors.backgroundElement }]}>
           <View style={styles.header}>
             <ThemedText type="title" style={styles.title}>
-              Add friend
+              {t('social.addFriend')}
             </ThemedText>
             <Pressable onPress={handleClose} hitSlop={8}>
               <Ionicons name="close" size={26} color={colors.text} />
@@ -75,10 +77,10 @@ export function AddFriendModal({ visible, onClose }: AddFriendModalProps) {
           </View>
 
           <ThemedText style={[styles.wipNote, { color: colors.textSecondary }]}>
-            Work in progress — for now you can only follow people by email.
+            {t('social.addFriendDescription')}
           </ThemedText>
           <ThemedText style={[styles.wipNote, { color: colors.textSecondary }]}>
-            Posts from people you follow will show up in your feed, manage followers and following in your profile.
+            {t('social.feedDescription')}
           </ThemedText>
 
           <FormTextInput
@@ -88,7 +90,7 @@ export function AddFriendModal({ visible, onClose }: AddFriendModalProps) {
               setError(null);
               setSuccessName(null);
             }}
-            placeholder="Friend's email"
+            placeholder={t('social.friendEmail')}
             keyboardType="email-address"
             autoCapitalize="none"
             autoComplete="email"
@@ -96,12 +98,14 @@ export function AddFriendModal({ visible, onClose }: AddFriendModalProps) {
 
           {error ? <ThemedText style={[styles.message, { color: colors.danger }]}>{error}</ThemedText> : null}
           {successName ? (
-            <ThemedText style={[styles.message, { color: colors.success }]}>Now following {successName}!</ThemedText>
+            <ThemedText style={[styles.message, { color: colors.success }]}>
+              {t('social.nowFollowing', { name: successName })}
+            </ThemedText>
           ) : null}
 
-          <PrimaryButton title="Add friend" onPress={handleSubmit} loading={isBusy} disabled={!email.trim()} />
+          <PrimaryButton title={t('social.addFriend')} onPress={handleSubmit} loading={isBusy} disabled={!email.trim()} />
         </SafeAreaView>
-      </View>
+      </KeyboardAwareView>
     </Modal>
   );
 }
@@ -115,6 +119,8 @@ const styles = StyleSheet.create({
   sheet: {
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
     padding: Spacing.four,
   },
   header: {

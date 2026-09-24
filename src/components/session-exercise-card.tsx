@@ -1,11 +1,15 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useEffect, useRef, useState } from 'react';
-import { Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { useEffect, useId, useRef, useState } from 'react';
+import { Platform, Pressable, StyleSheet, TextInput, View } from 'react-native';
 
+import { t } from '@/i18n';
+import { KeyboardDismissAccessory } from '@/components/keyboard-dismiss-accessory';
 import { ThemedText } from '@/components/themed-text';
+import { KEYBOARD_ACCESSORY_ID } from '@/constants/keyboard';
 import { Radii, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import type { SessionExercise } from '@/types/session';
+import { formatPercent } from '@/utils/number';
 
 export interface SessionExerciseCardProps {
   sessionExercise: SessionExercise;
@@ -40,7 +44,7 @@ export function SessionExerciseCard({
   disabled,
 }: SessionExerciseCardProps) {
   const colors = useTheme();
-  const successRatePercent = Math.round(sessionExercise.successRate * 100);
+  const accessoryId = `${KEYBOARD_ACCESSORY_ID}-${useId().replace(/:/g, '')}`;
   const fail = sessionExercise.repetitions - sessionExercise.successfulRepetitions;
   const [notes, setNotes] = useState(sessionExercise.notes ?? '');
   // Debounced auto-save as a safety net: tapping straight from this field to the "Finish"
@@ -82,7 +86,7 @@ export function SessionExerciseCard({
             {fail}
           </ThemedText>
           <ThemedText themeColor="textSecondary" type="smallBold">
-            Fail
+            {t('sessionExercise.fail')}
           </ThemedText>
           <View style={styles.counterButtonsRow}>
             <Pressable
@@ -111,7 +115,7 @@ export function SessionExerciseCard({
             {sessionExercise.successfulRepetitions}
           </ThemedText>
           <ThemedText themeColor="textSecondary" type="smallBold">
-            Success
+            {t('sessionExercise.success')}
           </ThemedText>
           <View style={styles.counterButtonsRow}>
             <Pressable
@@ -141,24 +145,28 @@ export function SessionExerciseCard({
 
       <View style={[styles.summaryRow, { borderTopColor: colors.border }]}>
         <ThemedText themeColor="textSecondary" type="small">
-          Success rate: {successRatePercent}%
+          {t('sessionExercise.successRate', { rate: formatPercent(sessionExercise.successRate) })}
         </ThemedText>
         <ThemedText themeColor="textSecondary" type="small">
-          Total reps: {sessionExercise.repetitions}
+          {t('sessionExercise.totalReps', { count: sessionExercise.repetitions })}
         </ThemedText>
       </View>
 
       {onNotesBlur && !disabled ? (
-        <TextInput
-          key={sessionExercise.id}
-          value={notes}
-          onChangeText={setNotes}
-          onBlur={() => onNotesBlur(notes.trim() || null)}
-          placeholder="Notes for this exercise…"
-          placeholderTextColor={colors.textSecondary}
-          multiline
-          style={[styles.notesInput, { color: colors.text, borderColor: colors.border, backgroundColor: colors.backgroundElement }]}
-        />
+        <>
+          <TextInput
+            key={sessionExercise.id}
+            value={notes}
+            onChangeText={setNotes}
+            onBlur={() => onNotesBlur(notes.trim() || null)}
+            placeholder={t('training.exerciseNotes')}
+            placeholderTextColor={colors.textSecondary}
+            inputAccessoryViewID={Platform.OS === 'ios' ? accessoryId : undefined}
+            multiline
+            style={[styles.notesInput, { color: colors.text, borderColor: colors.border, backgroundColor: colors.backgroundElement }]}
+          />
+          <KeyboardDismissAccessory nativeID={accessoryId} />
+        </>
       ) : sessionExercise.notes ? (
         <ThemedText themeColor="textSecondary" type="small">
           {sessionExercise.notes}

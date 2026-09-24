@@ -1,6 +1,7 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
+import { t } from '@/i18n';
 import { DogForm } from '@/components/dog-form';
 import { EmptyState } from '@/components/empty-state';
 import { MediaAvatarPicker } from '@/components/media-avatar-picker';
@@ -45,8 +46,8 @@ export default function EditDogScreen() {
   if (isError || !dog) {
     return (
       <ThemedView style={{ flex: 1 }}>
-        <EmptyState icon="alert-circle-outline" title="Couldn't load this dog" message={getApiErrorMessage(error)}>
-          <PrimaryButton title="Exit" variant="secondary" onPress={() => router.replace('/(tabs)')} />
+        <EmptyState icon="alert-circle-outline" title={t('dog.loadError')} message={getApiErrorMessage(error)}>
+          <PrimaryButton title={t('common.exit')} variant="secondary" onPress={() => router.replace('/(tabs)')} />
         </EmptyState>
       </ThemedView>
     );
@@ -54,7 +55,7 @@ export default function EditDogScreen() {
 
   return (
     <ThemedView style={{ flex: 1 }}>
-      <Stack.Screen options={{ title: `Edit ${dog.name}` }} />
+      <Stack.Screen options={{ title: t('dog.editDog', { name: dog.name }) }} />
 
       <View style={styles.mediaSection}>
         <MediaAvatarPicker
@@ -68,7 +69,7 @@ export default function EditDogScreen() {
         />
         {dog.mediaUrl ? (
           <PrimaryButton
-            title="Remove Photo"
+            title={t('common.removePhoto')}
             variant="secondary"
             disabled={isMediaBusy}
             onPress={() => removeMedia.mutate()}
@@ -84,7 +85,7 @@ export default function EditDogScreen() {
 
       <DogForm
         initialValue={dog}
-        submitLabel="Save Changes"
+        submitLabel={t('common.saveChanges')}
         isSubmitting={updateDog.isPending}
         errorMessage={updateDog.isError ? getApiErrorMessage(updateDog.error) : null}
         onSubmit={handleSubmit}

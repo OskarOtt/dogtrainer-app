@@ -1,0 +1,10 @@
+{
+  "ios": {
+    "CFBundleDisplayName": "Flink",
+    "CFBundleName": "Flink",
+    "NSPhotoLibraryUsageDescription": "Gi Flink tilgang til bildene dine for å velge profilbilde eller hundebilde."
+  },
+  "android": {
+    "app_name": "Flink"
+  }
+}

@@ -1,6 +1,7 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 
+import { t } from '@/i18n';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { EmptyState } from '@/components/empty-state';
 import { MediaAvatarPicker } from '@/components/media-avatar-picker';
@@ -15,6 +16,7 @@ import { useDogStatistics } from '@/hooks/use-stats';
 import { useTheme } from '@/hooks/use-theme';
 import { getApiErrorMessage } from '@/utils/apiError';
 import { formatAge, formatDuration } from '@/utils/date';
+import { formatPercent } from '@/utils/number';
 
 export default function DogDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -53,8 +55,8 @@ export default function DogDetailsScreen() {
   if (isError || !dog) {
     return (
       <ThemedView style={{ flex: 1 }}>
-        <EmptyState icon="alert-circle-outline" title="Couldn't load this dog" message={getApiErrorMessage(error)}>
-          <PrimaryButton title="Exit" variant="secondary" onPress={() => router.replace('/(tabs)')} />
+        <EmptyState icon="alert-circle-outline" title={t('dog.loadError')} message={getApiErrorMessage(error)}>
+          <PrimaryButton title={t('common.exit')} variant="secondary" onPress={() => router.replace('/(tabs)')} />
         </EmptyState>
       </ThemedView>
     );
@@ -82,7 +84,7 @@ export default function DogDetailsScreen() {
         ) : null}
         {dog.mediaUrl ? (
           <PrimaryButton
-            title="Remove Photo"
+            title={t('common.removePhoto')}
             variant="secondary"
             disabled={isMediaBusy}
             onPress={() => removeMedia.mutate()}
@@ -94,29 +96,32 @@ export default function DogDetailsScreen() {
           {dog.name}
         </ThemedText>
         <ThemedText themeColor="textSecondary" style={styles.subtitle}>
-          {[dog.breed, age, dog.sex].filter(Boolean).join(' · ') || 'No details yet'}
+          {[dog.breed, age, dog.sex ? t(dog.sex === 'MALE' ? 'dog.male' : 'dog.female') : null]
+            .filter(Boolean)
+            .join(' · ') || t('common.noDetails')}
         </ThemedText>
 
         {statistics ? (
           <View style={[styles.card, { backgroundColor: colors.backgroundElement, borderColor: colors.border }]}>
             <ThemedText type="subtitle" style={styles.sectionTitle}>
-              Training Statistics
+              {t('dog.statistics')}
             </ThemedText>
             <ThemedText themeColor="textSecondary">
-              {statistics.completedSessions} sessions completed · {formatDuration(statistics.totalTrainingMinutes)}{' '}
-              total · {statistics.currentStreakWeeks} {statistics.currentStreakWeeks === 1 ? 'week' : 'weeks'} streak ·{' '}
-              {Math.round(statistics.averageSuccessRate * 100)}% avg success
+              {t('dog.sessionsCompleted', { count: statistics.completedSessions })} ·{' '}
+              {t('dog.totalDuration', { duration: formatDuration(statistics.totalTrainingMinutes) })} ·{' '}
+              {t('dog.streak', { count: statistics.currentStreakWeeks })} ·{' '}
+              {t('dog.averageSuccess', { rate: formatPercent(statistics.averageSuccessRate) })}
             </ThemedText>
           </View>
         ) : null}
 
         <View style={[styles.card, { backgroundColor: colors.backgroundElement, borderColor: colors.border }]}>
           <ThemedText type="subtitle" style={styles.sectionTitle}>
-            Training History
+            {t('dog.history')}
           </ThemedText>
           {!sessions || sessions.length === 0 ? (
             <ThemedText themeColor="textSecondary">
-              No training sessions yet. Start a session from the Train tab.
+              {t('dog.noSessions')}
             </ThemedText>
           ) : (
             <View style={styles.sessionsList}>
@@ -132,32 +137,32 @@ export default function DogDetailsScreen() {
         </View>
 
         <PrimaryButton
-          title="Start Training"
+          title={t('dog.startTraining')}
           onPress={() => router.push(`/train/${dog.id}`)}
           style={styles.button}
         />
 
         <PrimaryButton
-          title="View Progress"
+          title={t('dog.viewProgress')}
           variant="secondary"
           onPress={() => router.push(`/progress/${dog.id}`)}
           style={styles.button}
         />
 
         <PrimaryButton
-          title="Edit Dog"
+          title={t('dog.edit')}
           variant="secondary"
           onPress={() => router.push(`/dog/${dog.id}/edit`)}
           style={styles.button}
         />
         <ConfirmDialog
-          title="Delete Dog"
+          title={t('dog.deleteDog')}
           variant="danger"
           loading={deleteDog.isPending}
           style={styles.button}
-          dialogTitle="Delete dog"
-          dialogMessage={`Remove ${dog.name} and all of their training data?`}
-          confirmLabel="Delete"
+          dialogTitle={t('dog.deleteTitle')}
+          dialogMessage={t('dog.deleteMessage', { name: dog.name })}
+          confirmLabel={t('common.delete')}
           destructive
           onConfirm={handleDelete}
         />

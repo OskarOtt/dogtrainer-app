@@ -3,7 +3,9 @@ import { useState } from 'react';
 import { Modal, Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { t } from '@/i18n';
 import { FormTextInput } from '@/components/form-text-input';
+import { KeyboardAwareView } from '@/components/keyboard-aware-layout';
 import { PrimaryButton } from '@/components/primary-button';
 import { SocialAuthButtons } from '@/components/social-auth-buttons';
 import { ThemedText } from '@/components/themed-text';
@@ -54,11 +56,11 @@ export function DeleteAccountModal({ visible, onClose, onDeleted, authMethods }:
 
   return (
     <Modal visible={visible} animationType="slide" transparent onRequestClose={handleClose}>
-      <View style={styles.backdrop}>
+      <KeyboardAwareView style={styles.backdrop}>
         <SafeAreaView edges={['bottom']} style={[styles.sheet, { backgroundColor: colors.backgroundElement }]}>
           <View style={styles.header}>
             <ThemedText type="title" style={styles.title}>
-              Delete account
+              {t('account.deleteAccount')}
             </ThemedText>
             <Pressable onPress={handleClose} hitSlop={8}>
               <Ionicons name="close" size={26} color={colors.text} />
@@ -66,8 +68,7 @@ export function DeleteAccountModal({ visible, onClose, onDeleted, authMethods }:
           </View>
 
           <ThemedText style={[styles.note, { color: colors.textSecondary }]}>
-            This permanently deletes your dogs, goals and training history, and removes you from
-            others&apos; followers/following. This can&apos;t be undone.
+            {t('account.deleteWarning')}
           </ThemedText>
 
           {hasPassword ? (
@@ -78,12 +79,12 @@ export function DeleteAccountModal({ visible, onClose, onDeleted, authMethods }:
                   setPassword(text);
                   deleteAccount.reset();
                 }}
-                placeholder="Enter your password"
+                placeholder={t('account.enterPassword')}
                 secureTextEntry
                 autoCapitalize="none"
               />
               <PrimaryButton
-                title="Delete my account"
+                title={t('account.deleteMyAccount')}
                 variant="danger"
                 onPress={handleConfirm}
                 loading={deleteAccount.isPending}
@@ -95,7 +96,7 @@ export function DeleteAccountModal({ visible, onClose, onDeleted, authMethods }:
           {socialMethods.length > 0 ? (
             <>
               <ThemedText style={[styles.reauthenticate, { color: colors.textSecondary }]}>
-                Confirm with a linked provider to delete your account.
+                {t('account.confirmProvider')}
               </ThemedText>
               <SocialAuthButtons
                 providers={socialMethods}
@@ -108,11 +109,11 @@ export function DeleteAccountModal({ visible, onClose, onDeleted, authMethods }:
 
           {deleteAccount.isError || providerError ? (
             <ThemedText style={[styles.message, { color: colors.danger }]}>
-              {getApiErrorMessage(providerError ?? deleteAccount.error, 'Could not confirm account deletion.')}
+              {getApiErrorMessage(providerError ?? deleteAccount.error, t('account.confirmDeleteError'))}
             </ThemedText>
           ) : null}
         </SafeAreaView>
-      </View>
+      </KeyboardAwareView>
     </Modal>
   );
 }

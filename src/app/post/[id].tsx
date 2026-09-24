@@ -1,8 +1,10 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { ActivityIndicator, ScrollView, StyleSheet } from 'react-native';
+import { ActivityIndicator, StyleSheet } from 'react-native';
 
+import { t } from '@/i18n';
 import { CommentList } from '@/components/comment-list';
 import { EmptyState } from '@/components/empty-state';
+import { KeyboardAwareScrollView } from '@/components/keyboard-aware-layout';
 import { PostCard } from '@/components/post-card';
 import { PrimaryButton } from '@/components/primary-button';
 import { ThemedView } from '@/components/themed-view';
@@ -30,8 +32,8 @@ export default function PostDetailScreen() {
   if (isError || !post) {
     return (
       <ThemedView style={{ flex: 1 }}>
-        <EmptyState icon="alert-circle-outline" title="Couldn't load this post" message={getApiErrorMessage(error)}>
-          <PrimaryButton title="Exit" variant="secondary" onPress={() => router.replace('/(tabs)')} />
+        <EmptyState icon="alert-circle-outline" title={t('posts.loadError')} message={getApiErrorMessage(error)}>
+          <PrimaryButton title={t('common.exit')} variant="secondary" onPress={() => router.replace('/(tabs)')} />
         </EmptyState>
       </ThemedView>
     );
@@ -39,11 +41,11 @@ export default function PostDetailScreen() {
 
   return (
     <ThemedView style={{ flex: 1 }}>
-      <Stack.Screen options={{ title: 'Post' }} />
-      <ScrollView contentContainerStyle={styles.scroll}>
+      <Stack.Screen options={{ title: t('posts.post') }} />
+      <KeyboardAwareScrollView contentContainerStyle={styles.scroll}>
         <PostCard post={post} onPress={() => {}} onDeleted={() => router.back()} />
         <CommentList postId={post.id} isPostOwner={post.authorId === user?.id} />
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </ThemedView>
   );
 }

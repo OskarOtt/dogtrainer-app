@@ -1,10 +1,12 @@
-import { Host, TextInput } from '@expo/ui';
 import { Image } from 'expo-image';
 import { Link, useRouter } from 'expo-router';
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, useColorScheme, View } from 'react-native';
+import { StyleSheet, useColorScheme, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { t } from '@/i18n';
+import { FormTextInput } from '@/components/form-text-input';
+import { KeyboardAwareScrollView } from '@/components/keyboard-aware-layout';
 import { PrimaryButton } from '@/components/primary-button';
 import { SocialAuthButtons } from '@/components/social-auth-buttons';
 import { ThemedText } from '@/components/themed-text';
@@ -36,7 +38,7 @@ export default function RegisterScreen() {
     setError(null);
 
     if (!isValidEmail(email)) {
-      setError('Please enter a valid email address (e.g. xx@xxx.xyz).');
+      setError(t('auth.invalidEmail'));
       return;
     }
 
@@ -51,7 +53,7 @@ export default function RegisterScreen() {
       await register({ name: name.trim(), email: email.trim(), password });
       router.replace('/(tabs)');
     } catch (err) {
-      setError(getApiErrorMessage(err, 'Could not create your account. Please try again.'));
+      setError(getApiErrorMessage(err, t('auth.registerError')));
     } finally {
       setIsSubmitting(false);
     }
@@ -66,88 +68,63 @@ export default function RegisterScreen() {
   return (
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
-        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
-          <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
-            {isLight ? (
-              <ThemedView style={[styles.logoBackdrop, { backgroundColor: AuthBrandColors.lightBlue }]}>
-                <Image
-                  source={require('@/assets/images/noborder-doglogo.png')}
-                  style={styles.logo}
-                  contentFit="cover"
-                />
-              </ThemedView>
-            ) : null}
+        <KeyboardAwareScrollView contentContainerStyle={styles.scrollContent}>
+          {isLight ? (
+            <ThemedView style={[styles.logoBackdrop, { backgroundColor: AuthBrandColors.lightBlue }]}>
+              <Image
+                source={require('@/assets/images/noborder-doglogo.png')}
+                style={styles.logo}
+                contentFit="cover"
+              />
+            </ThemedView>
+          ) : null}
 
             <ThemedText type="title" style={styles.title}>
-              Create account
+              {t('auth.createAccount')}
             </ThemedText>
             <ThemedText themeColor="textSecondary" style={styles.subtitle}>
-              Track training progress for every dog you love.
+              {t('auth.registerSubtitle')}
             </ThemedText>
 
             <SocialAuthButtons
               defaultDisplayName={name}
               disabled={isSubmitting}
               onCredential={handleSocialLogin}
-              onError={(err) => setError(getApiErrorMessage(err, 'Could not continue with this provider.'))}
+              onError={(err) => setError(getApiErrorMessage(err, t('auth.providerError')))}
               onVisibilityChange={setShowSocialAuth}
             />
             {showSocialAuth ? (
               <View style={styles.dividerRow}>
                 <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
-                <ThemedText themeColor="textSecondary">or use email</ThemedText>
+                <ThemedText themeColor="textSecondary">{t('auth.orUseEmail')}</ThemedText>
                 <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
               </View>
             ) : null}
 
-            <Host style={[styles.inputHost, { borderColor: colors.border, backgroundColor: colors.backgroundElement }]}>
-              <TextInput
-                defaultValue={name}
-                onChangeText={setName}
-                placeholder="Name"
-                placeholderTextColor={colors.textSecondary}
-                autoComplete="name"
-                textStyle={{ color: colors.text, fontSize: 17 }}
-                style={{
-                  paddingHorizontal: Spacing.three,
-                  paddingVertical: Spacing.two,
-                  height: 56,
-                }}
-              />
-            </Host>
-            <Host style={[styles.inputHost, { borderColor: colors.border, backgroundColor: colors.backgroundElement }]}>
-              <TextInput
-                defaultValue={email}
-                onChangeText={setEmail}
-                placeholder="Email"
-                placeholderTextColor={colors.textSecondary}
-                autoCapitalize="none"
-                keyboardType="email-address"
-                autoComplete="email"
-                textStyle={{ color: colors.text, fontSize: 17 }}
-                style={{
-                  paddingHorizontal: Spacing.three,
-                  paddingVertical: Spacing.two,
-                  height: 56,
-                }}
-              />
-            </Host>
-            <Host style={[styles.inputHost, { borderColor: colors.border, backgroundColor: colors.backgroundElement }]}>
-              <TextInput
-                defaultValue={password}
-                onChangeText={setPassword}
-                placeholder="Password (min. 8 chars, 1 capital, 1 symbol)"
-                placeholderTextColor={colors.textSecondary}
-                secureTextEntry
-                autoComplete="new-password"
-                textStyle={{ color: colors.text, fontSize: 17 }}
-                style={{
-                  paddingHorizontal: Spacing.three,
-                  paddingVertical: Spacing.two,
-                  height: 56,
-                }}
-              />
-            </Host>
+            <FormTextInput
+              defaultValue={name}
+              onChangeText={setName}
+              placeholder={t('auth.name')}
+              autoComplete="name"
+              style={styles.input}
+            />
+            <FormTextInput
+              defaultValue={email}
+              onChangeText={setEmail}
+              placeholder={t('auth.email')}
+              autoCapitalize="none"
+              keyboardType="email-address"
+              autoComplete="email"
+              style={styles.input}
+            />
+            <FormTextInput
+              defaultValue={password}
+              onChangeText={setPassword}
+              placeholder={t('auth.passwordHint')}
+              secureTextEntry
+              autoComplete="new-password"
+              style={styles.input}
+            />
 
             {error ? (
               <ThemedText themeColor="danger" style={styles.error}>
@@ -156,7 +133,7 @@ export default function RegisterScreen() {
             ) : null}
 
             <PrimaryButton
-              title="Sign Up"
+              title={t('auth.signUp')}
               onPress={handleSubmit}
               loading={isSubmitting}
               disabled={!canSubmit}
@@ -168,11 +145,10 @@ export default function RegisterScreen() {
                 themeColor="primary"
                 style={isLight ? { color: AuthBrandColors.green } : undefined}
               >
-                Already have an account? Log in
+                {t('auth.hasAccount')}
               </ThemedText>
             </Link>
-          </ScrollView>
-        </KeyboardAvoidingView>
+        </KeyboardAwareScrollView>
       </SafeAreaView>
     </ThemedView>
   );
@@ -204,12 +180,7 @@ const styles = StyleSheet.create({
     gap: Spacing.two,
   },
   dividerLine: { flex: 1, height: StyleSheet.hairlineWidth },
-  inputHost: {
-    height: 56,
-    borderWidth: 1,
-    borderRadius: Radii.medium,
-    overflow: 'hidden',
-  },
+  input: { marginBottom: 0 },
   error: { textAlign: 'center' },
   button: { marginTop: Spacing.two },
   link: { alignSelf: 'center', marginTop: Spacing.three, padding: Spacing.two },

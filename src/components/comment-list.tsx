@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
+import { t } from '@/i18n';
 import { CommentItem } from '@/components/comment-item';
 import { FormTextInput } from '@/components/form-text-input';
 import { PrimaryButton } from '@/components/primary-button';
@@ -44,7 +45,7 @@ export function CommentList({ postId, isPostOwner }: CommentListProps) {
 
   return (
     <View style={styles.container}>
-      <ThemedText type="subtitle">Comments</ThemedText>
+      <ThemedText type="subtitle">{t('comments.comments')}</ThemedText>
 
       {isLoading ? (
         <ActivityIndicator color={colors.primary} />
@@ -55,7 +56,7 @@ export function CommentList({ postId, isPostOwner }: CommentListProps) {
           ))}
         </View>
       ) : (
-        <ThemedText themeColor="textSecondary">No comments yet.</ThemedText>
+        <ThemedText themeColor="textSecondary">{t('comments.empty')}</ThemedText>
       )}
 
       <View style={styles.composer}>
@@ -63,15 +64,15 @@ export function CommentList({ postId, isPostOwner }: CommentListProps) {
           key={inputKey}
           defaultValue={content}
           onChangeText={setContent}
-          placeholder="Add a comment..."
+          placeholder={t('comments.placeholder')}
           style={styles.input}
         />
         {createComment.isError ? (
           <ThemedText themeColor="danger" style={styles.error}>
-            {getApiErrorMessage(createComment.error, 'Could not post this comment.')}
+            {getApiErrorMessage(createComment.error, t('comments.error'))}
           </ThemedText>
         ) : null}
-        <PrimaryButton title="Post" onPress={handleSubmit} loading={createComment.isPending} disabled={!content.trim()} />
+        <PrimaryButton title={t('comments.post')} onPress={handleSubmit} loading={createComment.isPending} disabled={!content.trim()} />
       </View>
     </View>
   );

@@ -1,6 +1,7 @@
 import { StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { t } from '@/i18n';
 import { Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
@@ -20,27 +21,27 @@ export function SessionFooter({ onCancel, onFinish, cancelLoading, finishLoading
       <View style={[styles.footerBox, { backgroundColor: colors.card, borderColor: colors.border }]}>
         <View style={styles.footerButtonCancel}>
           <ConfirmDialog
-            title="Cancel"
+            title={t('training.cancel')}
             variant="danger"
             loading={cancelLoading}
             style={styles.footerButtonFill}
-            dialogTitle="Cancel session"
-            dialogMessage="Discard this training session? This cannot be undone."
-            confirmLabel="Discard"
-            cancelLabel="Keep Training"
+            dialogTitle={t('training.cancelTitle')}
+            dialogMessage={t('training.cancelMessage')}
+            confirmLabel={t('common.discard')}
+            cancelLabel={t('common.keepTraining')}
             destructive
             onConfirm={onCancel}
           />
         </View>
         <View style={styles.footerButtonFinish}>
           <ConfirmDialog
-            title="Finish"
+            title={t('training.finish')}
             variant="success"
             loading={finishLoading}
             style={styles.footerButtonFill}
-            dialogTitle="Finish session"
-            dialogMessage="Mark this training session as complete?"
-            confirmLabel="Finish"
+            dialogTitle={t('training.finishTitle')}
+            dialogMessage={t('training.finishMessage')}
+            confirmLabel={t('common.finish')}
             onConfirm={onFinish}
           />
         </View>

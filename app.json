@@ -2,8 +2,12 @@
   "expo": {
     "name": "Flink",
     "slug": "dogtrainer-app",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "description": "Track training sessions, plans, and progress for your dog.",
+    "locales": {
+      "en": "./locales/en.json",
+      "nb": "./locales/nb.json"
+    },
     "orientation": "portrait",
     "icon": "./assets/images/noborder-doglogo.png",
     "scheme": "dogtrainerapp",
@@ -49,6 +53,21 @@
           "photosPermission": "Allow $(PRODUCT_NAME) to access your photos to set a profile picture or dog photo.",
           "cameraPermission": false,
           "microphonePermission": false
+        }
+      ],
+      [
+        "expo-localization",
+        {
+          "supportedLocales": {
+            "ios": [
+              "en",
+              "nb"
+            ],
+            "android": [
+              "en",
+              "nb"
+            ]
+          }
         }
       ]
     ],

@@ -3,6 +3,7 @@ import { buttonStyle, disabled as disabledModifier, frame, tint } from '@expo/ui
 import { useState } from 'react';
 import { StyleSheet, useColorScheme } from 'react-native';
 
+import { t } from '@/i18n';
 import { Colors } from '@/constants/theme';
 
 import type { ConfirmDialogProps } from './confirm-dialog.types';
@@ -21,7 +22,7 @@ export function ConfirmDialog({
   dialogTitle,
   dialogMessage,
   confirmLabel,
-  cancelLabel = 'Cancel',
+  cancelLabel = t('common.cancel'),
   destructive,
   onConfirm,
 }: ConfirmDialogProps) {

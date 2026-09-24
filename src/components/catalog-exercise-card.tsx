@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { DifficultyColors, Radii, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
+import { t, type TranslationKey } from '@/i18n';
 import type { CatalogExercise } from '@/types/training';
 
 export interface CatalogExerciseCardProps {
@@ -11,10 +12,10 @@ export interface CatalogExerciseCardProps {
   selected?: boolean;
 }
 
-const DIFFICULTY_LABELS: Record<CatalogExercise['difficulty'], string> = {
-  BEGINNER: 'Beginner',
-  INTERMEDIATE: 'Intermediate',
-  ADVANCED: 'Advanced',
+const DIFFICULTY_LABELS: Record<CatalogExercise['difficulty'], TranslationKey> = {
+  BEGINNER: 'difficulty.beginner',
+  INTERMEDIATE: 'difficulty.intermediate',
+  ADVANCED: 'difficulty.advanced',
 };
 
 /**
@@ -45,7 +46,7 @@ export function CatalogExerciseCard({ exercise, onPress, selected }: CatalogExer
         </ThemedText>
         <View style={[styles.badge, { backgroundColor: difficultyColor + '22' }]}>
           <ThemedText type="small" style={{ color: difficultyColor }}>
-            {DIFFICULTY_LABELS[exercise.difficulty]}
+            {t(DIFFICULTY_LABELS[exercise.difficulty])}
           </ThemedText>
         </View>
       </View>

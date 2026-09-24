@@ -3,9 +3,11 @@ import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Alert, Pressable, StyleSheet, View } from 'react-native';
 
+import { t } from '@/i18n';
 import { FormTextInput } from '@/components/form-text-input';
+import { KeyboardAwareScrollView } from '@/components/keyboard-aware-layout';
 import { PrimaryButton } from '@/components/primary-button';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -44,7 +46,7 @@ export default function NewPostScreen() {
   async function handlePickPhoto() {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
-      Alert.alert('Permission needed', 'Allow photo library access to attach a photo.');
+      Alert.alert(t('media.permissionTitle'), t('media.permissionAttachment'));
       return;
     }
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -86,7 +88,7 @@ export default function NewPostScreen() {
     <ThemedView style={styles.container}>
       <Stack.Screen
         options={{
-          title: isFromSession ? 'Share Session' : 'New Post',
+          title: isFromSession ? t('posts.shareSession') : t('posts.newPost'),
           presentation: 'modal',
           headerRight: isFromSession
             ? () => (
@@ -97,12 +99,12 @@ export default function NewPostScreen() {
             : undefined,
         }}
       />
-      <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+      <KeyboardAwareScrollView contentContainerStyle={styles.scroll}>
         <FormTextInput
           defaultValue={content}
           onChangeText={setContent}
           placeholder={
-            isFromSession ? 'Add a caption (leave blank to auto-generate)' : "What's on your mind?"
+            isFromSession ? t('posts.captionSession') : t('posts.captionPost')
           }
           multiline
           numberOfLines={5}
@@ -115,7 +117,7 @@ export default function NewPostScreen() {
 
         {!isFromSession && dogs && dogs.length > 0 ? (
           <>
-            <ThemedText type="smallBold">Tag a dog (optional)</ThemedText>
+            <ThemedText type="smallBold">{t('posts.tagDog')}</ThemedText>
             <View style={styles.dogPicker}>
               <Pressable
                 onPress={() => setSelectedDogId(undefined)}
@@ -126,7 +128,7 @@ export default function NewPostScreen() {
                     borderColor: colors.border,
                   },
                 ]}>
-                <ThemedText style={{ color: !selectedDogId ? colors.onPrimary : colors.text }}>None</ThemedText>
+                <ThemedText style={{ color: !selectedDogId ? colors.onPrimary : colors.text }}>{t('common.none')}</ThemedText>
               </Pressable>
               {dogs.map((dog) => {
                 const selected = dog.id === selectedDogId;
@@ -149,7 +151,7 @@ export default function NewPostScreen() {
           </>
         ) : null}
 
-        <ThemedText type="smallBold">Photo (optional)</ThemedText>
+        <ThemedText type="smallBold">{t('posts.photoOptional')}</ThemedText>
         {selectedAsset ? (
           <View style={styles.photoPreviewWrap}>
             <Image source={{ uri: selectedAsset.uri }} style={styles.photoPreview} contentFit="cover" />
@@ -164,7 +166,7 @@ export default function NewPostScreen() {
             onPress={handlePickPhoto}
             style={[styles.addPhotoRow, { borderColor: colors.border, backgroundColor: colors.backgroundElement }]}>
             <Ionicons name="image-outline" size={22} color={colors.primary} />
-            <ThemedText themeColor="primary">Add Photo</ThemedText>
+            <ThemedText themeColor="primary">{t('posts.addPhoto')}</ThemedText>
           </Pressable>
         )}
 
@@ -175,7 +177,7 @@ export default function NewPostScreen() {
         ) : null}
 
         <PrimaryButton
-          title={isFromSession ? 'Share to Feed' : 'Post'}
+          title={isFromSession ? t('training.shareToFeed') : t('posts.post')}
           onPress={handleSubmitPress}
           loading={isSubmitting}
           disabled={!canSubmit || isSubmitting}
@@ -184,14 +186,14 @@ export default function NewPostScreen() {
 
         {isFromSession ? (
           <PrimaryButton
-            title="Don't Post"
+            title={t('posts.dontPost')}
             variant="secondary"
             onPress={handleSkip}
             disabled={isSubmitting}
             style={styles.dontPostButton}
           />
         ) : null}
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </ThemedView>
   );
 }

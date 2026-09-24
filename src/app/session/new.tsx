@@ -2,6 +2,7 @@ import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, StyleSheet } from 'react-native';
 
+import { t } from '@/i18n';
 import { sessionsApi } from '@/api/sessions';
 import { plansApi } from '@/api/plans';
 import { EmptyState } from '@/components/empty-state';
@@ -66,7 +67,7 @@ export default function NewSessionScreen() {
         }
 
         if (!sessionDogId) {
-          throw new Error('Missing dog for this training session');
+          throw new Error(t('training.missingDog'));
         }
 
         const session = await sessionsApi.create(sessionDogId, {});
@@ -75,23 +76,23 @@ export default function NewSessionScreen() {
         }
         router.replace(planId ? `/session/${session.id}?planId=${planId}` : `/session/${session.id}`);
       } catch (error) {
-        setErrorMessage(getApiErrorMessage(error, "Couldn't start this training session"));
+        setErrorMessage(getApiErrorMessage(error, t('training.startOneError')));
       }
     })();
   }, [dogId, exerciseIds, planId, router]);
 
   return (
     <ThemedView style={{ flex: 1 }}>
-      <Stack.Screen options={{ title: 'Starting Session' }} />
+      <Stack.Screen options={{ title: t('training.startingSession') }} />
       {errorMessage ? (
-        <EmptyState icon="alert-circle-outline" title="Couldn't start session" message={errorMessage}>
-          <PrimaryButton title="Exit" variant="secondary" onPress={() => router.replace('/(tabs)')} />
+        <EmptyState icon="alert-circle-outline" title={t('training.startError')} message={errorMessage}>
+          <PrimaryButton title={t('common.exit')} variant="secondary" onPress={() => router.replace('/(tabs)')} />
         </EmptyState>
       ) : (
         <ThemedView style={styles.center}>
           <ActivityIndicator color={colors.primary} />
           <ThemedText themeColor="textSecondary" style={styles.message}>
-            Starting your training session…
+            {t('training.startingSession')}…
           </ThemedText>
         </ThemedView>
       )}

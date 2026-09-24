@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
+import { t } from '@/i18n';
 import { Avatar } from '@/components/avatar';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { LikeButton } from '@/components/like-button';
@@ -55,13 +56,13 @@ export function PostCard({ post, onPress, onDeleted }: PostCardProps) {
 
         {isOwnPost ? (
           <ConfirmDialog
-            title="Delete"
+            title={t('common.delete')}
             variant="danger"
             loading={deletePost.isPending}
             style={styles.deleteButton}
-            dialogTitle="Delete post"
-            dialogMessage="This can't be undone."
-            confirmLabel="Delete"
+            dialogTitle={t('posts.deleteTitle')}
+            dialogMessage={t('posts.deleteMessage')}
+            confirmLabel={t('common.delete')}
             destructive
             onConfirm={() =>
               deletePost.mutate({ id: post.id, authorId: post.authorId }, { onSuccess: onDeleted })
@@ -72,7 +73,7 @@ export function PostCard({ post, onPress, onDeleted }: PostCardProps) {
             onPress={() => setIsReportSheetVisible(true)}
             hitSlop={8}
             style={styles.reportButton}
-            accessibilityLabel="Report or block"
+            accessibilityLabel={t('posts.reportOrBlock')}
           >
             <Ionicons name="alert-circle-outline" size={18} color={colors.textSecondary} />
           </Pressable>
@@ -89,14 +90,14 @@ export function PostCard({ post, onPress, onDeleted }: PostCardProps) {
           {post.dogId ? (
             <Tag
               icon="paw"
-              label={post.dogName ?? 'Dog'}
+              label={post.dogName ?? t('posts.dogFallback')}
               onPress={isOwnPost ? () => router.push(`/dog/${post.dogId}`) : undefined}
             />
           ) : null}
           {post.trainingSessionId ? (
             <Tag
               icon="barbell-outline"
-              label="Training session"
+              label={t('posts.sessionTag')}
               onPress={isOwnPost ? () => router.push(`/session/${post.trainingSessionId}`) : undefined}
             />
           ) : null}
@@ -109,7 +110,7 @@ export function PostCard({ post, onPress, onDeleted }: PostCardProps) {
           onPress={onPress ?? (() => router.push(`/post/${post.id}`))}
           hitSlop={8}
           style={styles.row}
-          accessibilityLabel="Comments"
+          accessibilityLabel={t('posts.commentsAccessibility')}
         >
           <Ionicons name="chatbubble-outline" size={18} color={colors.textSecondary} />
           {post.commentCount > 0 ? <ThemedText themeColor="textSecondary">{post.commentCount}</ThemedText> : null}

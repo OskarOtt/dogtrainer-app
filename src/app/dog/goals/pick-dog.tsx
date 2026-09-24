@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { t } from '@/i18n';
 import { DogCard } from '@/components/dog-card';
 import { EmptyState } from '@/components/empty-state';
 import { PrimaryButton } from '@/components/primary-button';
@@ -46,8 +47,8 @@ export default function PickDogForGoalScreen() {
     return (
       <ThemedView style={styles.container}>
         <SafeAreaView style={styles.safeArea} edges={['top']}>
-          <EmptyState icon="alert-circle-outline" title="Couldn't load dogs" message={getApiErrorMessage(error)}>
-            <PrimaryButton title="Exit" variant="secondary" onPress={() => router.replace('/(tabs)')} />
+          <EmptyState icon="alert-circle-outline" title={t('dog.loadDogsError')} message={getApiErrorMessage(error)}>
+            <PrimaryButton title={t('common.exit')} variant="secondary" onPress={() => router.replace('/(tabs)')} />
           </EmptyState>
         </SafeAreaView>
       </ThemedView>
@@ -58,8 +59,8 @@ export default function PickDogForGoalScreen() {
     return (
       <ThemedView style={styles.container}>
         <SafeAreaView style={styles.safeArea} edges={['top']}>
-          <EmptyState icon="paw-outline" title="No dogs yet" message="Add a dog before setting a goal.">
-            <PrimaryButton title="Add a Dog" onPress={() => router.push('/dog/new')} style={styles.emptyButton} />
+          <EmptyState icon="paw-outline" title={t('dog.noDogs')} message={t('dog.noDogsGoal')}>
+            <PrimaryButton title={t('dog.addADog')} onPress={() => router.push('/dog/new')} style={styles.emptyButton} />
           </EmptyState>
         </SafeAreaView>
       </ThemedView>
@@ -70,10 +71,10 @@ export default function PickDogForGoalScreen() {
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea} edges={['top']}>
         <ThemedText type="title" style={styles.title}>
-          Choose a Dog
+          {t('screens.chooseDog')}
         </ThemedText>
         <ThemedText themeColor="textSecondary" style={styles.subtitle}>
-          Who is this goal for?
+          {t('screens.dogForGoal')}
         </ThemedText>
         <FlatList
           data={dogs}

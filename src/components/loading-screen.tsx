@@ -1,5 +1,6 @@
 import { Image, StyleSheet, Text, View } from 'react-native';
 
+import { t } from '@/i18n';
 import { Spacing } from '@/constants/theme';
 
 /**
@@ -15,7 +16,7 @@ export function LoadingScreen() {
         style={styles.logo}
         resizeMode="contain"
       />
-      <Text style={styles.text}>Loading...</Text>
+      <Text style={styles.text}>{t('common.loading')}</Text>
     </View>
   );
 }

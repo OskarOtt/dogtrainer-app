@@ -1,6 +1,7 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, View } from 'react-native';
 
+import { t } from '@/i18n';
 import { Avatar } from '@/components/avatar';
 import { EmptyState } from '@/components/empty-state';
 import { ThemedText } from '@/components/themed-text';
@@ -26,7 +27,7 @@ export default function FollowersScreen() {
 
   return (
     <ThemedView style={{ flex: 1 }}>
-      <Stack.Screen options={{ title: 'Followers' }} />
+      <Stack.Screen options={{ title: t('social.followers') }} />
       <FlatList
         data={followers ?? []}
         keyExtractor={(item: User) => item.id}
@@ -39,7 +40,7 @@ export default function FollowersScreen() {
             </View>
           </Pressable>
         )}
-        ListEmptyComponent={<EmptyState icon="people-outline" title="No followers yet" />}
+        ListEmptyComponent={<EmptyState icon="people-outline" title={t('social.noFollowers')} />}
       />
     </ThemedView>
   );

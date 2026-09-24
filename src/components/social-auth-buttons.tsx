@@ -3,7 +3,9 @@ import { useEffect, useState } from 'react';
 import { Modal, Platform, StyleSheet, useColorScheme, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { t } from '@/i18n';
 import { FormTextInput } from '@/components/form-text-input';
+import { KeyboardAwareView } from '@/components/keyboard-aware-layout';
 import { PrimaryButton } from '@/components/primary-button';
 import { ThemedText } from '@/components/themed-text';
 import { Radii, Spacing } from '@/constants/theme';
@@ -79,7 +81,7 @@ export function SocialAuthButtons({
         ],
       });
       if (!credential.identityToken) {
-        throw new Error('Apple did not return an identity token.');
+        throw new Error(t('auth.appleMissingToken'));
       }
       const displayName = credential.fullName
         ? AppleAuthentication.formatFullName(credential.fullName)
@@ -127,25 +129,25 @@ export function SocialAuthButtons({
       </View>
 
       <Modal visible={pendingCredential !== null} animationType="fade" transparent>
-        <View style={styles.backdrop}>
+        <KeyboardAwareView style={styles.backdrop}>
           <SafeAreaView style={[styles.nameSheet, { backgroundColor: colors.backgroundElement }]}>
-            <ThemedText type="subtitle">Finish creating your account</ThemedText>
-            <ThemedText themeColor="textSecondary">Enter the name shown on your profile.</ThemedText>
+            <ThemedText type="subtitle">{t('auth.finishAccount')}</ThemedText>
+            <ThemedText themeColor="textSecondary">{t('auth.profileNamePrompt')}</ThemedText>
             <FormTextInput
               key={pendingCredential?.provider}
               defaultValue={name}
               onChangeText={setName}
-              placeholder="Name"
+              placeholder={t('auth.name')}
               autoComplete="name"
             />
             <PrimaryButton
-              title="Continue"
+              title={t('common.continue')}
               disabled={!name.trim() || loadingProvider !== null}
               loading={loadingProvider !== null}
               onPress={() => pendingCredential && void submitCredential(pendingCredential, name)}
             />
             <PrimaryButton
-              title="Cancel"
+              title={t('common.cancel')}
               variant="secondary"
               disabled={loadingProvider !== null}
               onPress={() => {
@@ -154,7 +156,7 @@ export function SocialAuthButtons({
               }}
             />
           </SafeAreaView>
-        </View>
+        </KeyboardAwareView>
       </Modal>
     </>
   );

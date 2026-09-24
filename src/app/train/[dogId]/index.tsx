@@ -1,6 +1,7 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 
+import { t } from '@/i18n';
 import { PrimaryButton } from '@/components/primary-button';
 import { ExerciseCatalogPicker } from '@/components/exercise-catalog-picker';
 import { ThemedView } from '@/components/themed-view';
@@ -47,14 +48,14 @@ export default function TrainScreen() {
 
   return (
     <ThemedView style={{ flex: 1 }}>
-      <Stack.Screen options={{ title: 'Select Exercises' }} />
+      <Stack.Screen options={{ title: t('training.selectExercises') }} />
       <ExerciseCatalogPicker
-        headerMessage="Tap exercises to add them to this session."
+        headerMessage={t('training.selectForSession')}
         selectedIds={selectedIds}
         onToggle={toggle}
         actionButton={
           <PrimaryButton
-            title={sessionId ? 'Add to Session' : 'Start Training'}
+            title={sessionId ? t('training.addToSession') : t('dog.startTraining')}
             onPress={handleStart}
             disabled={selectedIds.length === 0}
             loading={isAdding}

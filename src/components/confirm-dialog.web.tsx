@@ -1,3 +1,4 @@
+import { t } from '@/i18n';
 import { Alert } from 'react-native';
 
 import { PrimaryButton } from './primary-button';
@@ -17,7 +18,7 @@ export function ConfirmDialog({
   dialogTitle,
   dialogMessage,
   confirmLabel,
-  cancelLabel = 'Cancel',
+  cancelLabel = t('common.cancel'),
   destructive,
   onConfirm,
 }: ConfirmDialogProps) {

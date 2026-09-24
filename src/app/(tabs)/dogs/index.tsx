@@ -3,6 +3,7 @@ import { useRouter } from 'expo-router';
 import { ActivityIndicator, Pressable, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { t } from '@/i18n';
 import { DraggableDogList } from '@/components/draggable-dog-list';
 import { EmptyState } from '@/components/empty-state';
 import { ThemedText } from '@/components/themed-text';
@@ -23,7 +24,7 @@ export default function DogsScreen() {
       <SafeAreaView style={styles.safeArea} edges={['top']}>
         <ThemedView style={styles.header}>
           <ThemedText type="title" style={styles.title}>
-            Dogs
+            {t('navigation.dogs')}
           </ThemedText>
           <Pressable
             onPress={() => router.push('/dog/new')}
@@ -36,9 +37,9 @@ export default function DogsScreen() {
         {isLoading ? (
           <ActivityIndicator style={styles.loading} color={colors.primary} />
         ) : isError ? (
-          <EmptyState icon="alert-circle-outline" title="Couldn't load dogs" message={getApiErrorMessage(error)} />
+          <EmptyState icon="alert-circle-outline" title={t('dog.loadDogsError')} message={getApiErrorMessage(error)} />
         ) : !dogs || dogs.length === 0 ? (
-          <EmptyState icon="paw-outline" title="No dogs yet" message="Add your first dog to get started." />
+          <EmptyState icon="paw-outline" title={t('dog.noDogs')} message={t('dog.noDogsFirst')} />
         ) : (
           <DraggableDogList
             dogs={dogs}

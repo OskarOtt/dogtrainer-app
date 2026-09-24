@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Modal, Platform, Pressable, StyleSheet, View } from 'react-native';
 import ExpoDateTimePicker from '@expo/ui/community/datetime-picker';
 
+import { t } from '@/i18n';
 import { ThemedText } from '@/components/themed-text';
 import { Radii, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
@@ -38,7 +39,14 @@ function dateToIso(date: Date): string {
  * Android. Displays the chosen value as dd-mm-yyyy and reports changes as an ISO (YYYY-MM-DD)
  * string.
  */
-export function DatePicker({ value, onChange, placeholder = 'Select date', minYear, maxYear, disabled }: DatePickerProps) {
+export function DatePicker({
+  value,
+  onChange,
+  placeholder = t('datePicker.selectDate'),
+  minYear,
+  maxYear,
+  disabled,
+}: DatePickerProps) {
   const colors = useTheme();
   const [visible, setVisible] = useState(false);
   const [pending, setPending] = useState<Date>(() => (value ? isoToDate(value) : new Date()));
@@ -109,13 +117,13 @@ export function DatePicker({ value, onChange, placeholder = 'Select date', minYe
             <View style={styles.header}>
               <Pressable onPress={close} hitSlop={8}>
                 <ThemedText type="linkPrimary" style={{ color: colors.primary }}>
-                  Cancel
+                  {t('common.cancel')}
                 </ThemedText>
               </Pressable>
-              <ThemedText type="smallBold">Select date</ThemedText>
+              <ThemedText type="smallBold">{t('datePicker.selectDate')}</ThemedText>
               <Pressable onPress={() => confirm(pending)} hitSlop={8}>
                 <ThemedText type="linkPrimary" style={{ color: colors.primary }}>
-                  Done
+                  {t('common.done')}
                 </ThemedText>
               </Pressable>
             </View>
@@ -165,5 +173,4 @@ const styles = StyleSheet.create({
     height: 200,
   },
 });
-
 

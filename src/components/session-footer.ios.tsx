@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { StyleSheet, useColorScheme } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { t } from '@/i18n';
 import { Colors } from '@/constants/theme';
 
 import type { SessionFooterProps } from './session-footer.types';
@@ -54,7 +55,7 @@ export function SessionFooter({ onCancel, onFinish, cancelLoading, finishLoading
             cornerRadius(28),
           ]}>
           <Button
-            label={cancelLoading ? '…' : 'Cancel'}
+            label={cancelLoading ? '…' : t('training.cancel')}
             systemImage="xmark"
             role="destructive"
             modifiers={[
@@ -73,13 +74,13 @@ export function SessionFooter({ onCancel, onFinish, cancelLoading, finishLoading
             ]}
             onPress={() => setFinishPresented(true)}>
             <HStack spacing={6}>
-              <Text>{finishLoading ? '…' : 'Finish'}</Text>
+              <Text>{finishLoading ? '…' : t('training.finish')}</Text>
               <Image systemName="checkmark" />
             </HStack>
           </Button>
         </HStack>
         <ConfirmationDialog
-          title="Cancel session"
+          title={t('training.cancelTitle')}
           isPresented={cancelPresented}
           onIsPresentedChange={setCancelPresented}
           titleVisibility="visible">
@@ -92,22 +93,22 @@ export function SessionFooter({ onCancel, onFinish, cancelLoading, finishLoading
           </ConfirmationDialog.Trigger>
           <ConfirmationDialog.Actions>
             <Button
-              label="Discard"
+              label={t('common.discard')}
               role="destructive"
               onPress={() => {
                 setCancelPresented(false);
                 onCancel();
               }}
             />
-            <Button label="Keep Training" role="cancel" onPress={() => setCancelPresented(false)} />
+            <Button label={t('common.keepTraining')} role="cancel" onPress={() => setCancelPresented(false)} />
           </ConfirmationDialog.Actions>
           <ConfirmationDialog.Message>
-            <Text>Discard this training session? This cannot be undone.</Text>
+            <Text>{t('training.cancelMessage')}</Text>
           </ConfirmationDialog.Message>
         </ConfirmationDialog>
 
         <ConfirmationDialog
-          title="Finish session"
+          title={t('training.finishTitle')}
           isPresented={finishPresented}
           onIsPresentedChange={setFinishPresented}
           titleVisibility="visible">
@@ -120,7 +121,7 @@ export function SessionFooter({ onCancel, onFinish, cancelLoading, finishLoading
           </ConfirmationDialog.Trigger>
           <ConfirmationDialog.Actions>
             <Button
-              label="Finish"
+              label={t('common.finish')}
               onPress={() => {
                 setFinishPresented(false);
                 onFinish();
@@ -128,7 +129,7 @@ export function SessionFooter({ onCancel, onFinish, cancelLoading, finishLoading
             />
           </ConfirmationDialog.Actions>
           <ConfirmationDialog.Message>
-            <Text>Mark this training session as complete?</Text>
+            <Text>{t('training.finishMessage')}</Text>
           </ConfirmationDialog.Message>
         </ConfirmationDialog>
       </Host>

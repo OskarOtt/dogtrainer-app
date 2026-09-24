@@ -1,9 +1,11 @@
 import { useMemo, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, FlatList, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, FlatList, Platform, View } from 'react-native';
 
+import { t } from '@/i18n';
 import { CatalogExerciseCard } from '@/components/catalog-exercise-card';
 import { EmptyState } from '@/components/empty-state';
 import { FormTextInput } from '@/components/form-text-input';
+import { KeyboardAwareView } from '@/components/keyboard-aware-layout';
 import { ThemedText } from '@/components/themed-text';
 import { Radii, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
@@ -66,10 +68,10 @@ export function ExerciseCatalogPicker({
   }
 
   return (
-    <View style={styles.container}>
+    <KeyboardAwareView style={styles.container}>
       <View style={styles.searchArea}>
         <FormTextInput
-          placeholder="Search by exercise, activity or category"
+          placeholder={t('training.searchPlaceholder')}
           onChangeText={setSearch}
           autoCapitalize="none"
           style={styles.searchInput}
@@ -105,14 +107,16 @@ export function ExerciseCatalogPicker({
       {isLoading ? (
         <ActivityIndicator style={styles.loading} color={colors.primary} />
       ) : isError ? (
-        <EmptyState icon="alert-circle-outline" title="Couldn't load exercises" message={getApiErrorMessage(error)} />
+        <EmptyState icon="alert-circle-outline" title={t('training.loadExercisesError')} message={getApiErrorMessage(error)} />
       ) : filtered.length === 0 ? (
-        <EmptyState icon="checkmark-circle-outline" title="No exercises found" message="Try a different search or filter." />
+        <EmptyState icon="checkmark-circle-outline" title={t('training.noExercisesFound')} message={t('training.trySearch')} />
       ) : (
         <FlatList
           data={filtered}
           keyExtractor={(exercise) => exercise.id}
           contentContainerStyle={styles.list}
+          keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
+          keyboardShouldPersistTaps="handled"
           ListHeaderComponent={
             <ThemedText themeColor="textSecondary" style={styles.header}>
               {headerMessage}
@@ -131,12 +135,12 @@ export function ExerciseCatalogPicker({
       <View style={[styles.footer, { backgroundColor: colors.background, borderTopColor: colors.border }]}>
         <ThemedText themeColor="textSecondary" style={styles.summary}>
           {selectedIds.length === 0
-            ? 'No exercises selected'
-            : `${selectedIds.length} exercise${selectedIds.length === 1 ? '' : 's'} selected`}
+            ? t('training.selectedNone')
+            : t('training.selectedCount', { count: selectedIds.length })}
         </ThemedText>
         {actionButton}
       </View>
-    </View>
+    </KeyboardAwareView>
   );
 }
 

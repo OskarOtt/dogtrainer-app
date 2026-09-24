@@ -3,6 +3,7 @@ import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
 import { ActivityIndicator, Alert, Pressable, StyleSheet, View } from 'react-native';
 
+import { t } from '@/i18n';
 import { Radii } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import type { DogMediaType } from '@/types/dog';
@@ -42,7 +43,7 @@ export function MediaAvatarPicker({
     }
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
-      Alert.alert('Permission needed', 'Allow photo library access to choose a photo.');
+      Alert.alert(t('media.permissionTitle'), t('media.permissionPhoto'));
       return;
     }
     const result = await ImagePicker.launchImageLibraryAsync({
