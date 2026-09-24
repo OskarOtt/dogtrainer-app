@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { t } from '@/i18n';
 import { FormTextInput } from '@/components/form-text-input';
+import { KeyboardAwareView } from '@/components/keyboard-aware-layout';
 import { PrimaryButton } from '@/components/primary-button';
 import { SocialAuthButtons } from '@/components/social-auth-buttons';
 import { ThemedText } from '@/components/themed-text';
@@ -55,7 +56,7 @@ export function DeleteAccountModal({ visible, onClose, onDeleted, authMethods }:
 
   return (
     <Modal visible={visible} animationType="slide" transparent onRequestClose={handleClose}>
-      <View style={styles.backdrop}>
+      <KeyboardAwareView style={styles.backdrop}>
         <SafeAreaView edges={['bottom']} style={[styles.sheet, { backgroundColor: colors.backgroundElement }]}>
           <View style={styles.header}>
             <ThemedText type="title" style={styles.title}>
@@ -112,7 +113,7 @@ export function DeleteAccountModal({ visible, onClose, onDeleted, authMethods }:
             </ThemedText>
           ) : null}
         </SafeAreaView>
-      </View>
+      </KeyboardAwareView>
     </Modal>
   );
 }

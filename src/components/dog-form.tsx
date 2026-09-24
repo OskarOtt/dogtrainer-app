@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { DatePicker } from '@/components/date-picker';
 import { FormTextInput } from '@/components/form-text-input';
+import { KeyboardAwareScrollView } from '@/components/keyboard-aware-layout';
 import { PrimaryButton } from '@/components/primary-button';
 import { ThemedText } from '@/components/themed-text';
 import { Spacing } from '@/constants/theme';
@@ -42,7 +43,7 @@ export function DogForm({ initialValue, submitLabel, isSubmitting, errorMessage,
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+    <KeyboardAwareScrollView contentContainerStyle={styles.container}>
       <ThemedText type="smallBold">{t('dog.name')}</ThemedText>
       <FormTextInput defaultValue={name} onChangeText={setName} placeholder={t('dog.namePlaceholder')} />
 
@@ -95,7 +96,7 @@ export function DogForm({ initialValue, submitLabel, isSubmitting, errorMessage,
         disabled={!name.trim()}
         style={styles.submitButton}
       />
-    </ScrollView>
+    </KeyboardAwareScrollView>
   );
 }
 

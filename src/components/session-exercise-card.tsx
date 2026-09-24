@@ -1,9 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useEffect, useRef, useState } from 'react';
-import { Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { useEffect, useId, useRef, useState } from 'react';
+import { Platform, Pressable, StyleSheet, TextInput, View } from 'react-native';
 
 import { t } from '@/i18n';
+import { KeyboardDismissAccessory } from '@/components/keyboard-dismiss-accessory';
 import { ThemedText } from '@/components/themed-text';
+import { KEYBOARD_ACCESSORY_ID } from '@/constants/keyboard';
 import { Radii, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import type { SessionExercise } from '@/types/session';
@@ -42,6 +44,7 @@ export function SessionExerciseCard({
   disabled,
 }: SessionExerciseCardProps) {
   const colors = useTheme();
+  const accessoryId = `${KEYBOARD_ACCESSORY_ID}-${useId().replace(/:/g, '')}`;
   const fail = sessionExercise.repetitions - sessionExercise.successfulRepetitions;
   const [notes, setNotes] = useState(sessionExercise.notes ?? '');
   // Debounced auto-save as a safety net: tapping straight from this field to the "Finish"
@@ -150,16 +153,20 @@ export function SessionExerciseCard({
       </View>
 
       {onNotesBlur && !disabled ? (
-        <TextInput
-          key={sessionExercise.id}
-          value={notes}
-          onChangeText={setNotes}
-          onBlur={() => onNotesBlur(notes.trim() || null)}
-          placeholder={t('training.exerciseNotes')}
-          placeholderTextColor={colors.textSecondary}
-          multiline
-          style={[styles.notesInput, { color: colors.text, borderColor: colors.border, backgroundColor: colors.backgroundElement }]}
-        />
+        <>
+          <TextInput
+            key={sessionExercise.id}
+            value={notes}
+            onChangeText={setNotes}
+            onBlur={() => onNotesBlur(notes.trim() || null)}
+            placeholder={t('training.exerciseNotes')}
+            placeholderTextColor={colors.textSecondary}
+            inputAccessoryViewID={Platform.OS === 'ios' ? accessoryId : undefined}
+            multiline
+            style={[styles.notesInput, { color: colors.text, borderColor: colors.border, backgroundColor: colors.backgroundElement }]}
+          />
+          <KeyboardDismissAccessory nativeID={accessoryId} />
+        </>
       ) : sessionExercise.notes ? (
         <ThemedText themeColor="textSecondary" type="small">
           {sessionExercise.notes}

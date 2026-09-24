@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { t } from '@/i18n';
 import { FormTextInput } from '@/components/form-text-input';
+import { KeyboardAwareView } from '@/components/keyboard-aware-layout';
 import { PrimaryButton } from '@/components/primary-button';
 import { ThemedText } from '@/components/themed-text';
 import { Spacing } from '@/constants/theme';
@@ -64,7 +65,7 @@ export function AddFriendModal({ visible, onClose }: AddFriendModalProps) {
 
   return (
     <Modal visible={visible} animationType="slide" transparent onRequestClose={handleClose}>
-      <View style={styles.backdrop}>
+      <KeyboardAwareView style={styles.backdrop}>
         <SafeAreaView edges={['bottom']} style={[styles.sheet, { backgroundColor: colors.backgroundElement }]}>
           <View style={styles.header}>
             <ThemedText type="title" style={styles.title}>
@@ -104,7 +105,7 @@ export function AddFriendModal({ visible, onClose }: AddFriendModalProps) {
 
           <PrimaryButton title={t('social.addFriend')} onPress={handleSubmit} loading={isBusy} disabled={!email.trim()} />
         </SafeAreaView>
-      </View>
+      </KeyboardAwareView>
     </Modal>
   );
 }
@@ -118,6 +119,8 @@ const styles = StyleSheet.create({
   sheet: {
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
     padding: Spacing.four,
   },
   header: {

@@ -1,11 +1,12 @@
-import { Host, TextInput } from '@expo/ui';
 import { Image } from 'expo-image';
 import { Link, useRouter } from 'expo-router';
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, useColorScheme, View } from 'react-native';
+import { StyleSheet, useColorScheme, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { t } from '@/i18n';
+import { FormTextInput } from '@/components/form-text-input';
+import { KeyboardAwareScrollView } from '@/components/keyboard-aware-layout';
 import { PrimaryButton } from '@/components/primary-button';
 import { SocialAuthButtons } from '@/components/social-auth-buttons';
 import { ThemedText } from '@/components/themed-text';
@@ -67,17 +68,16 @@ export default function RegisterScreen() {
   return (
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea}>
-        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
-          <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
-            {isLight ? (
-              <ThemedView style={[styles.logoBackdrop, { backgroundColor: AuthBrandColors.lightBlue }]}>
-                <Image
-                  source={require('@/assets/images/noborder-doglogo.png')}
-                  style={styles.logo}
-                  contentFit="cover"
-                />
-              </ThemedView>
-            ) : null}
+        <KeyboardAwareScrollView contentContainerStyle={styles.scrollContent}>
+          {isLight ? (
+            <ThemedView style={[styles.logoBackdrop, { backgroundColor: AuthBrandColors.lightBlue }]}>
+              <Image
+                source={require('@/assets/images/noborder-doglogo.png')}
+                style={styles.logo}
+                contentFit="cover"
+              />
+            </ThemedView>
+          ) : null}
 
             <ThemedText type="title" style={styles.title}>
               {t('auth.createAccount')}
@@ -101,54 +101,30 @@ export default function RegisterScreen() {
               </View>
             ) : null}
 
-            <Host style={[styles.inputHost, { borderColor: colors.border, backgroundColor: colors.backgroundElement }]}>
-              <TextInput
-                defaultValue={name}
-                onChangeText={setName}
-                placeholder={t('auth.name')}
-                placeholderTextColor={colors.textSecondary}
-                autoComplete="name"
-                textStyle={{ color: colors.text, fontSize: 17 }}
-                style={{
-                  paddingHorizontal: Spacing.three,
-                  paddingVertical: Spacing.two,
-                  height: 56,
-                }}
-              />
-            </Host>
-            <Host style={[styles.inputHost, { borderColor: colors.border, backgroundColor: colors.backgroundElement }]}>
-              <TextInput
-                defaultValue={email}
-                onChangeText={setEmail}
-                placeholder={t('auth.email')}
-                placeholderTextColor={colors.textSecondary}
-                autoCapitalize="none"
-                keyboardType="email-address"
-                autoComplete="email"
-                textStyle={{ color: colors.text, fontSize: 17 }}
-                style={{
-                  paddingHorizontal: Spacing.three,
-                  paddingVertical: Spacing.two,
-                  height: 56,
-                }}
-              />
-            </Host>
-            <Host style={[styles.inputHost, { borderColor: colors.border, backgroundColor: colors.backgroundElement }]}>
-              <TextInput
-                defaultValue={password}
-                onChangeText={setPassword}
-                placeholder={t('auth.passwordHint')}
-                placeholderTextColor={colors.textSecondary}
-                secureTextEntry
-                autoComplete="new-password"
-                textStyle={{ color: colors.text, fontSize: 17 }}
-                style={{
-                  paddingHorizontal: Spacing.three,
-                  paddingVertical: Spacing.two,
-                  height: 56,
-                }}
-              />
-            </Host>
+            <FormTextInput
+              defaultValue={name}
+              onChangeText={setName}
+              placeholder={t('auth.name')}
+              autoComplete="name"
+              style={styles.input}
+            />
+            <FormTextInput
+              defaultValue={email}
+              onChangeText={setEmail}
+              placeholder={t('auth.email')}
+              autoCapitalize="none"
+              keyboardType="email-address"
+              autoComplete="email"
+              style={styles.input}
+            />
+            <FormTextInput
+              defaultValue={password}
+              onChangeText={setPassword}
+              placeholder={t('auth.passwordHint')}
+              secureTextEntry
+              autoComplete="new-password"
+              style={styles.input}
+            />
 
             {error ? (
               <ThemedText themeColor="danger" style={styles.error}>
@@ -172,8 +148,7 @@ export default function RegisterScreen() {
                 {t('auth.hasAccount')}
               </ThemedText>
             </Link>
-          </ScrollView>
-        </KeyboardAvoidingView>
+        </KeyboardAwareScrollView>
       </SafeAreaView>
     </ThemedView>
   );
@@ -205,12 +180,7 @@ const styles = StyleSheet.create({
     gap: Spacing.two,
   },
   dividerLine: { flex: 1, height: StyleSheet.hairlineWidth },
-  inputHost: {
-    height: 56,
-    borderWidth: 1,
-    borderRadius: Radii.medium,
-    overflow: 'hidden',
-  },
+  input: { marginBottom: 0 },
   error: { textAlign: 'center' },
   button: { marginTop: Spacing.two },
   link: { alignSelf: 'center', marginTop: Spacing.three, padding: Spacing.two },

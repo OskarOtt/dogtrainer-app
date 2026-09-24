@@ -3,10 +3,11 @@ import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Alert, Pressable, StyleSheet, View } from 'react-native';
 
 import { t } from '@/i18n';
 import { FormTextInput } from '@/components/form-text-input';
+import { KeyboardAwareScrollView } from '@/components/keyboard-aware-layout';
 import { PrimaryButton } from '@/components/primary-button';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -98,7 +99,7 @@ export default function NewPostScreen() {
             : undefined,
         }}
       />
-      <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+      <KeyboardAwareScrollView contentContainerStyle={styles.scroll}>
         <FormTextInput
           defaultValue={content}
           onChangeText={setContent}
@@ -192,7 +193,7 @@ export default function NewPostScreen() {
             style={styles.dontPostButton}
           />
         ) : null}
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </ThemedView>
   );
 }

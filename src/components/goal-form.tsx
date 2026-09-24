@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { DatePicker } from '@/components/date-picker';
 import { FormTextInput } from '@/components/form-text-input';
+import { KeyboardAwareScrollView } from '@/components/keyboard-aware-layout';
 import { PrimaryButton } from '@/components/primary-button';
 import { ThemedText } from '@/components/themed-text';
 import { Spacing } from '@/constants/theme';
@@ -41,7 +42,7 @@ export function GoalForm({ initialValue, submitLabel, isSubmitting, errorMessage
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+    <KeyboardAwareScrollView contentContainerStyle={styles.container}>
       <ThemedText type="smallBold">{t('goals.title')}</ThemedText>
       <FormTextInput defaultValue={title} onChangeText={setTitle} placeholder={t('goals.exampleTitle')} />
 
@@ -88,7 +89,7 @@ export function GoalForm({ initialValue, submitLabel, isSubmitting, errorMessage
         disabled={!title.trim()}
         style={styles.submitButton}
       />
-    </ScrollView>
+    </KeyboardAwareScrollView>
   );
 }
 

@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { t } from '@/i18n';
 import { EmptyState } from '@/components/empty-state';
+import { KeyboardAwareView } from '@/components/keyboard-aware-layout';
 import { PrimaryButton } from '@/components/primary-button';
 import LexicalNotesEditor from '@/components/rich-text/lexical-notes-editor.dom';
 import { SessionExerciseCard } from '@/components/session-exercise-card';
@@ -255,20 +256,21 @@ export default function ActiveSessionScreen() {
         }}
       />
 
-      <SafeAreaView style={styles.topSafeArea} edges={['top']}>
-        <View style={styles.headerRow}>
-          {!isActive ? (
-            <Pressable onPress={() => router.back()} hitSlop={8} style={styles.backButton}>
-              <Ionicons name="chevron-back" size={26} color={colors.primary} />
-            </Pressable>
-          ) : (
-            <View style={styles.backButtonPlaceholder} />
-          )}
-          <ThemedText type="title" style={styles.pageTitle}>
-            {isActive ? t('training.session') : t('training.summary')}
-          </ThemedText>
-        </View>
-      </SafeAreaView>
+      <KeyboardAwareView enabled={activeTab === 'exercises'} style={styles.keyboardArea}>
+        <SafeAreaView style={styles.topSafeArea} edges={['top']}>
+          <View style={styles.headerRow}>
+            {!isActive ? (
+              <Pressable onPress={() => router.back()} hitSlop={8} style={styles.backButton}>
+                <Ionicons name="chevron-back" size={26} color={colors.primary} />
+              </Pressable>
+            ) : (
+              <View style={styles.backButtonPlaceholder} />
+            )}
+            <ThemedText type="title" style={styles.pageTitle}>
+              {isActive ? t('training.session') : t('training.summary')}
+            </ThemedText>
+          </View>
+        </SafeAreaView>
 
       <View style={[styles.timerBar, { backgroundColor: colors.backgroundElement, borderColor: colors.border }]}>
         <Ionicons name="time-outline" size={22} color={colors.primary} />
@@ -292,6 +294,8 @@ export default function ActiveSessionScreen() {
           data={session.exercises}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.list}
+          keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
+          keyboardShouldPersistTaps="handled"
           ListHeaderComponent={
             isActive ? (
               <PrimaryButton
@@ -358,34 +362,36 @@ export default function ActiveSessionScreen() {
         />
       </View>
 
-      {isActive ? (
-        <SessionFooter
-          onCancel={handleCancel}
-          onFinish={handleFinish}
-          cancelLoading={cancelSession.isPending}
-          finishLoading={completeSession.isPending}
-        />
-      ) : session.status === 'COMPLETED' ? (
-        <SafeAreaView
-          edges={['bottom']}
-          style={[
-            styles.footer,
-            styles.footerCentered,
-            { backgroundColor: colors.background, borderTopColor: colors.border },
-          ]}>
-          <PrimaryButton
-            title={t('training.shareToFeed')}
-            onPress={() => router.push(`/post/new?sessionId=${session.id}`)}
-            style={styles.shareButton}
+        {isActive ? (
+          <SessionFooter
+            onCancel={handleCancel}
+            onFinish={handleFinish}
+            cancelLoading={cancelSession.isPending}
+            finishLoading={completeSession.isPending}
           />
-        </SafeAreaView>
-      ) : null}
+        ) : session.status === 'COMPLETED' ? (
+          <SafeAreaView
+            edges={['bottom']}
+            style={[
+              styles.footer,
+              styles.footerCentered,
+              { backgroundColor: colors.background, borderTopColor: colors.border },
+            ]}>
+            <PrimaryButton
+              title={t('training.shareToFeed')}
+              onPress={() => router.push(`/post/new?sessionId=${session.id}`)}
+              style={styles.shareButton}
+            />
+          </SafeAreaView>
+        ) : null}
+      </KeyboardAwareView>
     </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  keyboardArea: { flex: 1 },
   topSafeArea: { paddingHorizontal: Spacing.four },
   headerRow: { flexDirection: 'row', alignItems: 'center', paddingTop: Spacing.two, gap: Spacing.two },
   backButton: { padding: Spacing.one, marginLeft: -Spacing.one },

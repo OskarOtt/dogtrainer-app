@@ -28,7 +28,7 @@ function RootNavigator() {
   }
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
+    <Stack screenOptions={{ headerShown: false, headerBackButtonDisplayMode: 'minimal' }}>
       <Stack.Protected guard={isAuthenticated}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="dog/new" options={{ headerShown: true }} />

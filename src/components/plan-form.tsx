@@ -1,10 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { DatePicker } from '@/components/date-picker';
 import { FormTextInput } from '@/components/form-text-input';
+import { KeyboardAwareScrollView } from '@/components/keyboard-aware-layout';
 import { PrimaryButton } from '@/components/primary-button';
 import { ThemedText } from '@/components/themed-text';
 import { Radii, Spacing } from '@/constants/theme';
@@ -83,7 +84,7 @@ export function PlanForm({
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+    <KeyboardAwareScrollView contentContainerStyle={styles.container}>
       <ThemedText type="smallBold">{t('plans.name')}</ThemedText>
       <FormTextInput defaultValue={name} onChangeText={setName} placeholder={t('plans.exampleName')} />
 
@@ -161,7 +162,7 @@ export function PlanForm({
         disabled={!name.trim()}
         style={styles.submitButton}
       />
-    </ScrollView>
+    </KeyboardAwareScrollView>
   );
 }
 

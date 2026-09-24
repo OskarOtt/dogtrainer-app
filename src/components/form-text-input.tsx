@@ -1,6 +1,15 @@
-import { Host, TextInput, type TextInputProps } from '@expo/ui';
-import { StyleSheet, type ViewStyle } from 'react-native';
+import { useId } from 'react';
+import {
+  Platform,
+  StyleSheet,
+  TextInput,
+  type StyleProp,
+  type TextInputProps,
+  type TextStyle,
+} from 'react-native';
 
+import { KeyboardDismissAccessory } from '@/components/keyboard-dismiss-accessory';
+import { KEYBOARD_ACCESSORY_ID } from '@/constants/keyboard';
 import { Radii, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
@@ -21,15 +30,10 @@ export interface FormTextInputProps
   /** Uncontrolled initial text — the field manages its own state internally. */
   defaultValue?: string;
   onChangeText: (text: string) => void;
-  /** Style applied to the wrapping `Host` (sizing/margins), not the field itself. */
-  style?: ViewStyle;
+  style?: StyleProp<TextStyle>;
 }
 
-/**
- * Shared themed text field used across the app's forms, backed by `@expo/ui`'s
- * native `TextInput` (SwiftUI `TextField` on iOS, Compose `TextField` on
- * Android, RN `TextInput` on web).
- */
+/** Shared themed React Native text field used across the app's forms. */
 export function FormTextInput({
   defaultValue,
   onChangeText,
@@ -46,16 +50,10 @@ export function FormTextInput({
   style,
 }: FormTextInputProps) {
   const colors = useTheme();
+  const accessoryId = `${KEYBOARD_ACCESSORY_ID}-${useId().replace(/:/g, '')}`;
 
   return (
-    <Host
-      style={[
-        styles.host,
-        multiline && styles.multilineHost,
-        { borderColor: colors.border, backgroundColor: colors.backgroundElement },
-        style,
-      ]}
-    >
+    <>
       <TextInput
         defaultValue={defaultValue}
         onChangeText={onChangeText}
@@ -70,25 +68,31 @@ export function FormTextInput({
         editable={editable}
         onBlur={onBlur}
         maxLength={maxLength}
-        textStyle={{ color: colors.text, fontSize: 17 }}
-        style={{
-          paddingHorizontal: Spacing.three,
-          paddingVertical: Spacing.two,
-        }}
+        inputAccessoryViewID={Platform.OS === 'ios' ? accessoryId : undefined}
+        style={[
+          styles.input,
+          multiline && styles.multilineInput,
+          { borderColor: colors.border, backgroundColor: colors.backgroundElement, color: colors.text },
+          style,
+        ]}
       />
-    </Host>
+      <KeyboardDismissAccessory nativeID={accessoryId} />
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  host: {
+  input: {
     height: 56,
     marginBottom: Spacing.two,
     borderWidth: 1,
     borderRadius: Radii.medium,
-    overflow: 'hidden',
+    paddingHorizontal: Spacing.three,
+    paddingVertical: Spacing.two,
+    fontSize: 17,
   },
-  multilineHost: {
+  multilineInput: {
     height: 96,
+    textAlignVertical: 'top',
   },
 });

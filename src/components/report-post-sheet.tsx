@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { t } from '@/i18n';
 import type { TranslationKey } from '@/i18n';
 import { FormTextInput } from '@/components/form-text-input';
+import { KeyboardAwareView } from '@/components/keyboard-aware-layout';
 import { PrimaryButton } from '@/components/primary-button';
 import { ThemedText } from '@/components/themed-text';
 import { Radii, Spacing } from '@/constants/theme';
@@ -78,7 +79,7 @@ export function ReportPostSheet({ visible, onClose, postId, authorId, authorName
 
   return (
     <Modal visible={visible} animationType="slide" transparent onRequestClose={handleClose}>
-      <View style={styles.backdrop}>
+      <KeyboardAwareView style={styles.backdrop}>
         <SafeAreaView edges={['bottom']} style={[styles.sheet, { backgroundColor: colors.backgroundElement }]}>
           <View style={styles.header}>
             <ThemedText type="subtitle" style={styles.title}>
@@ -154,7 +155,7 @@ export function ReportPostSheet({ visible, onClose, postId, authorId, authorName
             </View>
           ) : null}
         </SafeAreaView>
-      </View>
+      </KeyboardAwareView>
     </Modal>
   );
 }

@@ -1,9 +1,10 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { ActivityIndicator, ScrollView, StyleSheet } from 'react-native';
+import { ActivityIndicator, StyleSheet } from 'react-native';
 
 import { t } from '@/i18n';
 import { CommentList } from '@/components/comment-list';
 import { EmptyState } from '@/components/empty-state';
+import { KeyboardAwareScrollView } from '@/components/keyboard-aware-layout';
 import { PostCard } from '@/components/post-card';
 import { PrimaryButton } from '@/components/primary-button';
 import { ThemedView } from '@/components/themed-view';
@@ -41,10 +42,10 @@ export default function PostDetailScreen() {
   return (
     <ThemedView style={{ flex: 1 }}>
       <Stack.Screen options={{ title: t('posts.post') }} />
-      <ScrollView contentContainerStyle={styles.scroll}>
+      <KeyboardAwareScrollView contentContainerStyle={styles.scroll}>
         <PostCard post={post} onPress={() => {}} onDeleted={() => router.back()} />
         <CommentList postId={post.id} isPostOwner={post.authorId === user?.id} />
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </ThemedView>
   );
 }

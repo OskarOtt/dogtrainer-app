@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { t } from '@/i18n';
 import { FormTextInput } from '@/components/form-text-input';
+import { KeyboardAwareView } from '@/components/keyboard-aware-layout';
 import { PrimaryButton } from '@/components/primary-button';
 import { ThemedText } from '@/components/themed-text';
 import { Radii, Spacing } from '@/constants/theme';
@@ -128,7 +129,7 @@ export function SocialAuthButtons({
       </View>
 
       <Modal visible={pendingCredential !== null} animationType="fade" transparent>
-        <View style={styles.backdrop}>
+        <KeyboardAwareView style={styles.backdrop}>
           <SafeAreaView style={[styles.nameSheet, { backgroundColor: colors.backgroundElement }]}>
             <ThemedText type="subtitle">{t('auth.finishAccount')}</ThemedText>
             <ThemedText themeColor="textSecondary">{t('auth.profileNamePrompt')}</ThemedText>
@@ -155,7 +156,7 @@ export function SocialAuthButtons({
               }}
             />
           </SafeAreaView>
-        </View>
+        </KeyboardAwareView>
       </Modal>
     </>
   );

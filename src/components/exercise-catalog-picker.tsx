@@ -1,10 +1,11 @@
 import { useMemo, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, FlatList, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, FlatList, Platform, View } from 'react-native';
 
 import { t } from '@/i18n';
 import { CatalogExerciseCard } from '@/components/catalog-exercise-card';
 import { EmptyState } from '@/components/empty-state';
 import { FormTextInput } from '@/components/form-text-input';
+import { KeyboardAwareView } from '@/components/keyboard-aware-layout';
 import { ThemedText } from '@/components/themed-text';
 import { Radii, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
@@ -67,7 +68,7 @@ export function ExerciseCatalogPicker({
   }
 
   return (
-    <View style={styles.container}>
+    <KeyboardAwareView style={styles.container}>
       <View style={styles.searchArea}>
         <FormTextInput
           placeholder={t('training.searchPlaceholder')}
@@ -114,6 +115,8 @@ export function ExerciseCatalogPicker({
           data={filtered}
           keyExtractor={(exercise) => exercise.id}
           contentContainerStyle={styles.list}
+          keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
+          keyboardShouldPersistTaps="handled"
           ListHeaderComponent={
             <ThemedText themeColor="textSecondary" style={styles.header}>
               {headerMessage}
@@ -137,7 +140,7 @@ export function ExerciseCatalogPicker({
         </ThemedText>
         {actionButton}
       </View>
-    </View>
+    </KeyboardAwareView>
   );
 }
 
