@@ -1,6 +1,8 @@
 import { apiClient } from '@/api/client';
-import type { CreatePostFromSessionPayload, CreatePostPayload, Post, PostPage } from '@/types/post';
+import type { CreatePostFromActivityPayload, CreatePostFromSessionPayload, CreatePostPayload, Post, PostPage } from '@/types/post';
 import type { UploadUrlRequest, UploadUrlResponse } from '@/types/media';
+import type { PhysicalActivity } from '@/types/activity';
+import type { TrainingSession } from '@/types/session';
 
 /**
  * Thin wrapper around the /posts, /users/{userId}/posts and /feed endpoints. UI code and
@@ -17,6 +19,11 @@ export const postsApi = {
     return data;
   },
 
+  async createFromActivity(activityId: string, payload: CreatePostFromActivityPayload): Promise<Post> {
+    const { data } = await apiClient.post<Post>(`/posts/from-activity/${activityId}`, payload);
+    return data;
+  },
+
   async get(id: string): Promise<Post> {
     const { data } = await apiClient.get<Post>(`/posts/${id}`);
     return data;
@@ -24,6 +31,18 @@ export const postsApi = {
 
   async remove(id: string): Promise<void> {
     await apiClient.delete(`/posts/${id}`);
+  },
+
+  /** Preview of the training session shared through this post - readable by anyone who can see the post. */
+  async getTrainingSession(id: string): Promise<TrainingSession> {
+    const { data } = await apiClient.get<TrainingSession>(`/posts/${id}/training-session`);
+    return data;
+  },
+
+  /** Preview of the physical activity shared through this post - readable by anyone who can see the post. */
+  async getPhysicalActivity(id: string): Promise<PhysicalActivity> {
+    const { data } = await apiClient.get<PhysicalActivity>(`/posts/${id}/physical-activity`);
+    return data;
   },
 
   async getMediaUploadUrl(id: string, payload: UploadUrlRequest): Promise<UploadUrlResponse> {

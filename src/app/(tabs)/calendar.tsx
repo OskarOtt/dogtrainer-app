@@ -15,10 +15,14 @@ import { BottomTabInset, Radii, Spacing, StatusColors } from '@/constants/theme'
 import { useAllGoals } from '@/hooks/use-goals';
 import { useAllPlans } from '@/hooks/use-plans';
 import { useAllSessions } from '@/hooks/use-sessions';
+import { useAllActivities } from '@/hooks/use-activities';
 import { useTheme } from '@/hooks/use-theme';
 import type { CalendarEvent } from '@/utils/calendar-events';
 import { buildCalendarEvents } from '@/utils/calendar-events';
 import { toIsoDateLocal } from '@/utils/date';
+
+/** Distinct teal used for completed physical-activity calendar events (plan/session/goal already use theme colors). */
+const ACTIVITY_EVENT_COLOR = '#2FB6C9';
 
 /**
  * Calendar tab: month view aggregating training plans (spanning startDate → endDate),
@@ -35,15 +39,16 @@ export default function CalendarScreen() {
   const { data: plans, isLoading: isLoadingPlans, isError: isPlansError } = useAllPlans();
   const { data: sessionsWithDog, isLoading: isLoadingSessions, isError: isSessionsError } = useAllSessions();
   const { data: goalsWithDog, isLoading: isLoadingGoals, isError: isGoalsError } = useAllGoals();
+  const { data: activitiesWithDog, isLoading: isLoadingActivities, isError: isActivitiesError } = useAllActivities();
 
   const events = useMemo<CalendarEvent[]>(
-    () => buildCalendarEvents(plans ?? [], sessionsWithDog ?? [], goalsWithDog ?? []),
-    [plans, sessionsWithDog, goalsWithDog]
+    () => buildCalendarEvents(plans ?? [], sessionsWithDog ?? [], goalsWithDog ?? [], activitiesWithDog ?? []),
+    [plans, sessionsWithDog, goalsWithDog, activitiesWithDog]
   );
 
   const todayIso = toIsoDateLocal(new Date());
-  const isLoading = isLoadingPlans || isLoadingSessions || isLoadingGoals;
-  const isError = isPlansError || isSessionsError || isGoalsError;
+  const isLoading = isLoadingPlans || isLoadingSessions || isLoadingGoals || isLoadingActivities;
+  const isError = isPlansError || isSessionsError || isGoalsError || isActivitiesError;
 
   function changeMonth(delta: number) {
     setViewDate((prev) => new Date(prev.getFullYear(), prev.getMonth() + delta, 1));
@@ -68,19 +73,25 @@ export default function CalendarScreen() {
           <View style={styles.legendItem}>
             <View style={[styles.legendDot, { backgroundColor: colors.primary }]} />
             <ThemedText themeColor="textSecondary" type="small">
-              {t('calendar.trainingPlans')}
+              {t('calendar.legendPlans')}
             </ThemedText>
           </View>
           <View style={styles.legendItem}>
             <View style={[styles.legendDot, { backgroundColor: StatusColors.COMPLETED }]} />
             <ThemedText themeColor="textSecondary" type="small">
-              {t('calendar.completedTrainings')}
+              {t('calendar.legendCompleted')}
             </ThemedText>
           </View>
           <View style={styles.legendItem}>
             <View style={[styles.legendDot, { backgroundColor: colors.warning }]} />
             <ThemedText themeColor="textSecondary" type="small">
-              {t('calendar.goals')}
+              {t('calendar.legendGoals')}
+            </ThemedText>
+          </View>
+          <View style={styles.legendItem}>
+            <View style={[styles.legendDot, { backgroundColor: ACTIVITY_EVENT_COLOR }]} />
+            <ThemedText themeColor="textSecondary" type="small">
+              {t('calendar.legendActivity')}
             </ThemedText>
           </View>
         </View>
@@ -111,7 +122,13 @@ export default function CalendarScreen() {
               }
               eventCellStyle={(event) => ({
                 backgroundColor:
-                  event.type === 'plan' ? colors.primary : event.type === 'goal' ? colors.warning : StatusColors.COMPLETED,
+                  event.type === 'plan'
+                    ? colors.primary
+                    : event.type === 'goal'
+                      ? colors.warning
+                      : event.type === 'activity'
+                        ? ACTIVITY_EVENT_COLOR
+                        : StatusColors.COMPLETED,
               })}
             />
           </View>
@@ -135,8 +152,11 @@ const styles = StyleSheet.create({
   navLabel: { minWidth: 180, textAlign: 'center' },
   legendRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'center',
-    gap: Spacing.four,
+    paddingHorizontal: Spacing.four,
+    rowGap: Spacing.one,
+    columnGap: Spacing.three,
     marginTop: Spacing.two,
     marginBottom: Spacing.three,
   },

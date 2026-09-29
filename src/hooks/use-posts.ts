@@ -2,7 +2,7 @@ import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tansta
 import type { ImagePickerAsset } from 'expo-image-picker';
 
 import { postsApi } from '@/api/posts';
-import type { CreatePostFromSessionPayload, CreatePostPayload, Post } from '@/types/post';
+import type { CreatePostFromActivityPayload, CreatePostFromSessionPayload, CreatePostPayload, Post } from '@/types/post';
 import { getAssetFileSize, resolveContentType, uploadAssetToPresignedUrl } from '@/utils/upload';
 
 const feedKey = ['feed'] as const;
@@ -36,6 +36,24 @@ export function usePost(id: string | undefined) {
   });
 }
 
+/** Read-only preview of the training session shared through a post (works for non-owners too). */
+export function usePostTrainingSession(postId: string | undefined) {
+  return useQuery({
+    queryKey: ['posts', postId ?? '', 'training-session'] as const,
+    queryFn: () => postsApi.getTrainingSession(postId as string),
+    enabled: !!postId,
+  });
+}
+
+/** Read-only preview of the physical activity shared through a post (works for non-owners too). */
+export function usePostPhysicalActivity(postId: string | undefined) {
+  return useQuery({
+    queryKey: ['posts', postId ?? '', 'physical-activity'] as const,
+    queryFn: () => postsApi.getPhysicalActivity(postId as string),
+    enabled: !!postId,
+  });
+}
+
 export function useCreatePost() {
   const queryClient = useQueryClient();
   return useMutation({
@@ -51,6 +69,17 @@ export function useCreatePostFromSession(sessionId: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (payload: CreatePostFromSessionPayload) => postsApi.createFromSession(sessionId, payload),
+    onSuccess: (post) => {
+      queryClient.invalidateQueries({ queryKey: feedKey });
+      queryClient.invalidateQueries({ queryKey: userPostsKey(post.authorId) });
+    },
+  });
+}
+
+export function useCreatePostFromActivity(activityId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: CreatePostFromActivityPayload) => postsApi.createFromActivity(activityId, payload),
     onSuccess: (post) => {
       queryClient.invalidateQueries({ queryKey: feedKey });
       queryClient.invalidateQueries({ queryKey: userPostsKey(post.authorId) });

@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Modal, Platform, Pressable, StyleSheet, View } from 'react-native';
 import ExpoDateTimePicker from '@expo/ui/community/datetime-picker';
+import { Host, DatePicker as SwiftUIDatePicker } from '@expo/ui/swift-ui';
+import { datePickerStyle } from '@expo/ui/swift-ui/modifiers';
 
 import { t } from '@/i18n';
 import { ThemedText } from '@/components/themed-text';
@@ -107,7 +109,8 @@ export function DatePicker({
   }
 
   // iOS always renders the picker inline, so we host it in our own bottom sheet with
-  // Cancel/Done actions.
+  // Cancel/Done actions. Uses @expo/ui's SwiftUI `DatePicker` in 'graphical' style for a
+  // full month calendar view instead of the wheel spinner.
   return (
     <>
       {field}
@@ -127,15 +130,15 @@ export function DatePicker({
                 </ThemedText>
               </Pressable>
             </View>
-            <ExpoDateTimePicker
-              value={pending}
-              mode="date"
-              display="spinner"
-              minimumDate={minimumDate}
-              maximumDate={maximumDate}
-              onValueChange={(_event, date) => setPending(date)}
-              style={styles.picker}
-            />
+            <Host style={styles.picker}>
+              <SwiftUIDatePicker
+                modifiers={[datePickerStyle('graphical')]}
+                selection={pending}
+                range={{ start: minimumDate, end: maximumDate }}
+                displayedComponents={['date']}
+                onDateChange={setPending}
+              />
+            </Host>
           </View>
         </View>
       </Modal>
@@ -170,7 +173,7 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.three,
   },
   picker: {
-    height: 200,
+    height: 360,
   },
 });
 

@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 
 import { getLocaleTag, t } from '@/i18n';
+import { ActivityCard } from '@/components/activity-card';
 import { EmptyState } from '@/components/empty-state';
 import { GoalCard } from '@/components/goal-card';
 import { PrimaryButton } from '@/components/primary-button';
@@ -11,12 +12,13 @@ import { ThemedView } from '@/components/themed-view';
 import { TrainingPlanCard } from '@/components/training-plan-card';
 import { TrainingSessionCard } from '@/components/training-session-card';
 import { Spacing } from '@/constants/theme';
+import { useAllActivities } from '@/hooks/use-activities';
 import { useAllGoals } from '@/hooks/use-goals';
 import { useAllPlans } from '@/hooks/use-plans';
 import { useAllSessions } from '@/hooks/use-sessions';
 import { useTheme } from '@/hooks/use-theme';
 import { getApiErrorMessage } from '@/utils/apiError';
-import { goalsForDate, plansForDate, sessionsForDate } from '@/utils/calendar-events';
+import { activitiesForDate, goalsForDate, plansForDate, sessionsForDate } from '@/utils/calendar-events';
 import { parseIsoDateLocal } from '@/utils/date';
 
 /**
@@ -32,13 +34,15 @@ export default function CalendarDayScreen() {
   const { data: plans, isLoading: isLoadingPlans, isError: isPlansError, error: plansError } = useAllPlans();
   const { data: sessionsWithDog, isLoading: isLoadingSessions, isError: isSessionsError } = useAllSessions();
   const { data: goalsWithDog, isLoading: isLoadingGoals, isError: isGoalsError } = useAllGoals();
+  const { data: activitiesWithDog, isLoading: isLoadingActivities, isError: isActivitiesError } = useAllActivities();
 
   const dayPlans = useMemo(() => plansForDate(plans ?? [], date ?? ''), [plans, date]);
   const daySessions = useMemo(() => sessionsForDate(sessionsWithDog ?? [], date ?? ''), [sessionsWithDog, date]);
   const dayGoals = useMemo(() => goalsForDate(goalsWithDog ?? [], date ?? ''), [goalsWithDog, date]);
+  const dayActivities = useMemo(() => activitiesForDate(activitiesWithDog ?? [], date ?? ''), [activitiesWithDog, date]);
 
-  const isLoading = isLoadingPlans || isLoadingSessions || isLoadingGoals;
-  const isError = isPlansError || isSessionsError || isGoalsError;
+  const isLoading = isLoadingPlans || isLoadingSessions || isLoadingGoals || isLoadingActivities;
+  const isError = isPlansError || isSessionsError || isGoalsError || isActivitiesError;
 
   const parsedDate = parseIsoDateLocal(date);
   const heading = parsedDate
@@ -139,6 +143,23 @@ export default function CalendarDayScreen() {
             {dayGoals.map(({ goal, dog }) => (
               <View key={goal.id} style={styles.itemGroup}>
                 <GoalCard goal={goal} onPress={() => router.push(`/dog/${dog.id}/goals/${goal.id}/edit`)} />
+              </View>
+            ))}
+          </View>
+        )}
+
+        <ThemedText type="smallBold" style={styles.sectionTitle}>
+          {t('calendar.physicalActivities')}
+        </ThemedText>
+        {dayActivities.length === 0 ? (
+          <ThemedText themeColor="textSecondary" style={styles.emptyText}>
+            {t('calendar.noActivitiesDay')}
+          </ThemedText>
+        ) : (
+          <View style={styles.list}>
+            {dayActivities.map(({ activity, dog }) => (
+              <View key={activity.id} style={styles.itemGroup}>
+                <ActivityCard activity={activity} dogName={dog.name} onPress={() => router.push(`/activity/${activity.id}`)} />
               </View>
             ))}
           </View>

@@ -7,6 +7,7 @@ export interface Post {
   dogId: string | null;
   dogName: string | null;
   trainingSessionId: string | null;
+  physicalActivityId: string | null;
   content: string;
   imageUrl: string | null;
   createdAt: string;
@@ -21,6 +22,10 @@ export interface CreatePostPayload {
 }
 
 export interface CreatePostFromSessionPayload {
+  content?: string | null;
+}
+
+export interface CreatePostFromActivityPayload {
   content?: string | null;
 }
 

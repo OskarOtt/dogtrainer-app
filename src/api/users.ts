@@ -1,5 +1,6 @@
 import { apiClient } from '@/api/client';
 import type { DeleteAccountPayload, User } from '@/types/auth';
+import type { PublicDogSummary } from '@/types/dog';
 import type { UploadUrlRequest, UploadUrlResponse } from '@/types/media';
 import type { PublicUser } from '@/types/user';
 
@@ -16,6 +17,12 @@ export const usersApi = {
   /** 404s (via ResourceNotFoundException) when no user has this email. */
   async getByEmail(email: string): Promise<PublicUser> {
     const { data } = await apiClient.get<PublicUser>('/users', { params: { email } });
+    return data;
+  },
+
+  /** The user's dogs, for display on their public profile. */
+  async listDogs(userId: string): Promise<PublicDogSummary[]> {
+    const { data } = await apiClient.get<PublicDogSummary[]>(`/users/${userId}/dogs`);
     return data;
   },
 

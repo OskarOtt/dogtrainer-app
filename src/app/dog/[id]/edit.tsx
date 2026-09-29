@@ -8,8 +8,10 @@ import { MediaAvatarPicker } from '@/components/media-avatar-picker';
 import { PrimaryButton } from '@/components/primary-button';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { TitleBadge } from '@/components/title-badge';
 import { Spacing } from '@/constants/theme';
 import { useDog, useRemoveDogMedia, useUpdateDog, useUploadDogMedia } from '@/hooks/use-dogs';
+import { useDogTitles } from '@/hooks/use-titles';
 import { useTheme } from '@/hooks/use-theme';
 import type { DogPayload } from '@/types/dog';
 import { getApiErrorMessage } from '@/utils/apiError';
@@ -19,6 +21,7 @@ export default function EditDogScreen() {
   const router = useRouter();
   const colors = useTheme();
   const { data: dog, isLoading, isError, error } = useDog(id);
+  const { data: titles } = useDogTitles(id);
   const updateDog = useUpdateDog(id as string);
   const uploadMedia = useUploadDogMedia(id as string);
   const removeMedia = useRemoveDogMedia(id as string);
@@ -83,6 +86,21 @@ export default function EditDogScreen() {
         ) : null}
       </View>
 
+      <View style={styles.titlesSection}>
+        <ThemedText type="smallBold">{t('titles.title')}</ThemedText>
+        <View style={styles.titlesRow}>
+          {(titles ?? []).map((title) => (
+            <TitleBadge key={title.id} title={title} onPress={() => router.push(`/dog/${id}/titles/${title.id}/edit`)} />
+          ))}
+        </View>
+        <PrimaryButton
+          title={t('titles.addTitle')}
+          variant="secondary"
+          onPress={() => router.push(`/dog/${id}/titles/new`)}
+          style={styles.addTitleButton}
+        />
+      </View>
+
       <DogForm
         initialValue={dog}
         submitLabel={t('common.saveChanges')}
@@ -98,4 +116,7 @@ const styles = StyleSheet.create({
   mediaSection: { alignItems: 'center', gap: Spacing.two, paddingTop: Spacing.four },
   removeButton: { alignSelf: 'center', paddingHorizontal: Spacing.four },
   error: { textAlign: 'center', paddingHorizontal: Spacing.four },
+  titlesSection: { paddingHorizontal: Spacing.four, paddingTop: Spacing.three, gap: Spacing.two },
+  titlesRow: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.two },
+  addTitleButton: { alignSelf: 'flex-start', paddingHorizontal: Spacing.three },
 });

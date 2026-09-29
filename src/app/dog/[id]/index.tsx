@@ -8,11 +8,13 @@ import { MediaAvatarPicker } from '@/components/media-avatar-picker';
 import { PrimaryButton } from '@/components/primary-button';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { TitleBadge } from '@/components/title-badge';
 import { TrainingSessionCard } from '@/components/training-session-card';
 import { Radii, Spacing } from '@/constants/theme';
 import { useDeleteDog, useDog, useRemoveDogMedia, useUploadDogMedia } from '@/hooks/use-dogs';
 import { useDogSessions } from '@/hooks/use-sessions';
 import { useDogStatistics } from '@/hooks/use-stats';
+import { useDogTitles } from '@/hooks/use-titles';
 import { useTheme } from '@/hooks/use-theme';
 import { getApiErrorMessage } from '@/utils/apiError';
 import { formatAge, formatDuration } from '@/utils/date';
@@ -25,6 +27,7 @@ export default function DogDetailsScreen() {
   const { data: dog, isLoading, isError, error } = useDog(id);
   const { data: sessions } = useDogSessions(id);
   const { data: statistics } = useDogStatistics(id);
+  const { data: titles } = useDogTitles(id);
   const deleteDog = useDeleteDog();
   const uploadMedia = useUploadDogMedia(id as string);
   const removeMedia = useRemoveDogMedia(id as string);
@@ -101,6 +104,12 @@ export default function DogDetailsScreen() {
             .join(' · ') || t('common.noDetails')}
         </ThemedText>
 
+        <View style={styles.titlesRow}>
+          {(titles ?? []).map((title) => (
+            <TitleBadge key={title.id} title={title} />
+          ))}
+        </View>
+
         {statistics ? (
           <View style={[styles.card, { backgroundColor: colors.backgroundElement, borderColor: colors.border }]}>
             <ThemedText type="subtitle" style={styles.sectionTitle}>
@@ -139,6 +148,13 @@ export default function DogDetailsScreen() {
         <PrimaryButton
           title={t('dog.startTraining')}
           onPress={() => router.push(`/train/${dog.id}`)}
+          style={styles.button}
+        />
+
+        <PrimaryButton
+          title={t('titles.addTitle')}
+          variant="secondary"
+          onPress={() => router.push(`/dog/${dog.id}/titles/new`)}
           style={styles.button}
         />
 
@@ -182,6 +198,13 @@ const styles = StyleSheet.create({
   error: { textAlign: 'center', paddingHorizontal: Spacing.four },
   name: { fontSize: 28, marginTop: Spacing.two },
   subtitle: { marginBottom: Spacing.three },
+  titlesRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: Spacing.two,
+    marginBottom: Spacing.three,
+  },
   card: {
     alignSelf: 'stretch',
     borderWidth: 1,

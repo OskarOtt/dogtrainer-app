@@ -7,6 +7,7 @@ import { getAssetFileSize, resolveContentType, uploadAssetToPresignedUrl } from 
 
 const dogsKey = ['dogs'] as const;
 const dogKey = (id: string) => ['dogs', id] as const;
+const publicDogKey = (id: string) => ['dogs', id, 'public'] as const;
 
 export function useDogs() {
   return useQuery({
@@ -19,6 +20,15 @@ export function useDog(id: string | undefined) {
   return useQuery({
     queryKey: dogKey(id ?? ''),
     queryFn: () => dogsApi.get(id as string),
+    enabled: !!id,
+  });
+}
+
+/** Read-only profile for any dog (not just the current user's), used by the public dog profile screen. */
+export function usePublicDog(id: string | undefined) {
+  return useQuery({
+    queryKey: publicDogKey(id ?? ''),
+    queryFn: () => dogsApi.getPublic(id as string),
     enabled: !!id,
   });
 }

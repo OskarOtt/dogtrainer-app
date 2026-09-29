@@ -9,6 +9,7 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { BottomTabInset, Radii, Spacing } from '@/constants/theme';
 import { useInProgressSessions } from '@/hooks/use-sessions';
+import { useInProgressActivities } from '@/hooks/use-activities';
 import { useTheme } from '@/hooks/use-theme';
 
 /**
@@ -21,6 +22,7 @@ export default function TrainScreen() {
   const router = useRouter();
   const colors = useTheme();
   const { data: inProgressSessions } = useInProgressSessions();
+  const { data: inProgressActivities } = useInProgressActivities();
 
   return (
     <ThemedView style={styles.container}>
@@ -60,9 +62,42 @@ export default function TrainScreen() {
           </View>
         ) : null}
 
+        {inProgressActivities && inProgressActivities.length > 0 ? (
+          <View style={styles.resumeSection}>
+            <ThemedText type="smallBold" style={styles.resumeTitle}>
+              {t('train.resumeActivity')}
+            </ThemedText>
+            {inProgressActivities.map(({ activity, dog }) => (
+              <Pressable
+                key={activity.id}
+                onPress={() => router.push(`/activity/${activity.id}`)}
+                style={({ pressed }) => [
+                  styles.resumeCard,
+                  { backgroundColor: colors.backgroundElement, borderColor: colors.border, opacity: pressed ? 0.8 : 1 },
+                ]}>
+                <Ionicons
+                  name={activity.status === 'PAUSED' ? 'pause-circle-outline' : 'play-circle-outline'}
+                  size={28}
+                  color={colors.primary}
+                />
+                <View style={styles.resumeCardText}>
+                  <ThemedText type="subtitle" numberOfLines={1}>
+                    {dog.name}
+                  </ThemedText>
+                  <ThemedText themeColor="textSecondary" type="small" numberOfLines={1}>
+                    {activity.title} · {t('train.activityInProgress')}
+                  </ThemedText>
+                </View>
+                <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+              </Pressable>
+            ))}
+          </View>
+        ) : null}
+
         <View style={styles.buttons}>
           <PrimaryButton title={t('dog.startTraining')} onPress={() => router.push('/train/start')} />
           <PrimaryButton title={t('plans.planTraining')} variant="secondary" onPress={() => router.push('/train/plan')} />
+          <PrimaryButton title={t('dog.startActivity')} variant="secondary" onPress={() => router.push('/activity/pick-dog')} />
           <PrimaryButton title={t('goals.addGoal')} variant="secondary" onPress={() => router.push('/dog/goals/pick-dog')} />
         </View>
       </SafeAreaView>

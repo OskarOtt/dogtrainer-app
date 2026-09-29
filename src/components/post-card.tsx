@@ -85,20 +85,31 @@ export function PostCard({ post, onPress, onDeleted }: PostCardProps) {
         {post.imageUrl ? <Image source={{ uri: ensureMediaUri(post.imageUrl) }} style={styles.image} contentFit="cover" /> : null}
       </Pressable>
 
-      {post.dogId || post.trainingSessionId ? (
+      {post.dogId || post.trainingSessionId || post.physicalActivityId ? (
         <View style={styles.tagRow}>
           {post.dogId ? (
             <Tag
               icon="paw"
               label={post.dogName ?? t('posts.dogFallback')}
-              onPress={isOwnPost ? () => router.push(`/dog/${post.dogId}`) : undefined}
+              onPress={() => router.push(isOwnPost ? `/dog/${post.dogId}` : `/dog/${post.dogId}/public`)}
             />
           ) : null}
           {post.trainingSessionId ? (
             <Tag
               icon="barbell-outline"
               label={t('posts.sessionTag')}
-              onPress={isOwnPost ? () => router.push(`/session/${post.trainingSessionId}`) : undefined}
+              onPress={() =>
+                router.push(isOwnPost ? `/session/${post.trainingSessionId}` : `/post/${post.id}/session`)
+              }
+            />
+          ) : null}
+          {post.physicalActivityId ? (
+            <Tag
+              icon="footsteps-outline"
+              label={t('posts.activityTag')}
+              onPress={() =>
+                router.push(isOwnPost ? `/activity/${post.physicalActivityId}` : `/post/${post.id}/activity`)
+              }
             />
           ) : null}
         </View>
@@ -131,19 +142,34 @@ export function PostCard({ post, onPress, onDeleted }: PostCardProps) {
 }
 
 /**
- * Renders as a Pressable link only when `onPress` is given. Dogs and training sessions are
- * only viewable through the app by their owner (`GET /dogs/{id}` and `GET /training-sessions/{id}`
- * both 403 for anyone else) — so tags on someone else's post show the same label but aren't links.
+ * Renders as a Pressable button (accent-tinted background + border) so it clearly reads as
+ * tappable (vs. plain text). Tapping the dog tag always navigates - to the owner's management
+ * screen for the post's own author, or the read-only public profile for anyone else.
  */
 function Tag({ icon, label, onPress }: { icon: keyof typeof Ionicons.glyphMap; label: string; onPress?: () => void }) {
   const colors = useTheme();
+  const tintColor = onPress ? colors.primary : colors.textSecondary;
 
   return (
-    <Pressable onPress={onPress} disabled={!onPress} style={styles.tag} hitSlop={4}>
-      <Ionicons name={icon} size={14} color={colors.primary} />
-      <ThemedText type="small" themeColor="textSecondary">
+    <Pressable
+      onPress={onPress}
+      disabled={!onPress}
+      hitSlop={4}
+      style={({ pressed }) => [
+        styles.tag,
+        onPress
+          ? {
+              backgroundColor: colors.primary + (pressed ? '33' : '1f'),
+              borderWidth: 1,
+              borderColor: colors.primary + '55',
+            }
+          : null,
+      ]}>
+      <Ionicons name={icon} size={13} color={tintColor} />
+      <ThemedText type="small" style={onPress ? { color: tintColor, fontWeight: '600' } : undefined} themeColor={onPress ? undefined : 'textSecondary'}>
         {label}
       </ThemedText>
+      {onPress ? <Ionicons name="chevron-forward" size={11} color={tintColor} /> : null}
     </Pressable>
   );
 }
@@ -169,9 +195,10 @@ const styles = StyleSheet.create({
   tag: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 5,
     paddingHorizontal: Spacing.two,
-    paddingVertical: 4,
+    paddingVertical: 6,
+    minHeight: 29,
     borderRadius: Radii.pill,
     backgroundColor: 'rgba(128,128,128,0.12)',
   },

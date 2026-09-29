@@ -1,5 +1,5 @@
 import { apiClient } from '@/api/client';
-import type { Dog, DogPayload } from '@/types/dog';
+import type { Dog, DogPayload, PublicDogProfile } from '@/types/dog';
 import type { UploadUrlRequest, UploadUrlResponse } from '@/types/media';
 
 /**
@@ -14,6 +14,12 @@ export const dogsApi = {
 
   async get(id: string): Promise<Dog> {
     const { data } = await apiClient.get<Dog>(`/dogs/${id}`);
+    return data;
+  },
+
+  /** Read-only profile for any dog, viewable by any signed-in user (subject to blocking). */
+  async getPublic(id: string): Promise<PublicDogProfile> {
+    const { data } = await apiClient.get<PublicDogProfile>(`/dogs/${id}/public`);
     return data;
   },
 

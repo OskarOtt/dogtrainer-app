@@ -33,11 +33,14 @@ function RootNavigator() {
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="dog/new" options={{ headerShown: true }} />
         <Stack.Screen name="dog/[id]/index" options={{ headerShown: true }} />
+        <Stack.Screen name="dog/[id]/public" options={{ headerShown: true }} />
         <Stack.Screen name="dog/[id]/edit" options={{ headerShown: true }} />
         <Stack.Screen name="dog/[id]/goals/index" options={{ headerShown: true }} />
         <Stack.Screen name="dog/[id]/goals/new" options={{ headerShown: true }} />
         <Stack.Screen name="dog/goals/pick-dog" options={{ headerShown: true, title: t('goals.addGoal') }} />
         <Stack.Screen name="dog/[id]/goals/[goalId]/edit" options={{ headerShown: true }} />
+        <Stack.Screen name="dog/[id]/titles/new" options={{ headerShown: true }} />
+        <Stack.Screen name="dog/[id]/titles/[titleId]/edit" options={{ headerShown: true }} />
         <Stack.Screen name="train/pick-dog" options={{ headerShown: true, title: t('dog.startTraining') }} />
         <Stack.Screen name="train/[dogId]/index" options={{ headerShown: true }} />
         <Stack.Screen name="train/start/index" options={{ headerShown: true }} />
@@ -47,11 +50,16 @@ function RootNavigator() {
         <Stack.Screen name="train/plan-picker/index" options={{ headerShown: true }} />
         <Stack.Screen name="session/new" options={{ headerShown: true }} />
         <Stack.Screen name="session/[id]" options={{ headerShown: false }} />
+        <Stack.Screen name="activity/pick-dog" options={{ headerShown: true, title: t('dog.startActivity') }} />
+        <Stack.Screen name="activity/[dogId]/start" options={{ headerShown: true }} />
+        <Stack.Screen name="activity/[id]" options={{ headerShown: false }} />
         <Stack.Screen name="progress/[dogId]" options={{ headerShown: true }} />
         <Stack.Screen name="calendar/[date]/index" options={{ headerShown: true }} />
         <Stack.Screen name="calendar/[date]/new-plan" options={{ headerShown: true, title: t('plans.addPlan') }} />
         <Stack.Screen name="post/new" options={{ headerShown: true }} />
-        <Stack.Screen name="post/[id]" options={{ headerShown: true }} />
+        <Stack.Screen name="post/[id]/index" options={{ headerShown: true }} />
+        <Stack.Screen name="post/[id]/session" options={{ headerShown: true }} />
+        <Stack.Screen name="post/[id]/activity" options={{ headerShown: true }} />
         <Stack.Screen name="user/[id]/index" options={{ headerShown: true }} />
         <Stack.Screen name="user/[id]/followers" options={{ headerShown: true }} />
         <Stack.Screen name="user/[id]/following" options={{ headerShown: true }} />

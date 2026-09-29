@@ -8,11 +8,16 @@ import { ensureMediaUri } from '@/utils/media';
 export interface AvatarProps {
   uri: string | null | undefined;
   size?: number;
+  /** Icon shown when there's no photo (or, for a video, in place of a still frame). Defaults to 'person'. */
+  placeholderIcon?: keyof typeof Ionicons.glyphMap;
+  /** When 'VIDEO', shows a video-camera icon instead of trying to render `uri` as a still image. */
+  mediaType?: 'IMAGE' | 'VIDEO' | null;
 }
 
 /** Read-only circular avatar with an icon fallback, used anywhere a user/dog photo is shown but not editable. */
-export function Avatar({ uri, size = 40 }: AvatarProps) {
+export function Avatar({ uri, size = 40, placeholderIcon = 'person', mediaType }: AvatarProps) {
   const colors = useTheme();
+  const isVideo = mediaType === 'VIDEO';
 
   return (
     <View
@@ -20,10 +25,10 @@ export function Avatar({ uri, size = 40 }: AvatarProps) {
         styles.avatar,
         { width: size, height: size, borderRadius: size / 2, backgroundColor: colors.backgroundSelected },
       ]}>
-      {uri ? (
+      {uri && !isVideo ? (
         <Image source={{ uri: ensureMediaUri(uri) }} style={styles.image} contentFit="cover" />
       ) : (
-        <Ionicons name="person" size={size * 0.5} color={colors.primary} />
+        <Ionicons name={isVideo ? 'videocam' : placeholderIcon} size={size * 0.5} color={colors.primary} />
       )}
     </View>
   );

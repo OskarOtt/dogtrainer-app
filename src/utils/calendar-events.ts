@@ -1,13 +1,14 @@
 import type { ICalendarEventBase } from 'react-native-big-calendar';
 
 import { t } from '@/i18n';
+import type { PhysicalActivity } from '@/types/activity';
 import type { Dog } from '@/types/dog';
 import type { Goal } from '@/types/goal';
 import type { TrainingPlan } from '@/types/plan';
 import type { TrainingSession } from '@/types/session';
 import { parseIsoDateLocal, toIsoDateLocal } from '@/utils/date';
 
-export type CalendarEventType = 'plan' | 'session' | 'goal';
+export type CalendarEventType = 'plan' | 'session' | 'goal' | 'activity';
 
 export interface CalendarEvent extends ICalendarEventBase {
   type: CalendarEventType;
@@ -22,16 +23,21 @@ const SESSION_EVENT_DURATION_MINUTES = 30;
 /** Default event duration (minutes) used to render a goal target date as a point-in-time block. */
 const GOAL_EVENT_DURATION_MINUTES = 30;
 
+/** Default event duration (minutes) used to render a completed physical activity as a point-in-time block. */
+const ACTIVITY_EVENT_DURATION_MINUTES = 30;
+
 /**
  * Builds react-native-big-calendar events from training plans (spanning startDate → endDate),
- * completed training sessions (a short block at their completedAt/startedAt time), and goals
- * (a short block on their targetDate). Plans without a startDate, sessions that aren't
- * COMPLETED, and goals without a targetDate are skipped.
+ * completed training sessions (a short block at their completedAt/startedAt time), goals
+ * (a short block on their targetDate), and completed physical activities (a short block at
+ * their completedAt/startedAt time). Plans without a startDate, sessions/activities that
+ * aren't COMPLETED, and goals without a targetDate are skipped.
  */
 export function buildCalendarEvents(
   plans: TrainingPlan[],
   sessionsWithDog: { session: TrainingSession; dog: Dog }[],
-  goalsWithDog: { goal: Goal; dog: Dog }[] = []
+  goalsWithDog: { goal: Goal; dog: Dog }[] = [],
+  activitiesWithDog: { activity: PhysicalActivity; dog: Dog }[] = []
 ): CalendarEvent[] {
   const planEvents: CalendarEvent[] = plans.flatMap((plan) => {
     const start = parseIsoDateLocal(plan.startDate);
@@ -95,7 +101,30 @@ export function buildCalendarEvents(
     ];
   });
 
-  return [...planEvents, ...sessionEvents, ...goalEvents];
+  const activityEvents: CalendarEvent[] = activitiesWithDog.flatMap(({ activity, dog }) => {
+    if (activity.status !== 'COMPLETED') {
+      return [];
+    }
+    const startIso = activity.completedAt ?? activity.startedAt;
+    const start = new Date(startIso);
+    if (Number.isNaN(start.getTime())) {
+      return [];
+    }
+    const end = new Date(start.getTime() + ACTIVITY_EVENT_DURATION_MINUTES * 60 * 1000);
+    return [
+      {
+        type: 'activity' as const,
+        refId: activity.id,
+        dogId: activity.dogId,
+        dogName: dog.name,
+        title: activity.title,
+        start,
+        end,
+      },
+    ];
+  });
+
+  return [...planEvents, ...sessionEvents, ...goalEvents, ...activityEvents];
 }
 
 /** Filters events that overlap the given ISO date (YYYY-MM-DD), comparing by local date only. */
@@ -133,6 +162,21 @@ export function sessionsForDate(
       return false;
     }
     const startIso = session.completedAt ?? session.startedAt;
+    const date = new Date(startIso);
+    return !Number.isNaN(date.getTime()) && toIsoDateLocal(date) === isoDate;
+  });
+}
+
+/** Completed physical activities (paired with their dog) whose completedAt/startedAt falls on the given ISO date. */
+export function activitiesForDate(
+  activitiesWithDog: { activity: PhysicalActivity; dog: Dog }[],
+  isoDate: string
+): { activity: PhysicalActivity; dog: Dog }[] {
+  return activitiesWithDog.filter(({ activity }) => {
+    if (activity.status !== 'COMPLETED') {
+      return false;
+    }
+    const startIso = activity.completedAt ?? activity.startedAt;
     const date = new Date(startIso);
     return !Number.isNaN(date.getTime()) && toIsoDateLocal(date) === isoDate;
   });

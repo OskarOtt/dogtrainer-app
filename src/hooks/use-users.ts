@@ -10,6 +10,15 @@ export function usePublicUser(id: string | undefined) {
   });
 }
 
+/** A user's dogs, for the "Dogs" section on their public profile. */
+export function useUserDogs(id: string | undefined) {
+  return useQuery({
+    queryKey: ['users', id ?? '', 'dogs'],
+    queryFn: () => usersApi.listDogs(id as string),
+    enabled: !!id,
+  });
+}
+
 /** Looks up a user by email address. Rejects with a 404 if none is found. */
 export function useFindUserByEmail() {
   return useMutation({

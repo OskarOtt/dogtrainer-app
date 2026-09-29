@@ -1,6 +1,6 @@
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useMemo } from 'react';
-import { Alert, ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
+import { Alert, ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { t } from '@/i18n';
@@ -14,7 +14,7 @@ import { Spacing } from '@/constants/theme';
 import { useAuth } from '@/hooks/use-auth';
 import { useFollowers, useFollowing, useFollowUser, useUnfollowUser } from '@/hooks/use-follows';
 import { useUserPosts } from '@/hooks/use-posts';
-import { useBlockedUsers, useBlockUser, usePublicUser, useUnblockUser } from '@/hooks/use-users';
+import { useBlockedUsers, useBlockUser, usePublicUser, useUnblockUser, useUserDogs } from '@/hooks/use-users';
 import { useTheme } from '@/hooks/use-theme';
 import { getApiErrorMessage } from '@/utils/apiError';
 
@@ -33,6 +33,7 @@ export default function UserProfileScreen() {
   const { data: blockedUsers } = useBlockedUsers();
   const blockUser = useBlockUser();
   const unblockUser = useUnblockUser();
+  const { data: dogs } = useUserDogs(id);
 
   const isFollowing = useMemo(() => myFollowing?.some((u) => u.id === id) ?? false, [myFollowing, id]);
   const followMutation = isFollowing ? unfollowUser : followUser;
@@ -85,23 +86,6 @@ export default function UserProfileScreen() {
           <ThemedText type="subtitle" style={styles.name}>
             {profile.name}
           </ThemedText>
-          {currentUser?.id !== id ? (
-            <View style={styles.actionRow}>
-              <PrimaryButton
-                title={isFollowing ? t('social.unfollow') : t('social.follow')}
-                variant={isFollowing ? 'secondary' : 'primary'}
-                loading={followMutation.isPending}
-                disabled={isBlocked}
-                onPress={() => followMutation.mutate(id)}
-                style={styles.followButton}
-              />
-              <Pressable onPress={handleToggleBlock} hitSlop={8} style={styles.blockLink}>
-                <ThemedText themeColor="danger" type="small">
-                  {isBlocked ? t('common.unblock') : t('common.block')}
-                </ThemedText>
-              </Pressable>
-            </View>
-          ) : null}
         </View>
       </View>
 
@@ -119,6 +103,47 @@ export default function UserProfileScreen() {
           <ThemedText themeColor="textSecondary">{t('social.following')}</ThemedText>
         </Pressable>
       </View>
+
+      {currentUser?.id !== id || (dogs && dogs.length > 0) ? (
+        <View style={styles.dogsSection}>
+          <ThemedText type="subtitle" style={styles.sectionTitle}>
+            {t('social.dogs')}
+          </ThemedText>
+
+          {dogs && dogs.length > 0 ? (
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.dogsRow}>
+              {dogs.map((dog) => (
+                <Pressable key={dog.id} style={styles.dogCard} onPress={() => router.push(`/dog/${dog.id}/public`)}>
+                  <Avatar uri={dog.mediaUrl} mediaType={dog.mediaType} size={56} placeholderIcon="paw" />
+                  <ThemedText type="small" numberOfLines={1} style={styles.dogName}>
+                    {dog.name}
+                  </ThemedText>
+                </Pressable>
+              ))}
+            </ScrollView>
+          ) : null}
+
+          {currentUser?.id !== id ? (
+            <View style={styles.actionRow}>
+              <PrimaryButton
+                title={isFollowing ? t('social.unfollow') : t('social.follow')}
+                variant={isFollowing ? 'secondary' : 'primary'}
+                loading={followMutation.isPending}
+                disabled={isBlocked}
+                onPress={() => followMutation.mutate(id)}
+                style={styles.wideButton}
+              />
+              <PrimaryButton
+                title={isBlocked ? t('common.unblock') : t('common.block')}
+                variant={isBlocked ? 'secondary' : 'danger'}
+                loading={isBlocked ? unblockUser.isPending : blockUser.isPending}
+                onPress={handleToggleBlock}
+                style={styles.wideButton}
+              />
+            </View>
+          ) : null}
+        </View>
+      ) : null}
 
       <ThemedText type="subtitle" style={styles.sectionTitle}>
         {t('social.posts')}
@@ -153,14 +178,17 @@ const styles = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   safeArea: { flex: 1 },
   headerContent: { padding: Spacing.four, paddingBottom: 0, gap: Spacing.three },
-  profileRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.three },
-  profileInfo: { flex: 1, gap: Spacing.two },
-  name: { fontSize: 22 },
-  followButton: { alignSelf: 'flex-start', minWidth: 120 },
-  actionRow: { gap: Spacing.one, alignItems: 'flex-start' },
-  blockLink: { paddingVertical: Spacing.one },
+  profileRow: { alignItems: 'center', gap: Spacing.three },
+  profileInfo: { alignItems: 'center', gap: Spacing.two },
+  name: { fontSize: 22, textAlign: 'center' },
+  actionRow: { gap: Spacing.two, marginTop: Spacing.two + 10 },
+  wideButton: { width: '100%' },
   followRow: { flexDirection: 'row', gap: Spacing.four },
   followStat: { alignItems: 'center', flex: 1 },
   followCount: { fontSize: 20 },
   sectionTitle: { fontSize: 18 },
+  dogsSection: { gap: Spacing.two },
+  dogsRow: { gap: Spacing.three, paddingRight: Spacing.two },
+  dogCard: { alignItems: 'center', width: 72, gap: Spacing.one },
+  dogName: { textAlign: 'center' },
 });

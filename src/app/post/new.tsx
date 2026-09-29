@@ -13,17 +13,18 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Radii, Spacing } from '@/constants/theme';
 import { useDogs } from '@/hooks/use-dogs';
-import { useCreatePost, useCreatePostFromSession, useUploadPostMedia } from '@/hooks/use-posts';
+import { useCreatePost, useCreatePostFromActivity, useCreatePostFromSession, useUploadPostMedia } from '@/hooks/use-posts';
 import { useTheme } from '@/hooks/use-theme';
 import { getApiErrorMessage } from '@/utils/apiError';
 
 const MAX_CONTENT_LENGTH = 2048;
 
 export default function NewPostScreen() {
-  const { sessionId } = useLocalSearchParams<{ sessionId?: string }>();
+  const { sessionId, activityId } = useLocalSearchParams<{ sessionId?: string; activityId?: string }>();
   const router = useRouter();
   const colors = useTheme();
   const isFromSession = !!sessionId;
+  const isFromActivity = !!activityId;
 
   const { data: dogs } = useDogs();
   const [content, setContent] = useState('');
@@ -32,16 +33,19 @@ export default function NewPostScreen() {
 
   const createPost = useCreatePost();
   const createPostFromSession = useCreatePostFromSession(sessionId ?? '');
+  const createPostFromActivity = useCreatePostFromActivity(activityId ?? '');
   const uploadMedia = useUploadPostMedia();
 
-  const isSubmitting = createPost.isPending || createPostFromSession.isPending || uploadMedia.isPending;
+  const isSubmitting = createPost.isPending || createPostFromSession.isPending || createPostFromActivity.isPending || uploadMedia.isPending;
   const errorMessage = createPost.isError
     ? getApiErrorMessage(createPost.error)
     : createPostFromSession.isError
       ? getApiErrorMessage(createPostFromSession.error)
-      : uploadMedia.isError
-        ? getApiErrorMessage(uploadMedia.error)
-        : null;
+      : createPostFromActivity.isError
+        ? getApiErrorMessage(createPostFromActivity.error)
+        : uploadMedia.isError
+          ? getApiErrorMessage(uploadMedia.error)
+          : null;
 
   async function handlePickPhoto() {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -68,7 +72,9 @@ export default function NewPostScreen() {
     const trimmed = content.trim();
     const post = isFromSession
       ? await createPostFromSession.mutateAsync({ content: trimmed || null })
-      : await createPost.mutateAsync({ content: trimmed, dogId: selectedDogId ?? null });
+      : isFromActivity
+        ? await createPostFromActivity.mutateAsync({ content: trimmed || null })
+        : await createPost.mutateAsync({ content: trimmed, dogId: selectedDogId ?? null });
 
     if (selectedAsset) {
       await uploadMedia.mutateAsync({ postId: post.id, asset: selectedAsset });
@@ -82,21 +88,22 @@ export default function NewPostScreen() {
     });
   }
 
-  const canSubmit = isFromSession || content.trim().length > 0;
+  const canSubmit = isFromSession || isFromActivity || content.trim().length > 0;
 
   return (
     <ThemedView style={styles.container}>
       <Stack.Screen
         options={{
-          title: isFromSession ? t('posts.shareSession') : t('posts.newPost'),
+          title: isFromSession ? t('posts.shareSession') : isFromActivity ? t('posts.shareActivity') : t('posts.newPost'),
           presentation: 'modal',
-          headerRight: isFromSession
-            ? () => (
-                <Pressable onPress={handleSkip} hitSlop={8}>
-                  <Ionicons name="close" size={24} color={colors.text} />
-                </Pressable>
-              )
-            : undefined,
+          headerRight:
+            isFromSession || isFromActivity
+              ? () => (
+                  <Pressable onPress={handleSkip} hitSlop={8}>
+                    <Ionicons name="close" size={24} color={colors.text} />
+                  </Pressable>
+                )
+              : undefined,
         }}
       />
       <KeyboardAwareScrollView contentContainerStyle={styles.scroll}>
@@ -104,7 +111,7 @@ export default function NewPostScreen() {
           defaultValue={content}
           onChangeText={setContent}
           placeholder={
-            isFromSession ? t('posts.captionSession') : t('posts.captionPost')
+            isFromSession ? t('posts.captionSession') : isFromActivity ? t('posts.captionActivity') : t('posts.captionPost')
           }
           multiline
           numberOfLines={5}
@@ -115,7 +122,7 @@ export default function NewPostScreen() {
           {content.length}/{MAX_CONTENT_LENGTH}
         </ThemedText>
 
-        {!isFromSession && dogs && dogs.length > 0 ? (
+        {!isFromSession && !isFromActivity && dogs && dogs.length > 0 ? (
           <>
             <ThemedText type="smallBold">{t('posts.tagDog')}</ThemedText>
             <View style={styles.dogPicker}>
@@ -177,14 +184,14 @@ export default function NewPostScreen() {
         ) : null}
 
         <PrimaryButton
-          title={isFromSession ? t('training.shareToFeed') : t('posts.post')}
+          title={isFromSession || isFromActivity ? t('training.shareToFeed') : t('posts.post')}
           onPress={handleSubmitPress}
           loading={isSubmitting}
           disabled={!canSubmit || isSubmitting}
           style={styles.submitButton}
         />
 
-        {isFromSession ? (
+        {isFromSession || isFromActivity ? (
           <PrimaryButton
             title={t('posts.dontPost')}
             variant="secondary"

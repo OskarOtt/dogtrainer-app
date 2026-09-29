@@ -10,6 +10,10 @@ the versioned docs at https://docs.expo.dev/versions/v57.0.0/.
 - `npm run android` / `npm run ios` / `npm run web` — start targeting a platform.
 - `npm run lint` — runs `expo lint` (ESLint, flat config in `eslint.config.js`, extends `eslint-config-expo`).
 - No test runner is configured in this repo.
+- EAS builds: `eas build --platform ios --profile production --auto-submit` (production),
+  `eas build --platform ios --profile developmentClient` (required for native modules like Apple
+  sign-in, which don't run in Expo Go), `eas build --platform android --profile preview` (internal
+  test build), `eas submit --platform ios` (submit an existing build).
 
 ## Architecture
 - File-based routing via `expo-router`; routes live under `src/app/` (not top-level `app/`).
@@ -33,6 +37,9 @@ the versioned docs at https://docs.expo.dev/versions/v57.0.0/.
 - Path aliases: `@/*` → `src/*`, `@/assets/*` → `assets/*` (see `tsconfig.json`).
 - Domain types live in `src/types/*.ts`, one file per resource, typically exporting both the entity
   (e.g. `Dog`) and its write payload (e.g. `DogPayload`) shape.
+- Social sign-in (Apple) exchanges a native provider ID token for the backend's own access/refresh
+  tokens; provider credentials are never persisted by the app. Uses native code via
+  `expo-apple-authentication`, so it does not run in Expo Go — test with a development client build.
 
 ## Conventions
 - Query key convention (see `src/hooks/use-dogs.ts`): a list key like `['dogs']` and a per-item key
@@ -42,3 +49,9 @@ the versioned docs at https://docs.expo.dev/versions/v57.0.0/.
   Platform-specific variants use the `.web.tsx` suffix (e.g. `date-picker.web.tsx`).
 - API base URL comes from `EXPO_PUBLIC_API_URL` env var (see `.env.example`), defaulting to
   `http://localhost:8080/api/v1`.
+- i18n: UI strings live in `src/i18n/{en,nb}.ts` (typed via `TranslationKey`, a dot-path union derived
+  from the `en` object) and are read via `t('some.key')` from `src/i18n/index.ts`; locale is resolved
+  from device locale (`nb`/`no`/`nn` → `nb`, else `en`) and can be overridden via
+  `src/i18n/language-preference.ts`. Don't confuse this with `locales/en.json` / `locales/nb.json` at
+  the repo root — those are native app-store metadata (iOS `CFBundleDisplayName`, Android `app_name`,
+  permission strings) consumed by `app.json`, not runtime UI copy.
