@@ -14,7 +14,8 @@ export default function NewTitleScreen() {
 
   function handleSubmit(payload: DogTitlePayload) {
     createTitle.mutate(payload, {
-      onSuccess: () => router.back(),
+      onSuccess: (createdTitle) =>
+        router.replace({ pathname: '/dog/[id]/titles/congrats', params: { id, title: createdTitle.title } }),
     });
   }
 

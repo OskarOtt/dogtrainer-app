@@ -150,6 +150,12 @@ export const en = {
     exampleTitle: 'e.g. CH',
     dateEarned: 'Date earned',
     selectDateEarned: 'Select date earned',
+    congratsHeader: 'New Title!',
+    congratsTitle: 'Congratulations on %{title}!',
+    congratsMessage: 'Want to share this achievement with your followers?',
+    congratsPost: 'Share to Feed',
+    congratsSkip: "Don't Post",
+    congratsPostCaption: '%{name} just earned the %{title} title! 🏆',
   },
   plans: {
     planTraining: 'Plan Training',

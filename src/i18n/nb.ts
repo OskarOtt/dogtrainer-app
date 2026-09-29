@@ -156,6 +156,12 @@ export const nb = {
     exampleTitle: 'f.eks. CH',
     dateEarned: 'Dato oppnådd',
     selectDateEarned: 'Velg dato oppnådd',
+    congratsHeader: 'Ny tittel!',
+    congratsTitle: 'Gratulerer med %{title}!',
+    congratsMessage: 'Vil du dele dette med følgerne dine?',
+    congratsPost: 'Del i feeden',
+    congratsSkip: 'Ikke del',
+    congratsPostCaption: '%{name} har oppnådd tittelen %{title}! 🏆',
   },
   plans: {
     planTraining: 'Planlegg trening',

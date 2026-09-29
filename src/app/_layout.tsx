@@ -40,6 +40,7 @@ function RootNavigator() {
         <Stack.Screen name="dog/goals/pick-dog" options={{ headerShown: true, title: t('goals.addGoal') }} />
         <Stack.Screen name="dog/[id]/goals/[goalId]/edit" options={{ headerShown: true }} />
         <Stack.Screen name="dog/[id]/titles/new" options={{ headerShown: true }} />
+        <Stack.Screen name="dog/[id]/titles/congrats" options={{ headerShown: true }} />
         <Stack.Screen name="dog/[id]/titles/[titleId]/edit" options={{ headerShown: true }} />
         <Stack.Screen name="train/pick-dog" options={{ headerShown: true, title: t('dog.startTraining') }} />
         <Stack.Screen name="train/[dogId]/index" options={{ headerShown: true }} />

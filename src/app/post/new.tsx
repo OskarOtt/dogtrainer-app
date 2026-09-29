@@ -20,15 +20,20 @@ import { getApiErrorMessage } from '@/utils/apiError';
 const MAX_CONTENT_LENGTH = 2048;
 
 export default function NewPostScreen() {
-  const { sessionId, activityId } = useLocalSearchParams<{ sessionId?: string; activityId?: string }>();
+  const { sessionId, activityId, dogId, initialContent } = useLocalSearchParams<{
+    sessionId?: string;
+    activityId?: string;
+    dogId?: string;
+    initialContent?: string;
+  }>();
   const router = useRouter();
   const colors = useTheme();
   const isFromSession = !!sessionId;
   const isFromActivity = !!activityId;
 
   const { data: dogs } = useDogs();
-  const [content, setContent] = useState('');
-  const [selectedDogId, setSelectedDogId] = useState<string | undefined>(undefined);
+  const [content, setContent] = useState(initialContent ?? '');
+  const [selectedDogId, setSelectedDogId] = useState<string | undefined>(dogId);
   const [selectedAsset, setSelectedAsset] = useState<ImagePicker.ImagePickerAsset | null>(null);
 
   const createPost = useCreatePost();
