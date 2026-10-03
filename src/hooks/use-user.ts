@@ -33,6 +33,14 @@ export function useRemoveAvatar() {
   });
 }
 
+export function useUpdateUsername() {
+  const { setUser } = useAuth();
+  return useMutation({
+    mutationFn: (name: string) => usersApi.updateUsername(name),
+    onSuccess: (user) => setUser(user),
+  });
+}
+
 /** Only sends the request — the caller (profile screen) clears the local session on success. */
 export function useDeleteAccount() {
   return useMutation({

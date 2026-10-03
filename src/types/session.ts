@@ -35,6 +35,14 @@ export interface UpdateTrainingSessionPayload {
   notes?: string | null;
 }
 
+/** Logs a session that already happened (Train tab's "log a past entry" shortcut). */
+export interface CreateManualTrainingSessionPayload {
+  startedAt: string;
+  durationMinutes: number;
+  location?: string | null;
+  notes?: string | null;
+}
+
 export interface AddSessionExercisePayload {
   exerciseId: string;
   repetitions?: number;

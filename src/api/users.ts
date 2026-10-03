@@ -40,6 +40,11 @@ export const usersApi = {
     await apiClient.delete('/users/me/avatar');
   },
 
+  async updateUsername(name: string): Promise<User> {
+    const { data } = await apiClient.put<User>('/users/me/username', { name });
+    return data;
+  },
+
   async deleteAccount(payload: DeleteAccountPayload): Promise<void> {
     await apiClient.delete('/users/me', { data: payload });
   },

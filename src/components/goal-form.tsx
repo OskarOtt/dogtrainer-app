@@ -12,6 +12,7 @@ import type { Goal, GoalPayload, GoalStatus } from '@/types/goal';
 
 export interface GoalFormProps {
   initialValue?: Goal;
+  dogName?: string;
   submitLabel: string;
   isSubmitting?: boolean;
   errorMessage?: string | null;
@@ -26,7 +27,7 @@ const STATUS_OPTIONS: { label: TranslationKey; value: GoalStatus }[] = [
 ];
 
 /** Shared add/edit form used by both the "new goal" and "edit goal" screens. */
-export function GoalForm({ initialValue, submitLabel, isSubmitting, errorMessage, onSubmit }: GoalFormProps) {
+export function GoalForm({ initialValue, dogName, submitLabel, isSubmitting, errorMessage, onSubmit }: GoalFormProps) {
   const [title, setTitle] = useState(initialValue?.title ?? '');
   const [description, setDescription] = useState(initialValue?.description ?? '');
   const [targetDate, setTargetDate] = useState(initialValue?.targetDate ?? '');
@@ -43,6 +44,13 @@ export function GoalForm({ initialValue, submitLabel, isSubmitting, errorMessage
 
   return (
     <KeyboardAwareScrollView contentContainerStyle={styles.container}>
+      {dogName ? (
+        <>
+          <ThemedText type="smallBold">{t('goals.dog')}</ThemedText>
+          <ThemedText style={styles.dogName}>{dogName}</ThemedText>
+        </>
+      ) : null}
+
       <ThemedText type="smallBold">{t('goals.title')}</ThemedText>
       <FormTextInput defaultValue={title} onChangeText={setTitle} placeholder={t('goals.exampleTitle')} />
 
@@ -99,6 +107,7 @@ const styles = StyleSheet.create({
     gap: Spacing.two,
   },
   multilineHost: { height: 88, marginBottom: Spacing.two },
+  dogName: { marginBottom: Spacing.two },
   statusGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',

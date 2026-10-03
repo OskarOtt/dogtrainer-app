@@ -1,6 +1,7 @@
 import { apiClient } from '@/api/client';
 import type {
   AddSessionExercisePayload,
+  CreateManualTrainingSessionPayload,
   CreateTrainingSessionPayload,
   TrainingSession,
   UpdateSessionExercisePayload,
@@ -19,6 +20,11 @@ export const sessionsApi = {
 
   async create(dogId: string, payload: CreateTrainingSessionPayload): Promise<TrainingSession> {
     const { data } = await apiClient.post<TrainingSession>(`/dogs/${dogId}/training-sessions`, payload);
+    return data;
+  },
+
+  async createManual(dogId: string, payload: CreateManualTrainingSessionPayload): Promise<TrainingSession> {
+    const { data } = await apiClient.post<TrainingSession>(`/dogs/${dogId}/training-sessions/manual`, payload);
     return data;
   },
 
@@ -62,5 +68,9 @@ export const sessionsApi = {
   async removeExercise(sessionId: string, exerciseId: string): Promise<TrainingSession> {
     const { data } = await apiClient.delete<TrainingSession>(`/training-sessions/${sessionId}/exercises/${exerciseId}`);
     return data;
+  },
+
+  async remove(id: string): Promise<void> {
+    await apiClient.delete(`/training-sessions/${id}`);
   },
 };

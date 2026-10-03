@@ -6,6 +6,7 @@ import { ActivityIndicator, Alert, BackHandler, FlatList, Platform, Pressable, S
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { t } from '@/i18n';
+import { ConfirmDialog } from '@/components/confirm-dialog';
 import { EmptyState } from '@/components/empty-state';
 import { KeyboardAwareView } from '@/components/keyboard-aware-layout';
 import { PrimaryButton } from '@/components/primary-button';
@@ -20,6 +21,7 @@ import { useExercise } from '@/hooks/use-training-catalog';
 import {
   useCancelSession,
   useCompleteSession,
+  useDeleteSession,
   useRemoveSessionExercise,
   useSession,
   useUpdateSession,
@@ -78,6 +80,7 @@ export default function ActiveSessionScreen() {
   const updateSession = useUpdateSession(id ?? '');
   const completeSession = useCompleteSession(id ?? '');
   const cancelSession = useCancelSession(id ?? '');
+  const deleteSession = useDeleteSession(id ?? '', session?.dogId);
   const updateSessionExercise = useUpdateSessionExercise(id ?? '');
   const removeSessionExercise = useRemoveSessionExercise(id ?? '');
 
@@ -197,6 +200,12 @@ export default function ActiveSessionScreen() {
 
   function handleCancel() {
     cancelSession.mutate(undefined, {
+      onSuccess: () => router.replace('/(tabs)'),
+    });
+  }
+
+  function handleDelete() {
+    deleteSession.mutate(undefined, {
       onSuccess: () => router.replace('/(tabs)'),
     });
   }
@@ -374,13 +383,24 @@ export default function ActiveSessionScreen() {
             edges={['bottom']}
             style={[
               styles.footer,
-              styles.footerCentered,
+              styles.footerRow,
               { backgroundColor: colors.background, borderTopColor: colors.border },
             ]}>
             <PrimaryButton
               title={t('training.shareToFeed')}
               onPress={() => router.push(`/post/new?sessionId=${session.id}`)}
               style={styles.shareButton}
+            />
+            <ConfirmDialog
+              title={t('training.deleteSession')}
+              variant="danger"
+              loading={deleteSession.isPending}
+              style={styles.deleteButton}
+              dialogTitle={t('training.deleteSessionTitle')}
+              dialogMessage={t('training.deleteSessionMessage')}
+              confirmLabel={t('common.delete')}
+              destructive
+              onConfirm={handleDelete}
             />
           </SafeAreaView>
         ) : null}
@@ -427,6 +447,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.six,
     paddingVertical: Spacing.one,
   },
-  footerCentered: { justifyContent: 'center', alignItems: 'center' },
-  shareButton: { width: '70%', height: 40 },
+  footerRow: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: Spacing.three },
+  shareButton: { flex: 1, height: 48 },
+  deleteButton: { flex: 1, height: 48 },
 });

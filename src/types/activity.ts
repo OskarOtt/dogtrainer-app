@@ -26,3 +26,12 @@ export interface UpdatePhysicalActivityPayload {
   title: string;
   notes?: string | null;
 }
+
+/** Logs an activity that already happened (Train tab's "log a past entry" shortcut). */
+export interface CreateManualPhysicalActivityPayload {
+  activityType: ActivityType;
+  title?: string | null;
+  notes?: string | null;
+  startedAt: string;
+  durationMinutes: number;
+}

@@ -2,34 +2,15 @@ import { Ionicons } from '@expo/vector-icons';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { FlatList, Pressable, StyleSheet } from 'react-native';
 
-import { t, type TranslationKey } from '@/i18n';
+import { t } from '@/i18n';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
+import { ACTIVITY_TYPES, ACTIVITY_TYPE_LABEL_KEYS } from '@/constants/activity-types';
 import { Radii, Spacing } from '@/constants/theme';
 import { useCreateActivity } from '@/hooks/use-activities';
 import { useTheme } from '@/hooks/use-theme';
 import type { ActivityType } from '@/types/activity';
 import { getApiErrorMessage } from '@/utils/apiError';
-
-const ACTIVITY_TYPES: { type: ActivityType; icon: keyof typeof Ionicons.glyphMap }[] = [
-  { type: 'WALK', icon: 'footsteps-outline' },
-  { type: 'RUN', icon: 'walk-outline' },
-  { type: 'SKI', icon: 'snow-outline' },
-  { type: 'STRENGTH_TRAINING', icon: 'barbell-outline' },
-  { type: 'SWIM', icon: 'water-outline' },
-  { type: 'HIKE', icon: 'trail-sign-outline' },
-  { type: 'PLAY_SESSION', icon: 'tennisball-outline' },
-];
-
-const TYPE_LABEL_KEYS: Record<ActivityType, TranslationKey> = {
-  WALK: 'activity.walk',
-  RUN: 'activity.run',
-  SKI: 'activity.ski',
-  STRENGTH_TRAINING: 'activity.strengthTraining',
-  SWIM: 'activity.swim',
-  HIKE: 'activity.hike',
-  PLAY_SESSION: 'activity.playSession',
-};
 
 /**
  * Activity type picker: starts the physical activity immediately on selection (no manual date
@@ -81,7 +62,7 @@ export default function StartActivityScreen() {
             ]}>
             <Ionicons name={item.icon} size={26} color={colors.primary} style={styles.icon} />
             <ThemedText type="subtitle" style={styles.label}>
-              {t(TYPE_LABEL_KEYS[item.type])}
+              {t(ACTIVITY_TYPE_LABEL_KEYS[item.type])}
             </ThemedText>
             <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
           </Pressable>
