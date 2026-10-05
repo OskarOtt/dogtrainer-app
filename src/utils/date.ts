@@ -141,3 +141,32 @@ export function formatTimer(totalSeconds: number): string {
   const seconds = clamped % 60;
   return `${minutes}:${String(seconds).padStart(2, '0')}`;
 }
+
+/**
+ * Derives the `startedAt` instant to send for a manually-logged (past) training session or
+ * physical activity, given only a picked date (YYYY-MM-DD) and a duration in minutes - the
+ * manual-entry forms deliberately don't ask for an exact time of day.
+ *
+ * Anchors the *end* of the activity to "now" if the picked date is today, or to local noon on
+ * that date otherwise (any earlier calendar day's noon is always already in the past). Then
+ * backdates by the duration to get `startedAt`. This guarantees both `startedAt` and the
+ * server-computed `completedAt` (`startedAt + duration`) are never in the future, while still
+ * landing on the date the user picked (day-grouping elsewhere keys off `completedAt`).
+ */
+export function deriveManualStartedAt(dateIso: string, durationMinutes: number): string {
+  const picked = parseIsoDateLocal(dateIso) ?? new Date();
+  const now = new Date();
+  const isToday = toIsoDateLocal(picked) === toIsoDateLocal(now);
+  const anchor = isToday ? now : new Date(picked.getFullYear(), picked.getMonth(), picked.getDate(), 12, 0, 0);
+  const startedAt = new Date(anchor.getTime() - durationMinutes * 60 * 1000);
+  return startedAt.toISOString();
+}
+
+/**
+ * True when `dateIso` (YYYY-MM-DD, local) is a calendar day after today. Used by the manual
+ * entry forms to block picking a future date up front, instead of only surfacing it as a
+ * server error after submitting.
+ */
+export function isFutureDate(dateIso: string): boolean {
+  return dateIso > toIsoDateLocal(new Date());
+}

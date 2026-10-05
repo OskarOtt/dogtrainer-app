@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { t } from '@/i18n';
@@ -27,78 +27,138 @@ export default function TrainScreen() {
   return (
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea} edges={['top']}>
-        <ThemedText type="title" style={styles.title}>
-          {t('train.title')}
-        </ThemedText>
-        <ThemedText themeColor="textSecondary" style={styles.subtitle}>
-          {t('train.subtitle')}
-        </ThemedText>
+        <ScrollView
+          style={styles.scroll}
+          contentContainerStyle={styles.scrollContent}
+        >
+          <ThemedText type='title' style={styles.title}>
+            {t('train.title')}
+          </ThemedText>
+          <ThemedText themeColor='textSecondary' style={styles.subtitle}>
+            {t('train.subtitle')}
+          </ThemedText>
 
-        {inProgressSessions && inProgressSessions.length > 0 ? (
-          <View style={styles.resumeSection}>
-            <ThemedText type="smallBold" style={styles.resumeTitle}>
-              {t('train.resumeSession')}
-            </ThemedText>
-            {inProgressSessions.map(({ session, dog }) => (
-              <Pressable
-                key={session.id}
-                onPress={() => router.push(`/session/${session.id}`)}
-                style={({ pressed }) => [
-                  styles.resumeCard,
-                  { backgroundColor: colors.backgroundElement, borderColor: colors.border, opacity: pressed ? 0.8 : 1 },
-                ]}>
-                <Ionicons name="play-circle-outline" size={28} color={colors.primary} />
-                <View style={styles.resumeCardText}>
-                  <ThemedText type="subtitle" numberOfLines={1}>
-                    {dog.name}
-                  </ThemedText>
-                  <ThemedText themeColor="textSecondary" type="small">
-                    {t('train.exerciseInProgress', { count: session.exercises.length })}
-                  </ThemedText>
-                </View>
-                <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
-              </Pressable>
-            ))}
+          {inProgressSessions && inProgressSessions.length > 0 ? (
+            <View style={styles.resumeSection}>
+              <ThemedText type='smallBold' style={styles.resumeTitle}>
+                {t('train.resumeSession')}
+              </ThemedText>
+              {inProgressSessions.map(({ session, dog }) => (
+                <Pressable
+                  key={session.id}
+                  onPress={() => router.push(`/session/${session.id}`)}
+                  style={({ pressed }) => [
+                    styles.resumeCard,
+                    {
+                      backgroundColor: colors.backgroundElement,
+                      borderColor: colors.border,
+                      opacity: pressed ? 0.8 : 1,
+                    },
+                  ]}
+                >
+                  <Ionicons
+                    name='play-circle-outline'
+                    size={28}
+                    color={colors.primary}
+                  />
+                  <View style={styles.resumeCardText}>
+                    <ThemedText type='subtitle' numberOfLines={1}>
+                      {dog.name}
+                    </ThemedText>
+                    <ThemedText themeColor='textSecondary' type='small'>
+                      {t('train.exerciseInProgress', {
+                        count: session.exercises.length,
+                      })}
+                    </ThemedText>
+                  </View>
+                  <Ionicons
+                    name='chevron-forward'
+                    size={20}
+                    color={colors.textSecondary}
+                  />
+                </Pressable>
+              ))}
+            </View>
+          ) : null}
+
+          {inProgressActivities && inProgressActivities.length > 0 ? (
+            <View style={styles.resumeSection}>
+              <ThemedText type='smallBold' style={styles.resumeTitle}>
+                {t('train.resumeActivity')}
+              </ThemedText>
+              {inProgressActivities.map(({ activity, dog }) => (
+                <Pressable
+                  key={activity.id}
+                  onPress={() => router.push(`/activity/${activity.id}`)}
+                  style={({ pressed }) => [
+                    styles.resumeCard,
+                    {
+                      backgroundColor: colors.backgroundElement,
+                      borderColor: colors.border,
+                      opacity: pressed ? 0.8 : 1,
+                    },
+                  ]}
+                >
+                  <Ionicons
+                    name={
+                      activity.status === 'PAUSED'
+                        ? 'pause-circle-outline'
+                        : 'play-circle-outline'
+                    }
+                    size={28}
+                    color={colors.primary}
+                  />
+                  <View style={styles.resumeCardText}>
+                    <ThemedText type='subtitle' numberOfLines={1}>
+                      {dog.name}
+                    </ThemedText>
+                    <ThemedText
+                      themeColor='textSecondary'
+                      type='small'
+                      numberOfLines={1}
+                    >
+                      {activity.title} · {t('train.activityInProgress')}
+                    </ThemedText>
+                  </View>
+                  <Ionicons
+                    name='chevron-forward'
+                    size={20}
+                    color={colors.textSecondary}
+                  />
+                </Pressable>
+              ))}
+            </View>
+          ) : null}
+
+          <View style={styles.buttons}>
+            <PrimaryButton
+              title={t('dog.startTraining')}
+              onPress={() => router.push('/train/start')}
+            />
+            <PrimaryButton
+              title={t('plans.planTraining')}
+              variant='secondary'
+              onPress={() => router.push('/train/plan')}
+            />
+            <PrimaryButton
+              title={t('dog.startActivity')}
+              variant='secondary'
+              onPress={() => router.push('/activity/pick-dog')}
+            />
+            <PrimaryButton
+              title={t('goals.addGoal')}
+              variant='secondary'
+              onPress={() => router.push('/dog/goals/pick-dog')}
+            />
           </View>
-        ) : null}
-
-        {inProgressActivities && inProgressActivities.length > 0 ? (
-          <View style={styles.resumeSection}>
-            <ThemedText type="smallBold" style={styles.resumeTitle}>
-              {t('train.resumeActivity')}
-            </ThemedText>
-            {inProgressActivities.map(({ activity, dog }) => (
-              <Pressable
-                key={activity.id}
-                onPress={() => router.push(`/activity/${activity.id}`)}
-                style={({ pressed }) => [
-                  styles.resumeCard,
-                  { backgroundColor: colors.backgroundElement, borderColor: colors.border, opacity: pressed ? 0.8 : 1 },
-                ]}>
-                <Ionicons
-                  name={activity.status === 'PAUSED' ? 'pause-circle-outline' : 'play-circle-outline'}
-                  size={28}
-                  color={colors.primary}
-                />
-                <View style={styles.resumeCardText}>
-                  <ThemedText type="subtitle" numberOfLines={1}>
-                    {dog.name}
-                  </ThemedText>
-                  <ThemedText themeColor="textSecondary" type="small" numberOfLines={1}>
-                    {activity.title} · {t('train.activityInProgress')}
-                  </ThemedText>
-                </View>
-                <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
-              </Pressable>
-            ))}
-          </View>
-        ) : null}
-
-        <View style={styles.buttons}>
-          <PrimaryButton title={t('dog.startTraining')} onPress={() => router.push('/train/start')} />
-          <PrimaryButton title={t('plans.planTraining')} variant="secondary" onPress={() => router.push('/train/plan')} />
-          <PrimaryButton title={t('dog.startActivity')} variant="secondary" onPress={() => router.push('/activity/pick-dog')} />
-          <PrimaryButton title={t('goals.addGoal')} variant="secondary" onPress={() => router.push('/dog/goals/pick-dog')} />
+        </ScrollView>
+        <View style={styles.logPastWrapper}>
+          <PrimaryButton
+            title={t('train.logPast')}
+            variant='secondary'
+            onPress={() => router.push('/train/log')}
+            style={styles.logPastButton}
+          />
         </View>
       </SafeAreaView>
     </ThemedView>
@@ -108,9 +168,19 @@ export default function TrainScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   safeArea: { flex: 1 },
-  title: { fontSize: 28, paddingHorizontal: Spacing.four, paddingTop: Spacing.two },
+  scroll: { flex: 1 },
+  scrollContent: { flexGrow: 1 },
+  title: {
+    fontSize: 28,
+    paddingHorizontal: Spacing.four,
+    paddingTop: Spacing.two,
+  },
   subtitle: { paddingHorizontal: Spacing.four, marginBottom: Spacing.four },
-  resumeSection: { paddingHorizontal: Spacing.four, gap: Spacing.two, marginBottom: Spacing.four },
+  resumeSection: {
+    paddingHorizontal: Spacing.four,
+    gap: Spacing.two,
+    marginBottom: Spacing.four,
+  },
   resumeTitle: { marginBottom: Spacing.one },
   resumeCard: {
     flexDirection: 'row',
@@ -121,5 +191,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   resumeCardText: { flex: 1, gap: 2 },
-  buttons: { paddingHorizontal: Spacing.four, paddingBottom: BottomTabInset, gap: Spacing.three },
+  buttons: { paddingHorizontal: Spacing.four, gap: Spacing.three },
+  logPastWrapper: {
+    paddingHorizontal: Spacing.four,
+    paddingTop: Spacing.four,
+    paddingBottom: BottomTabInset + 50,
+  },
+  logPastButton: { height: 40 },
 });

@@ -49,6 +49,10 @@ function RootNavigator() {
         <Stack.Screen name="train/plan/[dogId]/new" options={{ headerShown: true }} />
         <Stack.Screen name="train/plan/[dogId]/[planId]/edit" options={{ headerShown: true }} />
         <Stack.Screen name="train/plan-picker/index" options={{ headerShown: true }} />
+        <Stack.Screen name="train/log/index" options={{ headerShown: true, title: t('train.logPast') }} />
+        <Stack.Screen name="train/log/pick-dog" options={{ headerShown: true, title: t('train.logPast') }} />
+        <Stack.Screen name="train/log/[dogId]/session" options={{ headerShown: true }} />
+        <Stack.Screen name="train/log/[dogId]/activity" options={{ headerShown: true }} />
         <Stack.Screen name="session/new" options={{ headerShown: true }} />
         <Stack.Screen name="session/[id]" options={{ headerShown: false }} />
         <Stack.Screen name="activity/pick-dog" options={{ headerShown: true, title: t('dog.startActivity') }} />

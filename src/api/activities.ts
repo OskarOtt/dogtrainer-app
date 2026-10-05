@@ -1,5 +1,6 @@
 import { apiClient } from '@/api/client';
 import type {
+  CreateManualPhysicalActivityPayload,
   CreatePhysicalActivityPayload,
   PhysicalActivity,
   UpdatePhysicalActivityPayload,
@@ -17,6 +18,11 @@ export const activitiesApi = {
 
   async create(dogId: string, payload: CreatePhysicalActivityPayload): Promise<PhysicalActivity> {
     const { data } = await apiClient.post<PhysicalActivity>(`/dogs/${dogId}/physical-activities`, payload);
+    return data;
+  },
+
+  async createManual(dogId: string, payload: CreateManualPhysicalActivityPayload): Promise<PhysicalActivity> {
+    const { data } = await apiClient.post<PhysicalActivity>(`/dogs/${dogId}/physical-activities/manual`, payload);
     return data;
   },
 

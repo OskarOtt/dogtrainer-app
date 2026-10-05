@@ -2,7 +2,7 @@ import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/rea
 
 import { activitiesApi } from '@/api/activities';
 import { dogsApi } from '@/api/dogs';
-import type { CreatePhysicalActivityPayload, UpdatePhysicalActivityPayload } from '@/types/activity';
+import type { CreateManualPhysicalActivityPayload, CreatePhysicalActivityPayload, UpdatePhysicalActivityPayload } from '@/types/activity';
 import { isVisiblePhysicalActivity } from '@/utils/activity';
 
 const dogActivitiesKey = (dogId: string) => ['dogs', dogId, 'physical-activities'] as const;
@@ -89,6 +89,16 @@ export function useCreateActivity(dogId: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (payload: CreatePhysicalActivityPayload) => activitiesApi.create(dogId, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: dogActivitiesKey(dogId) });
+    },
+  });
+}
+
+export function useCreateManualActivity(dogId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: CreateManualPhysicalActivityPayload) => activitiesApi.createManual(dogId, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: dogActivitiesKey(dogId) });
     },

@@ -2,9 +2,11 @@ import { useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 
 import { t } from '@/i18n';
 import { DeleteAccountModal } from '@/components/delete-account-modal';
+import { EditUsernameModal } from '@/components/edit-username-modal';
 import { EmptyState } from '@/components/empty-state';
 import { GoalCard } from '@/components/goal-card';
 import { LanguageSelectorModal } from '@/components/language-selector-modal';
@@ -36,6 +38,7 @@ export default function ProfileScreen() {
   const router = useRouter();
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [isLanguageSelectorVisible, setIsLanguageSelectorVisible] = useState(false);
+  const [isEditUsernameVisible, setIsEditUsernameVisible] = useState(false);
   const [linkError, setLinkError] = useState<unknown>(null);
   const { languagePreference, setLanguagePreference } = useTranslation();
 
@@ -120,9 +123,18 @@ export default function ProfileScreen() {
       </View>
 
       <ThemedView style={[styles.card, { backgroundColor: colors.backgroundElement, borderColor: colors.border }]}>
-        <ThemedText type="subtitle" style={styles.cardTitle}>
-          {user?.name ?? t('common.trainer')}
-        </ThemedText>
+        <View style={styles.nameRow}>
+          <ThemedText type="subtitle" style={styles.cardTitle}>
+            {user?.name ?? t('common.trainer')}
+          </ThemedText>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('profile.editUsername')}
+            onPress={() => setIsEditUsernameVisible(true)}
+            hitSlop={8}>
+            <Ionicons name="pencil" size={18} color={colors.textSecondary} />
+          </Pressable>
+        </View>
         <ThemedText themeColor="textSecondary">{user?.email}</ThemedText>
       </ThemedView>
 
@@ -324,6 +336,11 @@ export default function ProfileScreen() {
           setIsLanguageSelectorVisible(false);
         }}
       />
+      <EditUsernameModal
+        visible={isEditUsernameVisible}
+        currentName={user?.name ?? ''}
+        onClose={() => setIsEditUsernameVisible(false)}
+      />
     </ThemedView>
   );
 }
@@ -348,6 +365,7 @@ const styles = StyleSheet.create({
     gap: Spacing.one,
   },
   cardTitle: { fontSize: 20 },
+  nameRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: Spacing.two },
   languageSelectorLabel: { fontWeight: 700 },
   languageSelector: {
     minHeight: 48,

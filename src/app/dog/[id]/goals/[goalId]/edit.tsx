@@ -9,6 +9,7 @@ import { PrimaryButton } from '@/components/primary-button';
 import { ThemedView } from '@/components/themed-view';
 import { Spacing } from '@/constants/theme';
 import { useDeleteGoal, useGoal, useUpdateGoal } from '@/hooks/use-goals';
+import { useDog } from '@/hooks/use-dogs';
 import { useTheme } from '@/hooks/use-theme';
 import type { GoalPayload } from '@/types/goal';
 import { getApiErrorMessage } from '@/utils/apiError';
@@ -18,6 +19,7 @@ export default function EditGoalScreen() {
   const router = useRouter();
   const colors = useTheme();
   const { data: goal, isLoading, isError, error } = useGoal(goalId);
+  const { data: dog } = useDog(id);
   const updateGoal = useUpdateGoal(goalId, id);
   const deleteGoal = useDeleteGoal(id);
 
@@ -54,6 +56,7 @@ export default function EditGoalScreen() {
       <Stack.Screen options={{ title: t('goals.editGoal') }} />
       <GoalForm
         initialValue={goal}
+        dogName={dog?.name}
         submitLabel={t('common.saveChanges')}
         isSubmitting={updateGoal.isPending}
         errorMessage={updateGoal.isError ? getApiErrorMessage(updateGoal.error) : null}

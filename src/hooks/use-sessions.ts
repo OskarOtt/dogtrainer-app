@@ -2,8 +2,10 @@ import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/rea
 
 import { sessionsApi } from '@/api/sessions';
 import { dogsApi } from '@/api/dogs';
+import { useAuth } from '@/hooks/use-auth';
 import type {
   AddSessionExercisePayload,
+  CreateManualTrainingSessionPayload,
   CreateTrainingSessionPayload,
   UpdateSessionExercisePayload,
   UpdateTrainingSessionPayload,
@@ -101,6 +103,16 @@ export function useCreateSession(dogId: string) {
   });
 }
 
+export function useCreateManualSession(dogId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (payload: CreateManualTrainingSessionPayload) => sessionsApi.createManual(dogId, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: dogSessionsKey(dogId) });
+    },
+  });
+}
+
 export function useUpdateSession(id: string) {
   const queryClient = useQueryClient();
   return useMutation({
@@ -161,6 +173,29 @@ export function useRemoveSessionExercise(sessionId: string) {
     mutationFn: (exerciseId: string) => sessionsApi.removeExercise(sessionId, exerciseId),
     onSuccess: (session) => {
       queryClient.setQueryData(sessionKey(sessionId), session);
+    },
+  });
+}
+
+/**
+ * Deletes a completed session outright. A post sharing this session survives unlinked (backend
+ * sets its trainingSessionId to null), so the feed/profile posts caches are invalidated too, not
+ * just removed, to reflect that the "view session" link on any such post now disappears.
+ */
+export function useDeleteSession(sessionId: string, dogId: string | undefined) {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+  return useMutation({
+    mutationFn: () => sessionsApi.remove(sessionId),
+    onSuccess: () => {
+      queryClient.removeQueries({ queryKey: sessionKey(sessionId) });
+      if (dogId) {
+        queryClient.invalidateQueries({ queryKey: dogSessionsKey(dogId) });
+      }
+      queryClient.invalidateQueries({ queryKey: ['feed'] });
+      if (user) {
+        queryClient.invalidateQueries({ queryKey: ['users', user.id, 'posts'] });
+      }
     },
   });
 }
