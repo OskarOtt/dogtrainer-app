@@ -332,6 +332,11 @@ export const en = {
     feedDescription:
       'Posts from people you follow will show up in your feed. Manage followers and following in your profile.',
     nowFollowing: 'Now following %{name}!',
+    findFriends: 'Find friends',
+    searchPlaceholder: 'Search by name or username',
+    searchHint: 'Type at least 2 characters to search.',
+    noSearchResults: 'No users found.',
+    useEmailInstead: 'Use old add with email instead',
   },
   posts: {
     post: 'Post',

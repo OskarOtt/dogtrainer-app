@@ -26,6 +26,16 @@ export function useFindUserByEmail() {
   });
 }
 
+/** Fuzzy name/username search for the "find friends" UI. Only fires once the (trimmed) query is >= 2 chars. */
+export function useSearchUsers(query: string) {
+  const trimmedQuery = query.trim();
+  return useQuery({
+    queryKey: ['users', 'search', trimmedQuery],
+    queryFn: () => usersApi.search(trimmedQuery),
+    enabled: trimmedQuery.length >= 2,
+  });
+}
+
 const blockedUsersKey = ['users', 'me', 'blocked'] as const;
 
 export function useBlockedUsers() {

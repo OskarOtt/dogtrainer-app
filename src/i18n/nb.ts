@@ -338,6 +338,11 @@ export const nb = {
     feedDescription:
       'Innlegg fra personer du følger, vises i strømmen din. Administrer følgere og hvem du følger, i profilen.',
     nowFollowing: 'Følger nå %{name}!',
+    findFriends: 'Finn venner',
+    searchPlaceholder: 'Søk etter navn eller brukernavn',
+    searchHint: 'Skriv minst 2 tegn for å søke.',
+    noSearchResults: 'Fant ingen brukere.',
+    useEmailInstead: 'Bruk gammel legg-til-med-e-post i stedet',
   },
   posts: {
     post: 'Innlegg',

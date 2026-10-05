@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { t } from '@/i18n';
 import { AddFriendModal } from '@/components/add-friend-modal';
 import { EmptyState } from '@/components/empty-state';
+import { FindFriendsModal } from '@/components/find-friends-modal';
 import { PostList } from '@/components/post-list';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -19,6 +20,7 @@ export default function FeedScreen() {
   const router = useRouter();
   const colors = useTheme();
   const [isAddFriendVisible, setIsAddFriendVisible] = useState(false);
+  const [isFindFriendsVisible, setIsFindFriendsVisible] = useState(false);
   const {
     data,
     isLoading,
@@ -42,7 +44,7 @@ export default function FeedScreen() {
           </ThemedText>
           <View style={styles.headerActions}>
             <Pressable
-              onPress={() => setIsAddFriendVisible(true)}
+              onPress={() => setIsFindFriendsVisible(true)}
               hitSlop={8}
               style={[styles.composeButton, { backgroundColor: colors.backgroundElement, borderColor: colors.border, borderWidth: 1 }]}>
               <Ionicons name="person-add-outline" size={22} color={colors.text} />
@@ -56,6 +58,14 @@ export default function FeedScreen() {
           </View>
         </View>
 
+        <FindFriendsModal
+          visible={isFindFriendsVisible}
+          onClose={() => setIsFindFriendsVisible(false)}
+          onUseEmailFallback={() => {
+            setIsFindFriendsVisible(false);
+            setIsAddFriendVisible(true);
+          }}
+        />
         <AddFriendModal visible={isAddFriendVisible} onClose={() => setIsAddFriendVisible(false)} />
 
         {isLoading ? (

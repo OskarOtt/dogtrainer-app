@@ -2,7 +2,7 @@ import { apiClient } from '@/api/client';
 import type { DeleteAccountPayload, User } from '@/types/auth';
 import type { PublicDogSummary } from '@/types/dog';
 import type { UploadUrlRequest, UploadUrlResponse } from '@/types/media';
-import type { PublicUser } from '@/types/user';
+import type { PublicUser, UserSearchResult } from '@/types/user';
 
 /**
  * Thin wrapper around the /users endpoints. UI code and hooks should only ever
@@ -17,6 +17,12 @@ export const usersApi = {
   /** 404s (via ResourceNotFoundException) when no user has this email. */
   async getByEmail(email: string): Promise<PublicUser> {
     const { data } = await apiClient.get<PublicUser>('/users', { params: { email } });
+    return data;
+  },
+
+  /** Fuzzy name/username search, used by the "find friends" UI. `query` must be >= 2 chars. */
+  async search(query: string, limit = 20): Promise<UserSearchResult[]> {
+    const { data } = await apiClient.get<UserSearchResult[]>('/users/search', { params: { q: query, limit } });
     return data;
   },
 
