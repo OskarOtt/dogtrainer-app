@@ -38,6 +38,7 @@ export default function EditPlanScreen() {
   if (isLoading) {
     return (
       <ThemedView style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <Stack.Screen options={{ title: t('plans.editPlan') }} />
         <ActivityIndicator color={colors.primary} />
       </ThemedView>
     );
@@ -46,6 +47,7 @@ export default function EditPlanScreen() {
   if (isError || !plan) {
     return (
       <ThemedView style={{ flex: 1 }}>
+        <Stack.Screen options={{ title: t('plans.editPlan') }} />
         <EmptyState icon="alert-circle-outline" title={t('plans.loadOneError')} message={getApiErrorMessage(error)}>
           <PrimaryButton title={t('common.exit')} variant="secondary" onPress={() => router.replace('/(tabs)')} />
         </EmptyState>

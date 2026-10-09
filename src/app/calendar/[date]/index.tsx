@@ -52,6 +52,7 @@ export default function CalendarDayScreen() {
   if (isLoading) {
     return (
       <ThemedView style={styles.center}>
+        <Stack.Screen options={{ title: heading }} />
         <ActivityIndicator color={colors.primary} />
       </ThemedView>
     );
@@ -60,6 +61,7 @@ export default function CalendarDayScreen() {
   if (isError) {
     return (
       <ThemedView style={{ flex: 1 }}>
+        <Stack.Screen options={{ title: heading }} />
         <EmptyState icon="alert-circle-outline" title={t('calendar.dayLoadError')} message={getApiErrorMessage(plansError)}>
           <PrimaryButton title={t('common.exit')} variant="secondary" onPress={() => router.replace('/(tabs)')} />
         </EmptyState>

@@ -15,7 +15,7 @@ import type { CatalogExercise } from '@/types/training';
  * instead of drilling into category → activity → exercise.
  */
 export default function TrainScreen() {
-  const { dogId, sessionId, planId } = useLocalSearchParams<{ dogId: string; sessionId?: string; planId?: string }>();
+  const { dogId, sessionId } = useLocalSearchParams<{ dogId: string; sessionId?: string; planId?: string }>();
   const router = useRouter();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const addSessionExercise = useAddSessionExercise(sessionId ?? '');
@@ -34,7 +34,10 @@ export default function TrainScreen() {
         for (const exerciseId of selectedIds) {
           await addSessionExercise.mutateAsync({ exerciseId, repetitions: 0, successfulRepetitions: 0 });
         }
-        router.replace(planId ? `/session/${sessionId}?planId=${planId}` : `/session/${sessionId}`);
+        // Pop back to the session screen that pushed this picker (rather than replacing it)
+        // so its already-mounted instance — and any local state like an active edit mode —
+        // survives the round trip instead of being torn down and rebuilt from scratch.
+        router.back();
       } finally {
         setIsAdding(false);
       }

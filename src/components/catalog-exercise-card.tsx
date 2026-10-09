@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
-import { DifficultyColors, Radii, Spacing } from '@/constants/theme';
+import { CardShadow, DifficultyColors, Radii, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { t, type TranslationKey } from '@/i18n';
 import type { CatalogExercise } from '@/types/training';
@@ -67,6 +67,7 @@ const styles = StyleSheet.create({
     borderRadius: Radii.large,
     padding: Spacing.three,
     gap: Spacing.one,
+    ...CardShadow,
   },
   headerRow: {
     flexDirection: 'row',

@@ -32,7 +32,7 @@ async function getOrCreateWritableCalendar(): Promise<Calendar.ExpoCalendar> {
     const defaultCalendar = Calendar.getDefaultCalendarSync();
     return Calendar.createCalendar({
       title: t('calendar.deviceCalendarName'),
-      color: '#2F6FED',
+      color: '#3E8760',
       entityType: Calendar.EntityTypes.EVENT,
       sourceId: defaultCalendar.source.id,
       source: defaultCalendar.source,
@@ -49,7 +49,7 @@ async function getOrCreateWritableCalendar(): Promise<Calendar.ExpoCalendar> {
   };
   return Calendar.createCalendar({
     title: t('calendar.deviceCalendarName'),
-    color: '#2F6FED',
+    color: '#3E8760',
     entityType: Calendar.EntityTypes.EVENT,
     source: localSource,
     name: t('calendar.deviceCalendarName'),

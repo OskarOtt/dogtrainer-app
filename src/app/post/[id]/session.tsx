@@ -7,7 +7,7 @@ import { PrimaryButton } from '@/components/primary-button';
 import { SessionExerciseCard } from '@/components/session-exercise-card';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Spacing, StatusColors } from '@/constants/theme';
+import { CardShadow, Radii, Spacing, StatusColors } from '@/constants/theme';
 import { usePostTrainingSession } from '@/hooks/use-posts';
 import { useExercise } from '@/hooks/use-training-catalog';
 import { useTheme } from '@/hooks/use-theme';
@@ -52,6 +52,7 @@ export default function PostTrainingSessionPreviewScreen() {
   if (isLoading) {
     return (
       <ThemedView style={styles.center}>
+        <Stack.Screen options={{ title: t('posts.sessionPreviewTitle') }} />
         <ActivityIndicator color={colors.primary} />
       </ThemedView>
     );
@@ -60,6 +61,7 @@ export default function PostTrainingSessionPreviewScreen() {
   if (isError || !session) {
     return (
       <ThemedView style={{ flex: 1 }}>
+        <Stack.Screen options={{ title: t('posts.sessionPreviewTitle') }} />
         <EmptyState icon="alert-circle-outline" title={t('posts.sessionPreviewLoadError')} message={getApiErrorMessage(error)}>
           <PrimaryButton title={t('common.exit')} variant="secondary" onPress={() => router.back()} />
         </EmptyState>
@@ -116,10 +118,11 @@ const styles = StyleSheet.create({
   list: { padding: Spacing.four, gap: Spacing.three, flexGrow: 1 },
   summaryCard: {
     borderWidth: 1,
-    borderRadius: 16,
+    borderRadius: Radii.large,
     padding: Spacing.three,
     gap: Spacing.one,
     marginBottom: Spacing.three,
+    ...CardShadow,
   },
   summaryHeaderRow: {
     flexDirection: 'row',

@@ -24,6 +24,7 @@ export default function PostDetailScreen() {
   if (isLoading) {
     return (
       <ThemedView style={styles.center}>
+        <Stack.Screen options={{ title: t('posts.post') }} />
         <ActivityIndicator color={colors.primary} />
       </ThemedView>
     );
@@ -32,6 +33,7 @@ export default function PostDetailScreen() {
   if (isError || !post) {
     return (
       <ThemedView style={{ flex: 1 }}>
+        <Stack.Screen options={{ title: t('posts.post') }} />
         <EmptyState icon="alert-circle-outline" title={t('posts.loadError')} message={getApiErrorMessage(error)}>
           <PrimaryButton title={t('common.exit')} variant="secondary" onPress={() => router.replace('/(tabs)')} />
         </EmptyState>

@@ -17,7 +17,7 @@ import { StatCard } from '@/components/stat-card';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { TrainingSessionCard } from '@/components/training-session-card';
-import { BottomTabInset, Radii, Spacing } from '@/constants/theme';
+import { BottomTabInset, CardShadow, Radii, Spacing } from '@/constants/theme';
 import { useAuth } from '@/hooks/use-auth';
 import { useDogs } from '@/hooks/use-dogs';
 import { useFollowers, useFollowing } from '@/hooks/use-follows';
@@ -363,6 +363,7 @@ const styles = StyleSheet.create({
     borderRadius: Radii.large,
     padding: Spacing.four,
     gap: Spacing.one,
+    ...CardShadow,
   },
   cardTitle: { fontSize: 20 },
   nameRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: Spacing.two },

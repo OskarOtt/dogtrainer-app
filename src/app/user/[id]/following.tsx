@@ -20,6 +20,7 @@ export default function FollowingScreen() {
   if (isLoading) {
     return (
       <ThemedView style={styles.center}>
+        <Stack.Screen options={{ title: t('social.following') }} />
         <ActivityIndicator color={colors.primary} />
       </ThemedView>
     );

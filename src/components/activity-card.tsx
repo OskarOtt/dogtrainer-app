@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
-import { Radii, Spacing, StatusColors } from '@/constants/theme';
+import { CardShadow, Radii, Spacing, StatusColors } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { t, type TranslationKey } from '@/i18n';
 import type { ActivityStatus, ActivityType, PhysicalActivity } from '@/types/activity';
@@ -89,6 +89,7 @@ const styles = StyleSheet.create({
     borderRadius: Radii.large,
     padding: Spacing.three,
     gap: Spacing.three,
+    ...CardShadow,
   },
   iconWrap: { justifyContent: 'center' },
   icon: {

@@ -36,6 +36,7 @@ export default function EditGoalScreen() {
   if (isLoading) {
     return (
       <ThemedView style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <Stack.Screen options={{ title: t('goals.editGoal') }} />
         <ActivityIndicator color={colors.primary} />
       </ThemedView>
     );
@@ -44,6 +45,7 @@ export default function EditGoalScreen() {
   if (isError || !goal) {
     return (
       <ThemedView style={{ flex: 1 }}>
+        <Stack.Screen options={{ title: t('goals.editGoal') }} />
         <EmptyState icon="alert-circle-outline" title={t('goals.loadOneError')} message={getApiErrorMessage(error)}>
           <PrimaryButton title={t('common.exit')} variant="secondary" onPress={() => router.replace('/(tabs)')} />
         </EmptyState>

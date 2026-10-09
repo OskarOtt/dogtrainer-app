@@ -8,7 +8,7 @@ import { PrimaryButton } from '@/components/primary-button';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { TitleBadge } from '@/components/title-badge';
-import { Radii, Spacing, StatusColors } from '@/constants/theme';
+import { Radii, Spacing, StatusColors, CardShadow } from '@/constants/theme';
 import { usePublicDog } from '@/hooks/use-dogs';
 import { useTheme } from '@/hooks/use-theme';
 import { getApiErrorMessage } from '@/utils/apiError';
@@ -25,6 +25,7 @@ export default function PublicDogProfileScreen() {
   if (isLoading) {
     return (
       <ThemedView style={styles.center}>
+        <Stack.Screen options={{ title: t('common.loading') }} />
         <ActivityIndicator color={colors.primary} />
       </ThemedView>
     );
@@ -33,6 +34,7 @@ export default function PublicDogProfileScreen() {
   if (isError || !dog) {
     return (
       <ThemedView style={{ flex: 1 }}>
+        <Stack.Screen options={{ title: t('common.loading') }} />
         <EmptyState icon="alert-circle-outline" title={t('dog.loadError')} message={getApiErrorMessage(error)}>
           <PrimaryButton title={t('common.exit')} variant="secondary" onPress={() => router.back()} />
         </EmptyState>
@@ -165,6 +167,7 @@ const styles = StyleSheet.create({
     padding: Spacing.four,
     gap: Spacing.one,
     marginBottom: Spacing.three,
+    ...CardShadow,
   },
   sectionTitle: { fontSize: 18 },
   sessionsList: { gap: Spacing.two, marginTop: Spacing.one },

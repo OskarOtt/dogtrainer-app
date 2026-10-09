@@ -115,7 +115,7 @@ export function buildCalendarEvents(
       {
         type: 'activity' as const,
         refId: activity.id,
-        dogId: activity.dogId,
+        dogId: dog.id,
         dogName: dog.name,
         title: activity.title,
         start,

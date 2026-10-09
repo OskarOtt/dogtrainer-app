@@ -35,6 +35,7 @@ export default function EditTitleScreen() {
   if (isLoading) {
     return (
       <ThemedView style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+        <Stack.Screen options={{ title: t('titles.editTitle'), presentation: 'modal' }} />
         <ActivityIndicator color={colors.primary} />
       </ThemedView>
     );
@@ -43,6 +44,7 @@ export default function EditTitleScreen() {
   if (isError || !title) {
     return (
       <ThemedView style={{ flex: 1 }}>
+        <Stack.Screen options={{ title: t('titles.editTitle'), presentation: 'modal' }} />
         <EmptyState icon="alert-circle-outline" title={t('titles.loadError')} message={getApiErrorMessage(error)}>
           <PrimaryButton title={t('common.exit')} variant="secondary" onPress={() => router.back()} />
         </EmptyState>

@@ -212,10 +212,10 @@ function EditableSync({ editable }: { editable: boolean }) {
 }
 
 const DEFAULT_COLORS: NonNullable<LexicalNotesEditorProps['colors']> = {
-  border: '#D0D5DD',
-  primary: '#5B93F5',
-  text: '#101828',
-  textSecondary: '#667085',
+  border: '#DCE5DF',
+  primary: '#3E8760',
+  text: '#1C2922',
+  textSecondary: '#65736B',
   background: 'transparent',
 };
 
@@ -300,7 +300,7 @@ export default function LexicalNotesEditor({
           font-family: ${FONT_STACK};
           font-size: 16px;
           line-height: 24px;
-          color: ${isDark ? '#F2F4F7' : colors.text};
+          color: ${isDark ? '#ECF2EE' : colors.text};
           width: 100%;
           height: 100%;
           padding: 12px;

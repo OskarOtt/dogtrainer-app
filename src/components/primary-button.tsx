@@ -1,6 +1,6 @@
 import { ActivityIndicator, Pressable, StyleSheet, Text, useColorScheme, type ViewStyle } from 'react-native';
 
-import { Colors, Radii } from '@/constants/theme';
+import { CardShadow, Colors, Radii } from '@/constants/theme';
 
 export interface PrimaryButtonProps {
   title: string;
@@ -70,18 +70,14 @@ export function PrimaryButton({
 
 const styles = StyleSheet.create({
   base: {
-    height: 50,
+    height: 52,
     borderRadius: Radii.medium,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 16,
   },
   shadow: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 2,
-    elevation: 1,
+    ...CardShadow,
   },
   label: {
     fontSize: 17,

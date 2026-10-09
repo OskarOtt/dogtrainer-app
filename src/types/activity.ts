@@ -5,7 +5,7 @@ export type ActivityStatus = 'IN_PROGRESS' | 'PAUSED' | 'COMPLETED' | 'CANCELLED
 /** Mirrors the backend's activity.dto.PhysicalActivityResponse shape. */
 export interface PhysicalActivity {
   id: string;
-  dogId: string;
+  dogIds: string[];
   activityType: ActivityType;
   title: string;
   notes: string | null;
@@ -18,6 +18,7 @@ export interface PhysicalActivity {
 }
 
 export interface CreatePhysicalActivityPayload {
+  dogIds: string[];
   activityType: ActivityType;
   title?: string | null;
 }
@@ -29,6 +30,7 @@ export interface UpdatePhysicalActivityPayload {
 
 /** Logs an activity that already happened (Train tab's "log a past entry" shortcut). */
 export interface CreateManualPhysicalActivityPayload {
+  dogIds: string[];
   activityType: ActivityType;
   title?: string | null;
   notes?: string | null;

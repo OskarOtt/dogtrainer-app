@@ -6,7 +6,7 @@ import { t } from '@/i18n';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { ACTIVITY_TYPES, ACTIVITY_TYPE_LABEL_KEYS } from '@/constants/activity-types';
-import { Radii, Spacing } from '@/constants/theme';
+import { CardShadow, Radii, Spacing } from '@/constants/theme';
 import { useCreateActivity } from '@/hooks/use-activities';
 import { useTheme } from '@/hooks/use-theme';
 import type { ActivityType } from '@/types/activity';
@@ -16,17 +16,20 @@ import { getApiErrorMessage } from '@/utils/apiError';
  * Activity type picker: starts the physical activity immediately on selection (no manual date
  * picker - `startedAt` is set server-side to now) and navigates straight into the live timer
  * screen. Mirrors the simplicity of `train/[dogId]/index.tsx`'s exercise picker, but with a
- * fixed, small set of options instead of a searchable catalog.
+ * fixed, small set of options instead of a searchable catalog. Replaces the old per-dog
+ * `activity/[dogId]/start` route now that an activity can be tagged with multiple dogs - the
+ * comma-joined `dogIds` param comes from the (possibly multi-select) `activity/pick-dog` screen.
  */
 export default function StartActivityScreen() {
-  const { dogId } = useLocalSearchParams<{ dogId: string }>();
+  const { dogIds: dogIdsParam } = useLocalSearchParams<{ dogIds: string }>();
+  const dogIds = (dogIdsParam ?? '').split(',').filter(Boolean);
   const router = useRouter();
   const colors = useTheme();
-  const createActivity = useCreateActivity(dogId);
+  const createActivity = useCreateActivity();
 
   function handleSelect(activityType: ActivityType) {
     createActivity.mutate(
-      { activityType },
+      { dogIds, activityType },
       {
         onSuccess: (activity) => router.replace(`/activity/${activity.id}`),
       }
@@ -84,6 +87,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: Radii.large,
     padding: Spacing.three,
+    ...CardShadow,
   },
   icon: { marginRight: -Spacing.one },
   label: { flex: 1 },

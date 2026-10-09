@@ -1,22 +1,28 @@
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { Image, StyleSheet, View } from 'react-native';
+import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 
 import { t } from '@/i18n';
-import { Spacing } from '@/constants/theme';
+import { Colors, Spacing } from '@/constants/theme';
 
 /**
  * Full-screen loading state shown while the app determines auth status,
  * matching the native splash screen's green background so the transition
- * from splash to app feels seamless.
+ * from splash to app feels seamless. Logo/text fade in softly rather than
+ * popping in instantly.
  */
 export function LoadingScreen() {
   return (
     <View style={styles.container}>
-      <Image
-        source={require('@/assets/images/noborder-doglogo.png')}
-        style={styles.logo}
-        resizeMode="contain"
-      />
-      <Text style={styles.text}>{t('common.loading')}</Text>
+      <Animated.View entering={FadeIn.duration(400)}>
+        <Image
+          source={require('@/assets/images/noborder-doglogo.png')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+      </Animated.View>
+      <Animated.Text entering={FadeInDown.delay(150).duration(400)} style={styles.text}>
+        {t('common.loading')}
+      </Animated.Text>
     </View>
   );
 }
@@ -26,7 +32,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#3E8760',
+    backgroundColor: Colors.light.primary,
   },
   logo: {
     width: 120,
@@ -34,7 +40,7 @@ const styles = StyleSheet.create({
   },
   text: {
     marginTop: Spacing.three,
-    color: '#FFFFFF',
+    color: Colors.light.onPrimary,
     fontSize: 16,
     fontWeight: '600',
   },

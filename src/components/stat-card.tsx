@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
-import { Radii, Spacing } from '@/constants/theme';
+import { CardShadow, Radii, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
 type IoniconName = keyof typeof Ionicons.glyphMap;
@@ -19,7 +19,9 @@ export function StatCard({ icon, label, value }: StatCardProps) {
 
   return (
     <View style={[styles.card, { backgroundColor: colors.backgroundElement, borderColor: colors.border }]}>
-      <Ionicons name={icon} size={22} color={colors.primary} />
+      <View style={[styles.iconBadge, { backgroundColor: colors.backgroundSelected }]}>
+        <Ionicons name={icon} size={20} color={colors.primary} />
+      </View>
       <ThemedText type="title" style={styles.value}>
         {value}
       </ThemedText>
@@ -39,6 +41,14 @@ const styles = StyleSheet.create({
     padding: Spacing.three,
     gap: Spacing.one,
     alignItems: 'flex-start',
+    ...CardShadow,
+  },
+  iconBadge: {
+    width: 36,
+    height: 36,
+    borderRadius: Radii.pill,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   value: { fontSize: 24, lineHeight: 28 },
 });

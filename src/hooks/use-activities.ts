@@ -85,22 +85,22 @@ export function useActivity(id: string | undefined) {
   });
 }
 
-export function useCreateActivity(dogId: string) {
+export function useCreateActivity() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (payload: CreatePhysicalActivityPayload) => activitiesApi.create(dogId, payload),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: dogActivitiesKey(dogId) });
+    mutationFn: (payload: CreatePhysicalActivityPayload) => activitiesApi.create(payload),
+    onSuccess: (activity) => {
+      activity.dogIds.forEach((dogId) => queryClient.invalidateQueries({ queryKey: dogActivitiesKey(dogId) }));
     },
   });
 }
 
-export function useCreateManualActivity(dogId: string) {
+export function useCreateManualActivity() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (payload: CreateManualPhysicalActivityPayload) => activitiesApi.createManual(dogId, payload),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: dogActivitiesKey(dogId) });
+    mutationFn: (payload: CreateManualPhysicalActivityPayload) => activitiesApi.createManual(payload),
+    onSuccess: (activity) => {
+      activity.dogIds.forEach((dogId) => queryClient.invalidateQueries({ queryKey: dogActivitiesKey(dogId) }));
     },
   });
 }
@@ -111,7 +111,7 @@ export function useUpdateActivity(id: string) {
     mutationFn: (payload: UpdatePhysicalActivityPayload) => activitiesApi.update(id, payload),
     onSuccess: (activity) => {
       queryClient.setQueryData(activityKey(id), activity);
-      queryClient.invalidateQueries({ queryKey: dogActivitiesKey(activity.dogId) });
+      activity.dogIds.forEach((dogId) => queryClient.invalidateQueries({ queryKey: dogActivitiesKey(dogId) }));
     },
   });
 }
@@ -142,7 +142,7 @@ export function useCompleteActivity(id: string) {
     mutationFn: () => activitiesApi.complete(id),
     onSuccess: (activity) => {
       queryClient.setQueryData(activityKey(id), activity);
-      queryClient.invalidateQueries({ queryKey: dogActivitiesKey(activity.dogId) });
+      activity.dogIds.forEach((dogId) => queryClient.invalidateQueries({ queryKey: dogActivitiesKey(dogId) }));
     },
   });
 }
@@ -153,7 +153,7 @@ export function useCancelActivity(id: string) {
     mutationFn: () => activitiesApi.cancel(id),
     onSuccess: (activity) => {
       queryClient.setQueryData(activityKey(id), activity);
-      queryClient.invalidateQueries({ queryKey: dogActivitiesKey(activity.dogId) });
+      activity.dogIds.forEach((dogId) => queryClient.invalidateQueries({ queryKey: dogActivitiesKey(dogId) }));
     },
   });
 }

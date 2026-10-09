@@ -16,13 +16,13 @@ export const activitiesApi = {
     return data;
   },
 
-  async create(dogId: string, payload: CreatePhysicalActivityPayload): Promise<PhysicalActivity> {
-    const { data } = await apiClient.post<PhysicalActivity>(`/dogs/${dogId}/physical-activities`, payload);
+  async create(payload: CreatePhysicalActivityPayload): Promise<PhysicalActivity> {
+    const { data } = await apiClient.post<PhysicalActivity>('/physical-activities', payload);
     return data;
   },
 
-  async createManual(dogId: string, payload: CreateManualPhysicalActivityPayload): Promise<PhysicalActivity> {
-    const { data } = await apiClient.post<PhysicalActivity>(`/dogs/${dogId}/physical-activities/manual`, payload);
+  async createManual(payload: CreateManualPhysicalActivityPayload): Promise<PhysicalActivity> {
+    const { data } = await apiClient.post<PhysicalActivity>('/physical-activities/manual', payload);
     return data;
   },
 

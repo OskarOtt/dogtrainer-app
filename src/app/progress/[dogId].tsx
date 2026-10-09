@@ -27,6 +27,7 @@ export default function DogProgressScreen() {
   if (isLoading) {
     return (
       <ThemedView style={styles.center}>
+        <Stack.Screen options={{ title: dog ? t('progress.dogTitle', { name: dog.name }) : t('progress.title') }} />
         <ActivityIndicator color={colors.primary} />
       </ThemedView>
     );
@@ -35,6 +36,7 @@ export default function DogProgressScreen() {
   if (isError || !progress) {
     return (
       <ThemedView style={{ flex: 1 }}>
+        <Stack.Screen options={{ title: dog ? t('progress.dogTitle', { name: dog.name }) : t('progress.title') }} />
         <EmptyState icon="alert-circle-outline" title={t('progress.loadError')} message={getApiErrorMessage(error)}>
           <PrimaryButton title={t('common.exit')} variant="secondary" onPress={() => router.replace('/(tabs)')} />
         </EmptyState>

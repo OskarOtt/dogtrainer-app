@@ -10,7 +10,7 @@ import { ConfirmDialog } from '@/components/confirm-dialog';
 import { LikeButton } from '@/components/like-button';
 import { ReportPostSheet } from '@/components/report-post-sheet';
 import { ThemedText } from '@/components/themed-text';
-import { Radii, Spacing } from '@/constants/theme';
+import { CardShadow, Radii, Spacing } from '@/constants/theme';
 import { useAuth } from '@/hooks/use-auth';
 import { useDeletePost } from '@/hooks/use-posts';
 import { useTheme } from '@/hooks/use-theme';
@@ -85,15 +85,16 @@ export function PostCard({ post, onPress, onDeleted }: PostCardProps) {
         {post.imageUrl ? <Image source={{ uri: ensureMediaUri(post.imageUrl) }} style={styles.image} contentFit="cover" /> : null}
       </Pressable>
 
-      {post.dogId || post.trainingSessionId || post.physicalActivityId ? (
+      {post.dogIds.length > 0 || post.trainingSessionId || post.physicalActivityId ? (
         <View style={styles.tagRow}>
-          {post.dogId ? (
+          {post.dogIds.map((postDogId, index) => (
             <Tag
+              key={postDogId}
               icon="paw"
-              label={post.dogName ?? t('posts.dogFallback')}
-              onPress={() => router.push(isOwnPost ? `/dog/${post.dogId}` : `/dog/${post.dogId}/public`)}
+              label={post.dogNames[index] ?? t('posts.dogFallback')}
+              onPress={() => router.push(isOwnPost ? `/dog/${postDogId}` : `/dog/${postDogId}/public`)}
             />
-          ) : null}
+          ))}
           {post.trainingSessionId ? (
             <Tag
               icon="barbell-outline"
@@ -180,6 +181,7 @@ const styles = StyleSheet.create({
     borderRadius: Radii.large,
     padding: Spacing.three,
     gap: Spacing.two,
+    ...CardShadow,
   },
   headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: Spacing.two },
   authorRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two, flex: 1 },

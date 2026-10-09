@@ -21,13 +21,16 @@ import { getApiErrorMessage, isFutureEntryError } from '@/utils/apiError';
  * Manual "log a past physical activity" form - the Train tab's low-key shortcut for an
  * activity (walk/run/etc) the user forgot to track live. Collects only a date (not an exact
  * time) plus hours/minutes spent; the activity is created directly as COMPLETED (see
- * useCreateManualActivity).
+ * useCreateManualActivity). Top-level route (replacing the old per-dog `[dogId]/activity`) so
+ * the comma-joined `dogIds` param from the (possibly multi-select) `train/log/pick-dog` screen
+ * can tag more than one dog.
  */
 export default function LogPastActivityScreen() {
-  const { dogId } = useLocalSearchParams<{ dogId: string }>();
+  const { dogIds: dogIdsParam } = useLocalSearchParams<{ dogIds: string }>();
+  const dogIds = (dogIdsParam ?? '').split(',').filter(Boolean);
   const router = useRouter();
   const colors = useTheme();
-  const createManualActivity = useCreateManualActivity(dogId);
+  const createManualActivity = useCreateManualActivity();
 
   const [activityType, setActivityType] = useState<ActivityType>('WALK');
   const [date, setDate] = useState(() => toIsoDateLocal(new Date()));
@@ -38,7 +41,7 @@ export default function LogPastActivityScreen() {
 
   const durationMinutes = Math.max(0, Number(hoursText) || 0) * 60 + Math.max(0, Number(minutesText) || 0);
   const futureDate = isFutureDate(date);
-  const canSubmit = !!date && durationMinutes >= 1 && !futureDate;
+  const canSubmit = !!date && durationMinutes >= 1 && !futureDate && dogIds.length > 0;
 
   function handleSubmit() {
     if (!canSubmit) {
@@ -46,6 +49,7 @@ export default function LogPastActivityScreen() {
     }
     createManualActivity.mutate(
       {
+        dogIds,
         activityType,
         title: title.trim() || null,
         notes: notes.trim() || null,

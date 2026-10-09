@@ -10,7 +10,7 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { TitleBadge } from '@/components/title-badge';
 import { TrainingSessionCard } from '@/components/training-session-card';
-import { Radii, Spacing } from '@/constants/theme';
+import { Radii, Spacing, CardShadow } from '@/constants/theme';
 import { useDeleteDog, useDog, useRemoveDogMedia, useUploadDogMedia } from '@/hooks/use-dogs';
 import { useDogSessions } from '@/hooks/use-sessions';
 import { useDogStatistics } from '@/hooks/use-stats';
@@ -50,6 +50,7 @@ export default function DogDetailsScreen() {
   if (isLoading) {
     return (
       <ThemedView style={styles.center}>
+        <Stack.Screen options={{ title: t('common.loading') }} />
         <ActivityIndicator color={colors.primary} />
       </ThemedView>
     );
@@ -58,6 +59,7 @@ export default function DogDetailsScreen() {
   if (isError || !dog) {
     return (
       <ThemedView style={{ flex: 1 }}>
+        <Stack.Screen options={{ title: t('common.loading') }} />
         <EmptyState icon="alert-circle-outline" title={t('dog.loadError')} message={getApiErrorMessage(error)}>
           <PrimaryButton title={t('common.exit')} variant="secondary" onPress={() => router.replace('/(tabs)')} />
         </EmptyState>
@@ -212,6 +214,7 @@ const styles = StyleSheet.create({
     padding: Spacing.four,
     gap: Spacing.one,
     marginBottom: Spacing.three,
+    ...CardShadow,
   },
   sectionTitle: { fontSize: 18 },
   sessionsList: { gap: Spacing.two },

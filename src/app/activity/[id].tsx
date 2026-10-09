@@ -12,7 +12,7 @@ import { KeyboardAwareScrollView } from '@/components/keyboard-aware-layout';
 import { PrimaryButton } from '@/components/primary-button';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Spacing } from '@/constants/theme';
+import { CardShadow, Radii, Spacing } from '@/constants/theme';
 import {
   useActivity,
   useCancelActivity,
@@ -21,6 +21,7 @@ import {
   useResumeActivity,
   useUpdateActivity,
 } from '@/hooks/use-activities';
+import { useDogs } from '@/hooks/use-dogs';
 import { useTheme } from '@/hooks/use-theme';
 import type { PhysicalActivity } from '@/types/activity';
 import { formatTimer } from '@/utils/date';
@@ -91,6 +92,8 @@ function LoadedActivityScreen({ id, activity }: { id: string; activity: Physical
   const resumeActivity = useResumeActivity(id);
   const completeActivity = useCompleteActivity(id);
   const cancelActivity = useCancelActivity(id);
+  const { data: dogs } = useDogs();
+  const dogNames = (dogs ?? []).filter((dog) => activity.dogIds.includes(dog.id)).map((dog) => dog.name);
 
   const [elapsedSeconds, setElapsedSeconds] = useState(() =>
     computeElapsedSeconds(activity.startedAt, activity.pausedAt, activity.totalPausedSeconds, activity.status)
@@ -182,6 +185,11 @@ function LoadedActivityScreen({ id, activity }: { id: string; activity: Physical
               {isActive ? t(TYPE_LABEL_KEYS[activity.activityType]) : t('activity.summary')}
             </ThemedText>
           </View>
+          {dogNames.length > 0 ? (
+            <ThemedText themeColor="textSecondary" style={styles.dogNames}>
+              {dogNames.join(', ')}
+            </ThemedText>
+          ) : null}
         </SafeAreaView>
 
         <View style={[styles.timerBar, { backgroundColor: colors.backgroundElement, borderColor: colors.border }]}>
@@ -252,6 +260,7 @@ const styles = StyleSheet.create({
   backButton: { padding: Spacing.one, marginLeft: -Spacing.one },
   backButtonPlaceholder: { width: 26 + Spacing.one * 2, marginLeft: -Spacing.one },
   pageTitle: { fontSize: 22 },
+  dogNames: { paddingHorizontal: Spacing.two + 26 + Spacing.one, marginTop: -Spacing.one },
   timerBar: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -259,7 +268,8 @@ const styles = StyleSheet.create({
     gap: Spacing.two,
     padding: Spacing.three,
     borderWidth: 1,
-    borderRadius: 16,
+    borderRadius: Radii.large,
+    ...CardShadow,
   },
   timerText: { fontSize: 32, lineHeight: 36 },
   field: { gap: Spacing.one },

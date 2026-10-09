@@ -1,4 +1,4 @@
-import { useId } from 'react';
+import { useId, useState } from 'react';
 import {
   Platform,
   StyleSheet,
@@ -51,6 +51,7 @@ export function FormTextInput({
 }: FormTextInputProps) {
   const colors = useTheme();
   const accessoryId = `${KEYBOARD_ACCESSORY_ID}-${useId().replace(/:/g, '')}`;
+  const [isFocused, setIsFocused] = useState(false);
 
   return (
     <>
@@ -66,13 +67,22 @@ export function FormTextInput({
         multiline={multiline}
         numberOfLines={numberOfLines}
         editable={editable}
-        onBlur={onBlur}
+        onFocus={() => setIsFocused(true)}
+        onBlur={(event) => {
+          setIsFocused(false);
+          onBlur?.(event);
+        }}
         maxLength={maxLength}
         inputAccessoryViewID={Platform.OS === 'ios' ? accessoryId : undefined}
         style={[
           styles.input,
           multiline && styles.multilineInput,
-          { borderColor: colors.border, backgroundColor: colors.backgroundElement, color: colors.text },
+          {
+            borderColor: isFocused ? colors.primary : colors.border,
+            borderWidth: isFocused ? 1.5 : 1,
+            backgroundColor: colors.backgroundElement,
+            color: colors.text,
+          },
           style,
         ]}
       />

@@ -4,8 +4,8 @@ export interface Post {
   authorId: string;
   authorName: string;
   authorAvatarUrl: string | null;
-  dogId: string | null;
-  dogName: string | null;
+  dogIds: string[];
+  dogNames: string[];
   trainingSessionId: string | null;
   physicalActivityId: string | null;
   content: string;
@@ -18,7 +18,7 @@ export interface Post {
 
 export interface CreatePostPayload {
   content: string;
-  dogId?: string | null;
+  dogIds?: string[];
 }
 
 export interface CreatePostFromSessionPayload {
