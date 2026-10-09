@@ -210,7 +210,7 @@ export const nb = {
     noExercises: 'Ingen øvelser ennå',
     noExercisesActive: 'Legg til en øvelse for å begynne å registrere repetisjoner.',
     noExercisesRecorded: 'Ingen øvelser ble registrert.',
-    shareToFeed: 'Del i strømmen',
+    shareToFeed: 'Del',
     editSession: 'Rediger økt',
     doneEditing: 'Ferdig redigert',
     deleteSession: 'Slett',

@@ -24,6 +24,9 @@ import { toIsoDateLocal } from '@/utils/date';
 /** Distinct muted teal-green used for completed physical-activity calendar events (plan/session/goal already use theme colors). */
 const ACTIVITY_EVENT_COLOR = '#4F9D96';
 
+/** Blue used for training plan calendar events. */
+const PLAN_EVENT_COLOR = '#3B82F6';
+
 /**
  * Calendar tab: month view aggregating training plans (spanning startDate → endDate),
  * completed training sessions, and goal target dates across all dogs. Tapping a day opens
@@ -71,7 +74,7 @@ export default function CalendarScreen() {
 
         <View style={styles.legendRow}>
           <View style={styles.legendItem}>
-            <View style={[styles.legendDot, { backgroundColor: colors.primary }]} />
+            <View style={[styles.legendDot, { backgroundColor: PLAN_EVENT_COLOR }]} />
             <ThemedText themeColor="textSecondary" type="small">
               {t('calendar.legendPlans')}
             </ThemedText>
@@ -114,6 +117,7 @@ export default function CalendarScreen() {
               showAdjacentMonths
               onSwipeEnd={setViewDate}
               onPressCell={(date) => router.push(`/calendar/${toIsoDateLocal(date)}`)}
+              onPressEvent={(event) => router.push(`/calendar/${toIsoDateLocal(event.start)}`)}
               onPressDateHeader={(date) => router.push(`/calendar/${toIsoDateLocal(date)}`)}
               calendarCellStyle={(date) =>
                 date && toIsoDateLocal(date) === todayIso
@@ -123,7 +127,7 @@ export default function CalendarScreen() {
               eventCellStyle={(event) => ({
                 backgroundColor:
                   event.type === 'plan'
-                    ? colors.primary
+                    ? PLAN_EVENT_COLOR
                     : event.type === 'goal'
                       ? colors.warning
                       : event.type === 'activity'
