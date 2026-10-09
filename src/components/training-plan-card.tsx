@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
-import { Radii, Spacing, StatusColors } from '@/constants/theme';
+import { CardShadow, Radii, Spacing, StatusColors } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { t, type TranslationKey } from '@/i18n';
 import type { TrainingPlan } from '@/types/plan';
@@ -72,6 +72,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: Spacing.three,
     gap: Spacing.one,
+    ...CardShadow,
   },
   headerRow: {
     flexDirection: 'row',

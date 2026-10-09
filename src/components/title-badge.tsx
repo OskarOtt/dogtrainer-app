@@ -21,9 +21,9 @@ export function TitleBadge({ title, onPress }: TitleBadgeProps) {
       disabled={!onPress}
       style={({ pressed }) => [
         styles.badge,
-        { backgroundColor: colors.backgroundElement, borderColor: colors.border, opacity: pressed ? 0.85 : 1 },
+        { backgroundColor: colors.backgroundSelected, borderColor: colors.primaryLight, opacity: pressed ? 0.85 : 1 },
       ]}>
-      <ThemedText type="smallBold" numberOfLines={1}>
+      <ThemedText type="smallBold" themeColor="primaryDark" numberOfLines={1}>
         {title.title}
       </ThemedText>
       {title.dateEarned ? (

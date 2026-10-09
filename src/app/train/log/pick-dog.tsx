@@ -1,5 +1,5 @@
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -17,26 +17,42 @@ import { getApiErrorMessage } from '@/utils/apiError';
 /**
  * Dog picker for the Train tab's "log a past entry" shortcut, parameterized by `type`
  * (session|activity). Auto-selects (and skips itself) when the user has only one dog,
- * mirroring `train/pick-dog.tsx` / `activity/pick-dog.tsx`.
+ * mirroring `train/pick-dog.tsx` / `activity/pick-dog.tsx`. Training sessions stay single-dog
+ * (tap a dog to go straight to the form); physical activities support multiple dogs, so that
+ * branch becomes a checkbox multi-select with a Continue button, mirroring `activity/pick-dog.tsx`.
  */
 export default function PickDogForManualEntryScreen() {
   const { type } = useLocalSearchParams<{ type: 'session' | 'activity' }>();
+  const isMultiSelect = type === 'activity';
   const { data: dogs, isLoading, isError, error } = useDogs();
   const router = useRouter();
   const colors = useTheme();
   const redirected = useRef(false);
+  const [selectedDogIds, setSelectedDogIds] = useState<string[]>([]);
 
-  function destinationFor(dogId: string) {
+  function destinationForSingle(dogId: string) {
     return `/train/log/${dogId}/${type}`;
+  }
+
+  function destinationForMulti(dogIds: string[]) {
+    return `/train/log/activity?dogIds=${dogIds.join(',')}`;
   }
 
   useEffect(() => {
     if (!redirected.current && dogs && dogs.length === 1) {
       redirected.current = true;
-      router.replace(destinationFor(dogs[0].id) as never);
+      router.replace((isMultiSelect ? destinationForMulti([dogs[0].id]) : destinationForSingle(dogs[0].id)) as never);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dogs, router, type]);
+
+  function toggleDog(id: string) {
+    setSelectedDogIds((current) => (current.includes(id) ? current.filter((dogId) => dogId !== id) : [...current, id]));
+  }
+
+  function handleContinue() {
+    router.push(destinationForMulti(selectedDogIds) as never);
+  }
 
   if (isLoading || (dogs && dogs.length === 1)) {
     return (
@@ -76,7 +92,7 @@ export default function PickDogForManualEntryScreen() {
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea} edges={['top']}>
         <ThemedText type="title" style={styles.title}>
-          {t('screens.chooseDog')}
+          {isMultiSelect ? t('screens.chooseDogs') : t('screens.chooseDog')}
         </ThemedText>
         <ThemedText themeColor="textSecondary" style={styles.subtitle}>
           {t('screens.dogForManualEntry')}
@@ -85,8 +101,22 @@ export default function PickDogForManualEntryScreen() {
           data={dogs}
           keyExtractor={(dog) => dog.id}
           contentContainerStyle={styles.list}
-          renderItem={({ item }) => <DogCard dog={item} onPress={() => router.push(destinationFor(item.id) as never)} />}
+          renderItem={({ item }) =>
+            isMultiSelect ? (
+              <DogCard dog={item} selected={selectedDogIds.includes(item.id)} onPress={() => toggleDog(item.id)} />
+            ) : (
+              <DogCard dog={item} onPress={() => router.push(destinationForSingle(item.id) as never)} />
+            )
+          }
         />
+        {isMultiSelect ? (
+          <PrimaryButton
+            title={t('common.continue')}
+            onPress={handleContinue}
+            disabled={selectedDogIds.length === 0}
+            style={styles.continueButton}
+          />
+        ) : null}
       </SafeAreaView>
     </ThemedView>
   );
@@ -100,4 +130,5 @@ const styles = StyleSheet.create({
   subtitle: { paddingHorizontal: Spacing.four, marginBottom: Spacing.three },
   list: { paddingHorizontal: Spacing.four, gap: Spacing.three, paddingBottom: Spacing.six },
   emptyButton: { marginTop: Spacing.three, minWidth: 200 },
+  continueButton: { marginHorizontal: Spacing.four, marginBottom: Spacing.three },
 });

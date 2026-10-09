@@ -6,7 +6,7 @@ import { EmptyState } from '@/components/empty-state';
 import { PrimaryButton } from '@/components/primary-button';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Spacing, StatusColors } from '@/constants/theme';
+import { CardShadow, Radii, Spacing, StatusColors } from '@/constants/theme';
 import { usePostPhysicalActivity } from '@/hooks/use-posts';
 import { useTheme } from '@/hooks/use-theme';
 import type { ActivityStatus } from '@/types/activity';
@@ -44,6 +44,7 @@ export default function PostActivityPreviewScreen() {
   if (isLoading) {
     return (
       <ThemedView style={styles.center}>
+        <Stack.Screen options={{ title: t('common.loading') }} />
         <ActivityIndicator color={colors.primary} />
       </ThemedView>
     );
@@ -52,6 +53,7 @@ export default function PostActivityPreviewScreen() {
   if (isError || !activity) {
     return (
       <ThemedView style={{ flex: 1 }}>
+        <Stack.Screen options={{ title: t('common.loading') }} />
         <EmptyState icon="alert-circle-outline" title={t('activity.loadActivityError')} message={getApiErrorMessage(error)}>
           <PrimaryButton title={t('common.exit')} variant="secondary" onPress={() => router.back()} />
         </EmptyState>
@@ -98,9 +100,10 @@ const styles = StyleSheet.create({
   list: { padding: Spacing.four, gap: Spacing.three, flexGrow: 1 },
   summaryCard: {
     borderWidth: 1,
-    borderRadius: 16,
+    borderRadius: Radii.large,
     padding: Spacing.three,
     gap: Spacing.one,
+    ...CardShadow,
   },
   summaryHeaderRow: {
     flexDirection: 'row',

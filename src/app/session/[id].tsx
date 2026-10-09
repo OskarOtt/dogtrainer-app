@@ -91,6 +91,7 @@ export default function ActiveSessionScreen() {
 
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [activeTab, setActiveTab] = useState<'exercises' | 'notes'>('exercises');
+  const [isEditing, setIsEditing] = useState(false);
   // Bumped to force-remount the notes editor after its WebView's render/content process dies
   // (see handleNotesEditorProcessGone below) — otherwise the same crashed WebView instance stays mounted.
   const [notesEditorGeneration, setNotesEditorGeneration] = useState(0);
@@ -179,6 +180,9 @@ export default function ActiveSessionScreen() {
   }
 
   const isActive = session.status === 'IN_PROGRESS';
+  // Lets a user fix a finished session (e.g. a forgotten note or rep) without re-entering
+  // the "in progress" flow — exercise rows and the notes editor render as editable in both cases.
+  const editable = isActive || (isEditing && session.status === 'COMPLETED');
 
   function handleFinish() {
     completeSession.mutate(undefined, {
@@ -278,6 +282,17 @@ export default function ActiveSessionScreen() {
             <ThemedText type="title" style={styles.pageTitle}>
               {isActive ? t('training.session') : t('training.summary')}
             </ThemedText>
+            {session.status === 'COMPLETED' ? (
+              <Pressable
+                onPress={() => setIsEditing((prev) => !prev)}
+                hitSlop={8}
+                style={styles.editButton}
+                accessibilityLabel={isEditing ? t('training.doneEditing') : t('training.editSession')}>
+                <Ionicons name={isEditing ? 'checkmark' : 'pencil'} size={22} color={colors.primary} />
+              </Pressable>
+            ) : (
+              <View style={styles.editButtonPlaceholder} />
+            )}
           </View>
         </SafeAreaView>
 
@@ -306,7 +321,7 @@ export default function ActiveSessionScreen() {
           keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
           keyboardShouldPersistTaps="handled"
           ListHeaderComponent={
-            isActive ? (
+            editable ? (
               <PrimaryButton
                 title={t('training.addExercise')}
                 variant="secondary"
@@ -324,20 +339,20 @@ export default function ActiveSessionScreen() {
           renderItem={({ item }) => (
             <SessionExerciseRow
               sessionExercise={item}
-              disabled={!isActive}
+              disabled={!editable}
               onRemove={() => handleRemoveExercise(item.id)}
               onIncrementSuccess={() => handleIncrementSuccess(item)}
               onDecrementSuccess={() => handleDecrementSuccess(item)}
               onIncrementFail={() => handleIncrementFail(item)}
               onDecrementFail={() => handleDecrementFail(item)}
-              onNotesBlur={isActive ? (notes) => handleUpdateExerciseNotes(item, notes) : undefined}
+              onNotesBlur={editable ? (notes) => handleUpdateExerciseNotes(item, notes) : undefined}
             />
           )}
           ListEmptyComponent={
             <EmptyState
               icon="barbell-outline"
               title={t('training.noExercises')}
-              message={isActive ? t('training.noExercisesActive') : t('training.noExercisesRecorded')}
+              message={editable ? t('training.noExercisesActive') : t('training.noExercisesRecorded')}
             />
           }
         />
@@ -347,7 +362,7 @@ export default function ActiveSessionScreen() {
         <LexicalNotesEditor
           key={`${session.id}-${notesEditorGeneration}`}
           initialContent={session.notes}
-          editable={isActive}
+          editable={editable}
           labels={{
             bold: t('richText.bold'),
             italic: t('richText.italic'),
@@ -356,13 +371,13 @@ export default function ActiveSessionScreen() {
           }}
           isDark={isDark}
           colors={{ border: colors.border, primary: colors.primary, text: colors.text, textSecondary: colors.textSecondary, background: colors.backgroundElement }}
-          onBlurHtml={isActive ? handleNotesBlur : undefined}
+          onBlurHtml={editable ? handleNotesBlur : undefined}
           // The WebView's contentEditable often never fires a native `blur` when the user taps
           // straight from Notes to the native "Finish"/"Cancel" buttons or switches tabs (the pane
           // is just hidden via display:none, not unmounted) — so blur-only saving can silently drop
           // the last-typed notes. This debounced change handler (already built into the editor) acts
           // as a safety net so notes are persisted while typing too, not only on an explicit blur.
-          onChangeHtml={isActive ? handleNotesBlur : undefined}
+          onChangeHtml={editable ? handleNotesBlur : undefined}
           style={styles.notesEditor}
           dom={{
             onRenderProcessGone: handleNotesEditorProcessGone,
@@ -378,7 +393,7 @@ export default function ActiveSessionScreen() {
             cancelLoading={cancelSession.isPending}
             finishLoading={completeSession.isPending}
           />
-        ) : session.status === 'COMPLETED' ? (
+        ) : session.status === 'COMPLETED' && !isEditing ? (
           <SafeAreaView
             edges={['bottom']}
             style={[
@@ -416,7 +431,9 @@ const styles = StyleSheet.create({
   headerRow: { flexDirection: 'row', alignItems: 'center', paddingTop: Spacing.two, gap: Spacing.two },
   backButton: { padding: Spacing.one, marginLeft: -Spacing.one },
   backButtonPlaceholder: { width: 26 + Spacing.one * 2, marginLeft: -Spacing.one },
-  pageTitle: { fontSize: 22 },
+  pageTitle: { fontSize: 22, flex: 1 },
+  editButton: { padding: Spacing.one, marginRight: -Spacing.one },
+  editButtonPlaceholder: { width: 22 + Spacing.one * 2, marginRight: -Spacing.one },
   timerBar: {
     flexDirection: 'row',
     alignItems: 'center',

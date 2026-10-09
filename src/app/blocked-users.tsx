@@ -20,6 +20,7 @@ export default function BlockedUsersScreen() {
   if (isLoading) {
     return (
       <ThemedView style={styles.center}>
+        <Stack.Screen options={{ title: t('social.blockedUsers') }} />
         <ActivityIndicator color={colors.primary} />
       </ThemedView>
     );

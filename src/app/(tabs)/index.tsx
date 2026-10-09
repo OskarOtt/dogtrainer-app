@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Image, Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { t } from '@/i18n';
@@ -39,9 +39,16 @@ export default function FeedScreen() {
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea} edges={['top']}>
         <View style={styles.header}>
-          <ThemedText type="title" style={styles.title}>
-            {t('navigation.feed')}
-          </ThemedText>
+          <View style={styles.titleRow}>
+            <Image
+              source={require('@/assets/images/noborder-doglogo.png')}
+              style={styles.logo}
+              resizeMode="contain"
+            />
+            <ThemedText type="title" style={styles.title}>
+              {t('navigation.feed')}
+            </ThemedText>
+          </View>
           <View style={styles.headerActions}>
             <Pressable
               onPress={() => setIsFindFriendsVisible(true)}
@@ -106,6 +113,12 @@ const styles = StyleSheet.create({
     paddingTop: Spacing.two,
   },
   title: { fontSize: 28 },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.two,
+  },
+  logo: { width: 40, height: 40, borderRadius: 20 },
   headerActions: {
     flexDirection: 'row',
     alignItems: 'center',

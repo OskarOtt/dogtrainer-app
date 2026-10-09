@@ -33,7 +33,7 @@ export default function NewPostScreen() {
 
   const { data: dogs } = useDogs();
   const [content, setContent] = useState(initialContent ?? '');
-  const [selectedDogId, setSelectedDogId] = useState<string | undefined>(dogId);
+  const [selectedDogIds, setSelectedDogIds] = useState<string[]>(dogId ? [dogId] : []);
   const [selectedAsset, setSelectedAsset] = useState<ImagePicker.ImagePickerAsset | null>(null);
 
   const createPost = useCreatePost();
@@ -51,6 +51,10 @@ export default function NewPostScreen() {
         : uploadMedia.isError
           ? getApiErrorMessage(uploadMedia.error)
           : null;
+
+  function toggleDog(id: string) {
+    setSelectedDogIds((current) => (current.includes(id) ? current.filter((dogIdToRemove) => dogIdToRemove !== id) : [...current, id]));
+  }
 
   async function handlePickPhoto() {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -79,7 +83,7 @@ export default function NewPostScreen() {
       ? await createPostFromSession.mutateAsync({ content: trimmed || null })
       : isFromActivity
         ? await createPostFromActivity.mutateAsync({ content: trimmed || null })
-        : await createPost.mutateAsync({ content: trimmed, dogId: selectedDogId ?? null });
+        : await createPost.mutateAsync({ content: trimmed, dogIds: selectedDogIds });
 
     if (selectedAsset) {
       await uploadMedia.mutateAsync({ postId: post.id, asset: selectedAsset });
@@ -129,25 +133,14 @@ export default function NewPostScreen() {
 
         {!isFromSession && !isFromActivity && dogs && dogs.length > 0 ? (
           <>
-            <ThemedText type="smallBold">{t('posts.tagDog')}</ThemedText>
+            <ThemedText type="smallBold">{t('posts.tagDogs')}</ThemedText>
             <View style={styles.dogPicker}>
-              <Pressable
-                onPress={() => setSelectedDogId(undefined)}
-                style={[
-                  styles.dogChip,
-                  {
-                    backgroundColor: !selectedDogId ? colors.primary : colors.backgroundElement,
-                    borderColor: colors.border,
-                  },
-                ]}>
-                <ThemedText style={{ color: !selectedDogId ? colors.onPrimary : colors.text }}>{t('common.none')}</ThemedText>
-              </Pressable>
               {dogs.map((dog) => {
-                const selected = dog.id === selectedDogId;
+                const selected = selectedDogIds.includes(dog.id);
                 return (
                   <Pressable
                     key={dog.id}
-                    onPress={() => setSelectedDogId(dog.id)}
+                    onPress={() => toggleDog(dog.id)}
                     style={[
                       styles.dogChip,
                       {

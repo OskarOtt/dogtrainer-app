@@ -3,7 +3,7 @@ import { Image } from 'expo-image';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
-import { Radii, Spacing } from '@/constants/theme';
+import { CardShadow, Radii, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import { t } from '@/i18n';
 import type { Dog } from '@/types/dog';
@@ -17,12 +17,15 @@ export interface DogCardProps {
   onLongPress?: () => void;
   /** Disables press handling, e.g. while this card is the one actively being dragged. */
   disabled?: boolean;
+  /** When set (true/false), renders a checkbox-style selection indicator instead of the chevron, for multi-select pickers. */
+  selected?: boolean;
 }
 
 /** Card summarizing a dog for use in lists (Dogs tab, dog selection in Train flow). */
-export function DogCard({ dog, onPress, onLongPress, disabled }: DogCardProps) {
+export function DogCard({ dog, onPress, onLongPress, disabled, selected }: DogCardProps) {
   const colors = useTheme();
   const age = formatAge(dog.birthDate);
+  const isMultiSelect = selected !== undefined;
 
   return (
     <Pressable
@@ -31,7 +34,11 @@ export function DogCard({ dog, onPress, onLongPress, disabled }: DogCardProps) {
       disabled={disabled}
       style={({ pressed }) => [
         styles.card,
-        { backgroundColor: colors.backgroundElement, borderColor: colors.border, opacity: pressed ? 0.85 : 1 },
+        {
+          backgroundColor: colors.backgroundElement,
+          borderColor: selected ? colors.primary : colors.border,
+          opacity: pressed ? 0.85 : 1,
+        },
       ]}>
       <View style={[styles.avatar, { backgroundColor: colors.backgroundSelected }]}>
         {dog.mediaUrl && dog.mediaType !== 'VIDEO' ? (
@@ -52,7 +59,15 @@ export function DogCard({ dog, onPress, onLongPress, disabled }: DogCardProps) {
         </ThemedText>
       </View>
 
-      <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+      {isMultiSelect ? (
+        <Ionicons
+          name={selected ? 'checkmark-circle' : 'ellipse-outline'}
+          size={24}
+          color={selected ? colors.primary : colors.textSecondary}
+        />
+      ) : (
+        <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+      )}
     </Pressable>
   );
 }
@@ -65,6 +80,7 @@ const styles = StyleSheet.create({
     borderRadius: Radii.large,
     padding: Spacing.three,
     gap: Spacing.three,
+    ...CardShadow,
   },
   avatar: {
     width: 56,

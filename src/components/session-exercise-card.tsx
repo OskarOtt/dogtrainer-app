@@ -6,7 +6,7 @@ import { t } from '@/i18n';
 import { KeyboardDismissAccessory } from '@/components/keyboard-dismiss-accessory';
 import { ThemedText } from '@/components/themed-text';
 import { KEYBOARD_ACCESSORY_ID } from '@/constants/keyboard';
-import { Radii, Spacing } from '@/constants/theme';
+import { CardShadow, Radii, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 import type { SessionExercise } from '@/types/session';
 import { formatPercent } from '@/utils/number';
@@ -182,6 +182,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: Spacing.three,
     gap: Spacing.two,
+    ...CardShadow,
   },
   headerRow: {
     flexDirection: 'row',

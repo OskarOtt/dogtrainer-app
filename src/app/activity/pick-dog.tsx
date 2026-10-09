@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -15,22 +15,31 @@ import { useTheme } from '@/hooks/use-theme';
 import { getApiErrorMessage } from '@/utils/apiError';
 
 /**
- * Dog picker for the "Start Physical Activity" flow. Auto-selects (and skips itself)
- * when the user has only one dog, otherwise lets them choose which dog it's for.
- * Mirrors `train/pick-dog.tsx`.
+ * Multi-select dog picker for the "Start Physical Activity" flow. Auto-selects (and skips
+ * itself) when the user has only one dog, otherwise lets them toggle any number of dogs on
+ * before continuing. Mirrors `train/pick-dog.tsx` but allows more than one selection.
  */
 export default function PickDogForActivityScreen() {
   const { data: dogs, isLoading, isError, error } = useDogs();
   const router = useRouter();
   const colors = useTheme();
   const redirected = useRef(false);
+  const [selectedDogIds, setSelectedDogIds] = useState<string[]>([]);
 
   useEffect(() => {
     if (!redirected.current && dogs && dogs.length === 1) {
       redirected.current = true;
-      router.replace(`/activity/${dogs[0].id}/start`);
+      router.replace(`/activity/start?dogIds=${dogs[0].id}`);
     }
   }, [dogs, router]);
+
+  function toggleDog(id: string) {
+    setSelectedDogIds((current) => (current.includes(id) ? current.filter((dogId) => dogId !== id) : [...current, id]));
+  }
+
+  function handleContinue() {
+    router.push(`/activity/start?dogIds=${selectedDogIds.join(',')}`);
+  }
 
   if (isLoading || (dogs && dogs.length === 1)) {
     return (
@@ -70,7 +79,7 @@ export default function PickDogForActivityScreen() {
     <ThemedView style={styles.container}>
       <SafeAreaView style={styles.safeArea} edges={['top']}>
         <ThemedText type="title" style={styles.title}>
-          {t('screens.chooseDog')}
+          {t('screens.chooseDogs')}
         </ThemedText>
         <ThemedText themeColor="textSecondary" style={styles.subtitle}>
           {t('screens.dogForActivity')}
@@ -79,7 +88,15 @@ export default function PickDogForActivityScreen() {
           data={dogs}
           keyExtractor={(dog) => dog.id}
           contentContainerStyle={styles.list}
-          renderItem={({ item }) => <DogCard dog={item} onPress={() => router.push(`/activity/${item.id}/start`)} />}
+          renderItem={({ item }) => (
+            <DogCard dog={item} selected={selectedDogIds.includes(item.id)} onPress={() => toggleDog(item.id)} />
+          )}
+        />
+        <PrimaryButton
+          title={t('common.continue')}
+          onPress={handleContinue}
+          disabled={selectedDogIds.length === 0}
+          style={styles.continueButton}
         />
       </SafeAreaView>
     </ThemedView>
@@ -94,4 +111,5 @@ const styles = StyleSheet.create({
   subtitle: { paddingHorizontal: Spacing.four, marginBottom: Spacing.three },
   list: { paddingHorizontal: Spacing.four, gap: Spacing.three, paddingBottom: Spacing.six },
   emptyButton: { marginTop: Spacing.three, minWidth: 200 },
+  continueButton: { marginHorizontal: Spacing.four, marginBottom: Spacing.three },
 });

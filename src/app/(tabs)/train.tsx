@@ -7,7 +7,7 @@ import { t } from '@/i18n';
 import { PrimaryButton } from '@/components/primary-button';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { BottomTabInset, Radii, Spacing } from '@/constants/theme';
+import { BottomTabInset, CardShadow, Radii, Spacing } from '@/constants/theme';
 import { useInProgressSessions } from '@/hooks/use-sessions';
 import { useInProgressActivities } from '@/hooks/use-activities';
 import { useTheme } from '@/hooks/use-theme';
@@ -189,6 +189,7 @@ const styles = StyleSheet.create({
     padding: Spacing.three,
     borderRadius: Radii.large,
     borderWidth: 1,
+    ...CardShadow,
   },
   resumeCardText: { flex: 1, gap: 2 },
   buttons: { paddingHorizontal: Spacing.four, gap: Spacing.three },

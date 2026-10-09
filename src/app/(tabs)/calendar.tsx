@@ -21,8 +21,8 @@ import type { CalendarEvent } from '@/utils/calendar-events';
 import { buildCalendarEvents } from '@/utils/calendar-events';
 import { toIsoDateLocal } from '@/utils/date';
 
-/** Distinct teal used for completed physical-activity calendar events (plan/session/goal already use theme colors). */
-const ACTIVITY_EVENT_COLOR = '#2FB6C9';
+/** Distinct muted teal-green used for completed physical-activity calendar events (plan/session/goal already use theme colors). */
+const ACTIVITY_EVENT_COLOR = '#4F9D96';
 
 /**
  * Calendar tab: month view aggregating training plans (spanning startDate → endDate),

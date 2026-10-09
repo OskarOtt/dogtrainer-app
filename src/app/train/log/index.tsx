@@ -5,7 +5,7 @@ import { Pressable, StyleSheet } from 'react-native';
 import { t } from '@/i18n';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Radii, Spacing } from '@/constants/theme';
+import { CardShadow, Radii, Spacing } from '@/constants/theme';
 import { useTheme } from '@/hooks/use-theme';
 
 type LogEntryType = 'session' | 'activity';
@@ -62,6 +62,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: Radii.large,
     padding: Spacing.three,
+    ...CardShadow,
   },
   icon: { marginRight: -Spacing.one },
   cardText: { flex: 1, gap: 2, backgroundColor: 'transparent' },
