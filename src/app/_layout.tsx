@@ -8,6 +8,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { LoadingScreen } from '@/components/loading-screen';
 import { queryClient } from '@/data/queryClient';
 import { AuthProvider, useAuth } from '@/hooks/use-auth';
+import { usePushNotifications } from '@/hooks/use-push-notifications';
 import { t } from '@/i18n';
 import { LocalizationProvider, useTranslation } from '@/i18n/provider';
 
@@ -15,6 +16,7 @@ SplashScreen.preventAutoHideAsync();
 
 function RootNavigator() {
   const { isAuthenticated, isLoading } = useAuth();
+  usePushNotifications({ isAuthenticated, isAuthLoading: isLoading });
 
   // Hide the native splash screen as soon as JS has taken over, and show our
   // own green loading screen (with logo + text) until auth status resolves,
@@ -65,6 +67,7 @@ function RootNavigator() {
         <Stack.Screen name="post/[id]/index" options={{ headerShown: true, title: t('posts.post') }} />
         <Stack.Screen name="post/[id]/session" options={{ headerShown: true, title: t('posts.sessionPreviewTitle') }} />
         <Stack.Screen name="post/[id]/activity" options={{ headerShown: true, title: t('common.loading') }} />
+        <Stack.Screen name="notifications" options={{ headerShown: true, title: t('notifications.title') }} />
         <Stack.Screen name="user/[id]/index" options={{ headerShown: true, title: t('common.loading') }} />
         <Stack.Screen name="user/[id]/followers" options={{ headerShown: true, title: t('social.followers') }} />
         <Stack.Screen name="user/[id]/following" options={{ headerShown: true, title: t('social.following') }} />
