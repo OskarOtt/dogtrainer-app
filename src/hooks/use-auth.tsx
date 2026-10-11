@@ -4,7 +4,14 @@ import { createContext, useCallback, useContext, useEffect, useState, type React
 
 import { authApi } from '@/api/auth';
 import { registerRefreshHandler } from '@/api/client';
+import { getAppLocale } from '@/i18n';
 import type { LoginPayload, RegisterPayload, SocialAuthPayload, User } from '@/types/auth';
+import {
+  clearNotificationBadgeAsync,
+  clearStoredPushTokenAsync,
+  registerPushTokenIfPermittedAsync,
+  unregisterStoredPushTokenAsync,
+} from '@/utils/pushNotifications';
 import { tokenStorage } from '@/utils/tokenStorage';
 
 interface AuthContextValue {
@@ -63,6 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         const me = await authApi.me();
         setUser(me);
+        void registerPushTokenIfPermittedAsync(getAppLocale());
       } catch {
         await clearSession();
       } finally {
@@ -76,6 +84,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await tokenStorage.setTokens(tokens);
     const me = await authApi.me();
     setUser(me);
+    void registerPushTokenIfPermittedAsync(getAppLocale());
   }, []);
 
   const register = useCallback(async (payload: RegisterPayload) => {
@@ -83,6 +92,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await tokenStorage.setTokens(tokens);
     const me = await authApi.me();
     setUser(me);
+    void registerPushTokenIfPermittedAsync(getAppLocale());
   }, []);
 
   const socialLogin = useCallback(async (payload: SocialAuthPayload) => {
@@ -90,6 +100,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await tokenStorage.setTokens(tokens);
     const me = await authApi.me();
     setUser(me);
+    void registerPushTokenIfPermittedAsync(getAppLocale());
   }, []);
 
   const linkSocialIdentity = useCallback(async (payload: SocialAuthPayload) => {
@@ -98,6 +109,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const logout = useCallback(async () => {
+    await unregisterStoredPushTokenAsync();
+    await clearStoredPushTokenAsync();
+    await clearNotificationBadgeAsync();
+
     const refreshToken = await tokenStorage.getRefreshToken();
     if (refreshToken) {
       try {

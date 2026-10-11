@@ -25,6 +25,21 @@ Apple sign-in uses native code and does not run in Expo Go. Use a development cl
 eas build --platform ios --profile developmentClient
 ```
 
+## Push notifications
+
+Push notifications require a native build on a physical device. Expo Go is not supported for remote push notifications with `expo-notifications`.
+
+Use a development client when testing:
+
+```bash
+eas build --platform ios --profile developmentClient
+eas build --platform android --profile developmentClient
+```
+
+- iOS: upload an APNs key with `eas credentials`.
+- Android: configure FCM v1 with a service account and provide your own `google-services.json`.
+- After adding `google-services.json`, point `android.googleServicesFile` at it in `app.json` or `app.config.*`.
+
 ## Lint
 
 ```bash
